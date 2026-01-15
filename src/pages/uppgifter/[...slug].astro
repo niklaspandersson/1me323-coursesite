@@ -1,0 +1,79 @@
+---
+import { getCollection } from "astro:content";
+import LocalNav from "../../components/LocalNav.astro";
+import PageLayout from "../../layouts/PageLayout.astro";
+
+// 1. Generate a new path for every collection entry
+export async function getStaticPaths() {
+  const pages = await getCollection("assignments");
+  const localNav = pages
+    .map((entry) => ({
+      id: entry.slug,
+      title: `Uppgift ${entry.slug}`,
+    }))
+    .filter((entry) => !entry.id.includes("-"));
+
+  return pages.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry, localNav, ...entry.data },
+  }));
+}
+
+// 2. For your template, you can get the entry directly from the prop
+const { entry, localNav, downloads } = Astro.props;
+const { Content } = await entry.render();
+
+const download = Array.isArray(downloads) ? downloads[0] : downloads;
+const downloadIsFile = download?.endsWith(".zip");
+---
+
+<PageLayout
+  section="assignments"
+  title={`Uppgift ${entry.slug} - Webbteknik 3`}
+>
+  <LocalNav
+    slot="localNav"
+    prefix={import.meta.env.BASE_URL + "/uppgifter"}
+    active={entry.slug}
+    pages={localNav}
+  />
+  <Fragment slot="header">
+    <h2>{entry.data.title}</h2>
+  </Fragment>
+  <aside>
+    <h3>Examination och betyg:</h3>
+    <p>
+      Kursen examineras på tre olika moment, som alla måste vara godkända för
+      att bli godkänd på kursen:
+    </p>
+    <ul>
+      <li><strong>Inlämningsuppgifter: (2.5 hp, U/G)</strong></li>
+      <li><strong>Slutuppgift: (2.5 hp, U/G)</strong></li>
+      <li>Skriftlig tentamen: (2.5 hp, U/G/VG)</li>
+    </ul>
+  </aside>
+  {
+    download && (
+      <aside>
+        <h3>Arbetsmaterial</h3>
+        <p>
+          Följande zip-fil innehåller filerna du behöver för den här uppgiften.
+        </p>
+        <p>
+          <a
+            href={import.meta.env.BASE_URL + `downloads/${download}`}
+            download
+            class="zip"
+          >
+            {download}
+          </a>
+        </p>
+        <p>
+          Efter nedladdning får du packa upp filen, för att få en mapp med
+          innehållet.
+        </p>
+      </aside>
+    )
+  }
+  <div class="imported"><Content /></div>
+</PageLayout>

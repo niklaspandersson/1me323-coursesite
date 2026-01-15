@@ -1,0 +1,108 @@
+---
+type Sections = "start" | "about" | "schedule" | "labs" | "assignments";
+
+interface Props {
+  active?: Sections;
+  hamburger?: boolean;
+}
+
+const { active, hamburger } = Astro.props;
+---
+
+<nav class:list={["root", { hamburger }]}>
+  <ul>
+    <li class={active === "start" ? "active" : ""}>
+      <a href={import.meta.env.BASE_URL}>Start</a>
+    </li>
+    <li class={active === "about" ? "active" : ""}>
+      <a href={import.meta.env.BASE_URL + "om/kursen/"}>Om kursen</a>
+    </li>
+    <li class={active === "schedule" ? "active" : ""}>
+      <a href={import.meta.env.BASE_URL + "veckoplan/"}>Veckoplan</a>
+    </li>
+    <li class={active === "assignments" ? "active" : ""}>
+      <a href={import.meta.env.BASE_URL + "uppgifter/1/"}>Uppgifter</a>
+    </li>
+    <li class={active === "labs" ? "active" : ""}>
+      <a href={import.meta.env.BASE_URL + "laborationer/"}>Laborationer</a>
+    </li>
+  </ul>
+</nav>
+
+<style>
+  .root {
+    background-color: var(--secondaryBgColor);
+    color: var(--secondaryTextColor);
+
+    ul {
+      max-width: var(--siteMaxWidth);
+      margin: 0 auto;
+
+      display: flex;
+      list-style-type: none;
+      gap: 0.5em;
+      padding: 0;
+    }
+
+    li {
+      padding: 8px 10px;
+      color: inherit;
+
+      &:hover {
+        background-color: var(--lnuAccentColor);
+        color: var(--primaryTextColor);
+        opacity: 0.85;
+      }
+    }
+
+    a,
+    a:visited,
+    a:active,
+    a:hover {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .active {
+      background-color: var(--lnuAccentColor);
+
+      a {
+        color: var(--primaryTextColor);
+      }
+    }
+
+    .inactive {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .hamburger {
+    display: none;
+  }
+
+  @media screen and (max-width: 700px) {
+    .root {
+      font-size: 0.85rem;
+
+      article {
+        display: block;
+
+        aside {
+          box-shadow: none;
+          margin: 15px 0;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 595px) {
+    .root {
+      display: none;
+
+      ul {
+        flex-direction: column;
+      }
+    }
+  }
+</style>

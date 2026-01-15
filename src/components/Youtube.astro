@@ -1,0 +1,40 @@
+---
+type Props = {
+  id?: string;
+  length: string;
+};
+
+const { id, length } = Astro.props;
+---
+
+<>
+  {
+    id ? (
+      <figure>
+        <iframe
+          width="304"
+          height="171"
+          src={`https://www.youtube.com/embed/${id}`}
+          class="youtube"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        />
+        <figcaption>{length}</figcaption>
+      </figure>
+    ) : (
+      <img
+        src="../../img/unavailable-video.png"
+        width="304"
+        height="171"
+        alt="Videon ej tillgänglig än"
+        class="novideo"
+      />
+    )
+  }
+</>
+
+<style>
+  figure {
+    margin-left: 1em;
+  }
+</style>

@@ -1,0 +1,23 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import { Content } from "../../content/assignments/_start.mdx";
+---
+
+<PageLayout section="assignments" title={`Uppgifter - Webbteknik 3`}>
+  <Fragment slot="header">
+    <h2>Uppgifter</h2>
+  </Fragment>
+  <aside>
+    <h3>Examination och betyg:</h3>
+    <p>
+      Kursen examineras på tre olika moment, som alla måste vara godkända för
+      att bli godkänd på kursen:
+    </p>
+    <ul>
+      <li><strong>Inlämningsuppgifter: (2.5 hp, U/G)</strong></li>
+      <li><strong>Slutuppgift: (2.5 hp, U/G)</strong></li>
+      <li>Skriftlig tentamen: (2.5 hp, U/G/VG)</li>
+    </ul>
+  </aside>
+  <div class="imported"><Content /></div>
+</PageLayout>

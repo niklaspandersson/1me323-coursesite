@@ -1,0 +1,15 @@
+---
+interface Props {
+	reading: string[];
+}
+
+const { reading } = Astro.props;
+---
+
+<aside class="reading">
+	<h3>Läsanvisningar</h3>
+	<p>Detta är de delar i litteraturen som är relevanta för just den här labben:</p>
+	<ul>
+		{reading.map(r => <li>{r}</li>)}
+	</ul>
+</aside>

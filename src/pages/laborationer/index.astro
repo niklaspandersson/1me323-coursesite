@@ -1,0 +1,55 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import PageLayout from "../../layouts/PageLayout.astro";
+import { Content } from "../../content/labs/_start.mdx";
+import LabsLocalNav from "../../components/LabsLocalNav.astro";
+
+function groupBy(array: CollectionEntry<"labs">[]) {
+  return array.reduce(
+    (result, currentValue) => {
+      const groupKey = currentValue.slug.split("-")[0];
+      if (!result[groupKey]) {
+        result[groupKey] = [];
+      }
+      result[groupKey].push(currentValue.slug);
+      return result;
+    },
+    {} as Record<string, string[]>
+  );
+}
+
+const labs = await getCollection("labs");
+const sections = Object.entries(groupBy(labs));
+const localNav = sections.map(([section, entries]) => {
+  const subPages = entries.map((entry) => ({
+    id: entry,
+    slug: entry.replace("-", ""),
+    title: entry.split("-")[1] ?? entry,
+  }));
+  return { id: section, slug: subPages[0]?.slug ?? section, pages: subPages };
+});
+---
+
+<PageLayout section="labs" title={`Laborationer - Webbteknik 3`}>
+  <LabsLocalNav
+    slot="localNav"
+    prefix={import.meta.env.BASE_URL + "/laborationer"}
+    pages={localNav}
+  />
+  <Fragment slot="header">
+    <h2>Laborationer</h2>
+  </Fragment>
+  <aside>
+    <h3>Examination och betyg:</h3>
+    <p>
+      Kursen examineras på tre olika moment, som alla måste vara godkända för
+      att bli godkänd på kursen:
+    </p>
+    <ul>
+      <li>Inlämningsuppgifter: (2.5 hp, U/G)</li>
+      <li>Slutuppgift: (2.5 hp, U/G)</li>
+      <li>Skriftlig tentamen: (2.5 hp, U/G/VG)</li>
+    </ul>
+  </aside>
+  <div class="imported"><Content /></div>
+</PageLayout>

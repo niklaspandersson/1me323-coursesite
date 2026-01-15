@@ -1,0 +1,114 @@
+---
+import { join } from "node:path";
+
+type Page = {
+  id: string;
+  title?: string;
+  slug?: string;
+  pages?: Page[];
+};
+
+type Props = {
+  prefix: string;
+  active?: string;
+  pages: Page[];
+};
+
+const { pages, active, prefix }: Props = Astro.props;
+const [activeWeek, activeLab] = active?.split("-") ?? [];
+---
+
+<nav class="root">
+  <ul>
+    {
+      pages?.map((page) => (
+        <li class={activeWeek === page.id ? "active" : ""}>
+          {activeWeek === page.id ? (
+            <>
+              {page.id}
+              <ul class="labs">
+                {page.pages?.map((subPage) => (
+                  <li class={activeLab === subPage.title ? "active" : ""}>
+                    <a href={join(prefix, subPage.slug ?? subPage.id) + "/"}>
+                      {(subPage.title?.toLocaleLowerCase() === "ex"
+                        ? "Exempel"
+                        : subPage.title?.toLocaleUpperCase()) ?? subPage.id}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <a href={join(prefix, page.slug ?? page.id) + "/"}>
+              {page.title ?? page.id}
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .root {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    background-color: var(--lightAccentColor);
+
+    > ul {
+      max-width: var(--siteMaxWidth);
+      margin: 0 auto;
+
+      display: flex;
+      flex-flow: row wrap;
+      list-style-type: none;
+      gap: 0.5em;
+      padding: 8px 0 0 0.5em;
+
+      > li {
+        display: flex;
+        padding: 5px 10px;
+        color: inherit;
+        background-color: var(--lnuAccentColorTransparent);
+        border: 1px solid #92d6ef;
+        border-bottom: none;
+
+        &:hover {
+          background-color: var(--lnuAccentColor);
+          color: var(--primaryTextColor);
+          border: 1px solid #1aa7ce;
+          border-bottom: none;
+          opacity: 0.85;
+        }
+      }
+    }
+
+    .labs {
+      margin-left: 0;
+
+      li {
+        list-style-type: none;
+        display: inline-flex;
+        margin-left: 0.8em;
+
+        &.active {
+          font-weight: bold;
+          border: none;
+        }
+      }
+    }
+
+    .active {
+      background-color: var(--lnuAccentColor);
+      border: 1px solid #60a5be;
+      border-bottom: none;
+    }
+
+    a,
+    a:visited,
+    a:active,
+    a:hover {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+</style>

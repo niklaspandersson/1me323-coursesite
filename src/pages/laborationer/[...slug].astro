@@ -1,0 +1,113 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import PageLayout from "../../layouts/PageLayout.astro";
+import Reading from "../../components/Reading.astro";
+import LabsLocalNav from "../../components/LabsLocalNav.astro";
+
+// 1. Generate a new path for every collection entry
+export async function getStaticPaths() {
+  function groupBy(array: CollectionEntry<"labs">[]) {
+    return array.reduce(
+      (result, currentValue) => {
+        const groupKey = currentValue.slug.split("-")[0];
+        if (!result[groupKey]) {
+          result[groupKey] = [];
+        }
+        result[groupKey].push(currentValue.slug);
+        return result;
+      },
+      {} as Record<string, string[]>
+    );
+  }
+
+  const labs = await getCollection("labs");
+  const sections = Object.entries(groupBy(labs));
+  const localNav = sections.map(([section, entries]) => {
+    const subPages = entries.map((entry) => ({
+      id: entry,
+      slug: entry.replace("-", ""),
+      title: entry.split("-")[1] ?? entry,
+    }));
+    return { id: section, slug: subPages[0]?.slug ?? section, pages: subPages };
+  });
+
+  return labs.map((entry) => ({
+    params: { slug: entry.slug.replace("-", "") },
+    props: { entry, id: entry.slug, localNav, ...entry.data },
+  }));
+}
+
+// 2. For your template, you can get the entry directly from the prop
+const { entry, id, title, localNav, downloads, reading } = Astro.props;
+const slug = entry.slug.replace("-", " ");
+const download = Array.isArray(downloads) ? downloads[0] : downloads;
+const downloadIsFile = download?.endsWith(".zip");
+const readings = reading && Array.isArray(reading) ? reading : [reading!];
+const { Content } = await entry.render();
+---
+
+<PageLayout section="labs" title={`Laboration ${slug} - Webbteknik 3`}>
+  <LabsLocalNav
+    slot="localNav"
+    prefix={import.meta.env.BASE_URL + "/laborationer"}
+    active={id}
+    pages={localNav}
+  />
+  <Fragment slot="header">
+    <h2>
+      Laboration {
+        (slug?.toLocaleUpperCase().indexOf("EX") ?? -1) !== -1
+          ? slug?.toLocaleUpperCase()
+          : slug?.toLocaleUpperCase()?.replace(" ", "")
+      }
+    </h2>
+    {title && <h3>{title}</h3>}
+  </Fragment>
+  {reading && <Reading reading={readings} />}
+  {
+    download &&
+      (downloadIsFile ? (
+        <aside>
+          <h3>Arbetsmaterial</h3>
+          <p>
+            Följande zip-fil innehåller filerna du behöver för den här
+            laborationen.
+          </p>
+          <p>
+            <a
+              href={import.meta.env.BASE_URL + `downloads/${download}`}
+              download
+              class="zip"
+            >
+              {download}
+            </a>
+          </p>
+          <p>
+            Efter nedladdning får du packa upp filen, för att få en mapp med
+            innehållet.
+          </p>
+        </aside>
+      ) : (
+        <aside>
+          <h3>Arbetsmaterial</h3>
+          <p>
+            Länk till zip-fil med arbetsmaterial finns på sidan för laboration{" "}
+            {download}.
+          </p>
+        </aside>
+      ))
+  }
+  <aside>
+    <h3>Examination och betyg:</h3>
+    <p>
+      Kursen examineras på tre olika moment, som alla måste vara godkända för
+      att bli godkänd på kursen:
+    </p>
+    <ul>
+      <li>Inlämningsuppgifter: (2.5 hp, U/G)</li>
+      <li>Slutuppgift: (2.5 hp, U/G)</li>
+      <li>Skriftlig tentamen: (2.5 hp, U/G/VG)</li>
+    </ul>
+  </aside>
+  <div class="imported labs"><Content /></div>
+</PageLayout>

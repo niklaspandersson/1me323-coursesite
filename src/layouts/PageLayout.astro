@@ -1,0 +1,135 @@
+---
+import RootLayout from "./Layout.astro";
+import Footer from "../components/Footer.astro";
+import GlobalHeader from "../components/GlobalHeader.astro";
+import GlobalNav from "../components/GlobalNav.astro";
+import Header from "../components/Header.astro";
+
+const { section, title } = Astro.props;
+---
+
+<RootLayout title={title ?? "Webbteknik 3"}>
+  <GlobalHeader>
+    <GlobalNav hamburger={true} active={section} />
+  </GlobalHeader>
+  <GlobalNav active={section} />
+  <slot name="localNav" />
+
+  <div class="wrapper">
+    <div class="layout">
+      <Header><slot name="header" /></Header>
+      <article><slot /></article>
+    </div>
+  </div>
+
+  <Footer />
+</RootLayout>
+
+<style>
+  .wrapper {
+    flex: 1;
+  }
+
+  .layout {
+    max-width: var(--siteMaxWidth);
+    margin: 0 auto;
+    display: flex;
+    flex-flow: column nowrap;
+
+    > article {
+      padding: 0 10px;
+      margin-top: 1rem;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 2fr;
+      grid-template-rows: repeat(10, min-content);
+      grid-auto-flow: column;
+      grid-auto-columns: 350px;
+      align-items: start;
+      gap: 1rem;
+
+      main {
+        order: -10;
+        grid-row: 1 / 11;
+
+        p:first-child {
+          margin-top: 0;
+        }
+
+        img {
+          max-width: 100%;
+        }
+
+        padding-bottom: 1rem;
+      }
+
+      aside {
+        font-size: 0.85rem;
+        box-shadow: 0 0 10px #aaa;
+        border-radius: 2px;
+        background-color: var(--lightAccentColor);
+        border: 1px solid var(--secondaryBgColor);
+        padding: 15px 10px;
+
+        ul {
+          margin-top: 0;
+        }
+
+        ul p {
+          margin-bottom: 0;
+        }
+
+        p:last-child,
+        ul:last-child {
+          margin-bottom: 0;
+        }
+
+        a {
+          word-break: break-all;
+          word-break: break-word;
+        }
+
+        code,
+        pre {
+        }
+      }
+    }
+
+    pre {
+      font-size: 0.9em;
+      white-space: pre-wrap;
+      /* background-color: #f2f2f2; */
+    }
+
+    pre.astro-code {
+      background-color: rgb(240, 243, 247) !important;
+      padding: 10px !important;
+      border-radius: 10px;
+    }
+
+    code {
+      display: inline-block;
+    }
+  }
+
+  @media screen and (max-width: 950px) {
+    .layout {
+      article {
+        grid-auto-columns: 1fr;
+      }
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .layout {
+      article {
+        display: block;
+
+        aside {
+          box-shadow: none;
+          margin: 15px 0;
+        }
+      }
+    }
+  }
+</style>

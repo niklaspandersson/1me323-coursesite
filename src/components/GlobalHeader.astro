@@ -1,0 +1,135 @@
+---
+
+---
+
+<header>
+  <div class="root">
+    <div class="menu">
+      <label for="global-hamburger-menu">
+        <svg
+          height="32px"
+          id="Layer_1"
+          version="1.1"
+          viewBox="0 0 32 32"
+          width="32px"
+          xml-space="preserve"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns-xlink="http://www.w3.org/1999/xlink"
+        >
+          <path
+            d="M4,10h24c1.104,0,2-0.896,2-2s-0.896-2-2-2H4C2.896,6,2,6.896,2,8S2.896,10,4,10z M28,14H4c-1.104,0-2,0.896-2,2  s0.896,2,2,2h24c1.104,0,2-0.896,2-2S29.104,14,28,14z M28,22H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h24c1.104,0,2-0.896,2-2  S29.104,22,28,22z"
+          ></path>
+        </svg>
+      </label>
+      <input type="checkbox" id="global-hamburger-menu" />
+      <slot />
+    </div>
+    <h1>Webbteknik&nbsp;3</h1>
+    <ul class="shortcuts">
+      <li>
+        <a
+          href="https://kursplan.lnu.se/kursplaner/kursplan-1ME323-0.pdf?planid=f4efc7f6-33ef-11ef-a31d-403b7a624c95"
+          >kursplan</a
+        >
+      </li>
+      <li>
+        <a
+          href="https://cloud.timeedit.net/lnu/web/schema2/ri1Y1X8QQYwZ16Qv530X1795y4Y95Z7Y9285999Q2.html"
+          >schema</a
+        >
+      </li>
+      <li>
+        <a href="https://moodle.lnu.se/course/view.php?id=72708">moodle</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<style>
+  .root {
+    max-width: var(--siteMaxWidth);
+    margin: 0 auto;
+    padding: 10px;
+    display: flex;
+    flex-flow: row wrap;
+
+    h1 {
+      flex: 1;
+      font-size: 3rem;
+    }
+
+    ul {
+      list-style-type: none;
+      display: flex;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: inline-block;
+        padding: 0 1rem;
+        border-right: 1px solid var(--secondaryBgColor);
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
+
+    input {
+      display: none;
+    }
+
+    .menu {
+      display: none;
+
+      label {
+        display: flex;
+        align-items: center;
+        margin-right: 1em;
+      }
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .root {
+      h1 {
+        font-size: 2rem;
+      }
+
+      ul.shortcuts li:last-child {
+        padding-right: 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 595px) {
+    .root {
+      > .shortcuts {
+        display: none;
+      }
+
+      input:checked + .hamburger {
+        display: block;
+        margin: 0 -10px -10px;
+        width: calc(100% + 20px);
+        order: 1;
+
+        ul {
+          font-size: 1.2em;
+          gap: 0;
+          align-items: stretch;
+          text-align: center;
+
+          li {
+            padding: 10px;
+          }
+        }
+      }
+
+      .menu {
+        display: contents;
+      }
+    }
+  }
+</style>

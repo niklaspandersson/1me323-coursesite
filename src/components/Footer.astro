@@ -1,0 +1,57 @@
+---
+
+---
+
+<footer class="root">
+  <div class="container">
+    <div class="info">
+      <p>
+        <b>&copy; </b>Niklas Andersson
+      </p>
+      <p>
+        <em>Uppdaterad: </em>
+        <span id="lastUpdated">{new Date().toLocaleDateString("sv")}</span>
+      </p>
+    </div>
+    <img src={import.meta.env.BASE_URL + "/icon_v3.png"} alt="Webbteknik 3" />
+  </div>
+</footer>
+
+<style>
+  .root {
+    background-color: var(--secondaryBgColor);
+
+    img {
+      height: 48px;
+      width: 48px;
+    }
+  }
+
+  .container {
+    max-width: var(--siteMaxWidth);
+    margin: 0 auto;
+    color: var(--secondaryTextColor);
+    padding: 8px 10px;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+  }
+
+  .info {
+    padding: 10px;
+    flex: 1;
+
+    display: grid;
+    gap: 5px;
+
+    em {
+      color: inherit;
+      font-weight: bold;
+    }
+
+    p {
+      padding: 0;
+      margin: 0;
+    }
+  }
+</style>

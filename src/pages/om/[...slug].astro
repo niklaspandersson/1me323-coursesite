@@ -1,0 +1,65 @@
+---
+import { getCollection } from "astro:content";
+import LocalNav from "../../components/LocalNav.astro";
+import PageLayout from "../../layouts/PageLayout.astro";
+
+// 1. Generate a new path for every collection entry
+export async function getStaticPaths() {
+  const pages = await getCollection("about");
+  const localNav = pages.map((entry) => ({
+    id: entry.slug,
+  }));
+
+  return pages.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry, localNav },
+  }));
+}
+
+// 2. For your template, you can get the entry directly from the prop
+const { entry, localNav } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<PageLayout section="about" title="Webbteknik 3">
+  <LocalNav
+    slot="localNav"
+    prefix={import.meta.env.BASE_URL + "/om"}
+    active={entry.slug}
+    pages={localNav}
+  />
+  <h2 slot="header">{entry.data.title}</h2>
+  <div class="imported"><Content /></div>
+</PageLayout>
+
+<style is:global>
+  .book img {
+    float: left;
+    margin: 0 1.5em 0 1em;
+    height: 100px;
+    box-shadow: 2px 2px 2px #666;
+    transition: all 0.5s;
+  }
+
+  .book p {
+    padding-top: 20px;
+  }
+
+  section::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+
+  .book img:hover {
+    transform: scale(1.5);
+    box-shadow: 4px 4px 2px #666;
+  }
+
+  .book::after {
+    content: "";
+    display: block;
+    clear: both;
+    margin-bottom: 1em;
+  }
+</style>

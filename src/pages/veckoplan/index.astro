@@ -1,0 +1,353 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+---
+
+<PageLayout section="schedule" title="Webbteknik 3 - Veckoplan">
+  <h2 slot="header">Veckoplan</h2>
+  <div class="container"></div>
+</PageLayout>
+
+<style is:global>
+  .container {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+
+    gap: 5px 20px;
+    align-items: start;
+
+    .week {
+      margin-top: 14px;
+      font-weight: bold;
+    }
+  }
+
+  .level-card {
+    background: var(--primaryBgColor);
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    padding: 10px;
+    padding-left: 20px;
+    border: 2px solid #ececec;
+    position: relative;
+    transition:
+      border 0.2s,
+      background 0.2s;
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 0;
+      font-weight: 600;
+      font-size: 1.1em;
+      display: inline-block;
+    }
+
+    .sections {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 10px;
+      margin-right: 10px;
+      margin-bottom: 12px;
+    }
+
+    section {
+      box-sizing: border-box;
+      flex: 0 1 calc(33.333333% - 6.666666px);
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 6px;
+      padding: 14px 16px 12px 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(230, 230, 230, 0.8);
+
+      &.deadline {
+        flex: 1 1 100%;
+        display: flex;
+        flex-direction: row;
+        border: none;
+        color: red;
+        font-weight: bold;
+        background-color: unset;
+        box-shadow: unset;
+        padding: 0;
+        padding-top: 10px;
+
+        &::before,
+        &::after {
+          content: "";
+          flex: 1 1;
+          border-color: red;
+          border-bottom: 2px solid;
+          margin: auto;
+        }
+        &::before {
+          margin-right: 10px;
+        }
+        &::after {
+          margin-left: 10px;
+        }
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      h4 {
+        font-weight: bold;
+        font-size: 1em;
+        margin: 0 0 0.2em 0;
+      }
+
+      > ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+
+        > li {
+          margin: 0.5em 0;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+
+        .reading {
+          color: #555;
+          font-size: 0.98em;
+        }
+
+        .exercise a {
+          color: #1976d2;
+          text-decoration: underline;
+          font-size: 0.98em;
+        }
+
+        .note {
+          margin: 0;
+          padding-left: 1em;
+          font-size: 0.9em;
+          font-style: italic;
+          list-style-type: none;
+        }
+      }
+    }
+
+    &[open] summary {
+      margin-bottom: 16px;
+    }
+
+    &.current {
+      border-color: #89beea;
+      background: #e7f3fe;
+    }
+
+    &.completed {
+      border-color: #4caf50;
+      background: #eafbe7;
+
+      &::before {
+        content: "✔";
+        color: #4caf50;
+        font-size: 1.5rem;
+        position: absolute;
+        top: 9px;
+        right: 16px;
+        font-weight: bold;
+      }
+    }
+
+    &.holiday {
+      border-color: #ffc3c3;
+      background: #ffe1e1;
+      text-align: center;
+
+      summary {
+        list-style: none;
+        pointer-events: none;
+      }
+    }
+
+    &.milestone {
+      background: #ffe9b3;
+      border-left: 6px solid #ffc107;
+      border: 2px solid #ffc107;
+      padding: 24px;
+      /* margin-bottom: 10px; */
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+      text-align: center;
+    }
+  }
+
+  .arrow {
+    display: block;
+    text-align: center;
+    font-size: 1.7rem;
+    color: #bbb;
+    margin: 18px 0 18px 0;
+
+    &.milestone-arrow {
+      color: #ffc107;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .level-card {
+      .sections {
+        flex-flow: column nowrap;
+      }
+      section {
+        flex: 0 1 auto;
+      }
+    }
+  }
+
+  @media screen and (max-width: 595px) {
+    .container {
+      font-size: 0.9em;
+      grid-template-columns: 1fr;
+      gap: 5px 0;
+
+      .week {
+        margin-top: 15px;
+      }
+      .week:first-of-type {
+        margin-top: 0;
+      }
+
+      margin-bottom: 15px;
+    }
+  }
+</style>
+
+<script>
+  function iso8601Week(input?: Date) {
+    const date =
+      typeof input === "object" ? new Date(input.getTime()) : new Date();
+
+    // Find Thursday of this week starting on Monday
+    date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+    const thursday = date.getTime();
+
+    // Find January 1st
+    date.setMonth(0); // January
+    date.setDate(1); // 1st
+    const jan1st = date.getTime();
+
+    // Round the amount of days to compensate for daylight saving time
+    const days = Math.round((thursday - jan1st) / 86400000); // 1 day = 86400000 ms
+    return Math.floor(days / 7) + 1;
+  }
+
+  // TODO: Change to current week
+  const currentWeek = iso8601Week(new Date());
+
+  const container = document.querySelector(".container")!;
+
+  function createTask(task: any) {
+    const li = document.createElement("li");
+    if (task.type === "reading") {
+      li.className = "reading";
+      li.append("📖 ");
+    } else if (task.type === "exercise") {
+      li.className = "exercise";
+      li.append("🧑‍💻 ");
+    } else if (task.type === "training") {
+      li.className = "training";
+      li.append("🏋️‍♂️ ");
+    } else if (task.type === "examination") {
+      li.className = "examination";
+      li.append("🧑‍🎓 ");
+    } else if (task.type === "download") {
+      li.className = "download";
+      li.append("📦 ");
+    }
+
+    if (task.link) {
+      const a = document.createElement("a");
+      a.href = task.link;
+      if (task.link.startsWith("http")) {
+        a.target = "_blank";
+      }
+      a.textContent = task.title ?? task.link;
+      li.appendChild(a);
+    } else if (task.title) {
+      li.append(task.title);
+    }
+    if (task.note) {
+      const note = document.createElement("p");
+      note.className = "note";
+      note.textContent = task.note;
+      li.appendChild(note);
+    }
+
+    return li;
+  }
+
+  function createSection(session: any) {
+    const section = document.createElement("section");
+    if (session.id?.startsWith("deadline")) {
+      section.classList.add("deadline");
+      section.innerHTML = session.title;
+    } else {
+      if (session.title) {
+        const h4 = document.createElement("h4");
+        h4.textContent = session.title;
+        section.appendChild(h4);
+      }
+      const tasks = session.tasks;
+      if (tasks?.length) {
+        const ul = document.createElement("ul");
+        ul.append(...tasks.map(createTask));
+        section.appendChild(ul);
+      }
+    }
+
+    return section;
+  }
+
+  const schedule = await fetch(import.meta.env.BASE_URL + "schedule.json").then(
+    (r) => r.json()
+  );
+
+  const parts = schedule.flatMap((s: any) => s.parts);
+  parts.forEach((part: any, i: number) => {
+    // Week
+    const week = 1 + ((i + 3) % 52);
+    {
+      const weekDiv = document.createElement("div");
+      weekDiv.className = "week";
+      weekDiv.textContent = `Vecka ${week}`;
+      container.appendChild(weekDiv);
+    }
+
+    const level = document.createElement("details");
+    level.classList.add("level-card");
+
+    if (week === currentWeek) {
+      level.classList.add("current");
+      level.setAttribute("open", "");
+    } else if (currentWeek < 46 && week === 46) {
+      level.setAttribute("open", "");
+    }
+
+    const summary = document.createElement("summary");
+    const title = part.title || "";
+    const h3 = document.createElement("h3");
+    h3.textContent = title;
+    summary.appendChild(h3);
+    level.appendChild(summary);
+
+    const sections = document.createElement("div");
+    sections.className = "sections";
+    level.appendChild(sections);
+
+    if (part.flags?.includes("holiday")) {
+      level.classList.add("holiday");
+      level.removeAttribute("open");
+    } else {
+      const parts = part.sessions.map((s: any) => s.title);
+      console.log(parts);
+      sections.append(...part.sessions.map(createSection));
+    }
+
+    container.appendChild(level);
+  });
+</script>

@@ -1,0 +1,147 @@
+[
+  {
+    "title": "Hela kursen",
+    "parts": [
+      {
+        "title": "Strukturering av kod",
+        "sessions": [
+          {
+            "id": "js:modules",
+            "title": "Moduler",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "git:version-control",
+            "title": "Intro till versionshantering",
+            "tasks": [
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Strukturering av data",
+        "sessions": [
+          {
+            "id": "js:object",
+            "title": "Objekt",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "js:JSON",
+            "title": "JSON",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "js:localStorage",
+            "title": "localStorage",
+            "tasks": [
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Asynkron kommunikation",
+        "sessions": [
+          {
+            "id": "web:http",
+            "title": "HTTP",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "js:fetch",
+            "title": "Fetch och \"löften\"",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "deadline:assignment-1",
+            "title": "Deadline 1: fredag 6/2 kl. 23:59"
+          }
+        ]
+      },
+      {
+        "title": "Intro till Objektorienterad Programmering",
+        "sessions": [
+          {
+            "id": "js:classes",
+            "title": "Klasser och objekt",
+            "tasks": [
+            ]
+          }
+        ]
+      },
+      {
+        "title": "DOM och responsivitet för dynamsika webbsidor",
+        "sessions": [
+        ]
+      },
+      {
+        "title": "API och webbtjänster",
+        "sessions": [
+          {
+            "id": "web:http-advanced",
+            "title": "Fördjupning i HTTP",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "web:web-apier",
+            "title": "Webb-APIer",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "deadline:assignment-2",
+            "title": "Deadline 2: fredag 27/2 kl. 23:59"
+          }
+        ]
+      },
+      {
+        "title": "Formulär",
+        "sessions": [
+          {
+            "id": "html:form-advanced",
+            "title": "Input-element och formulärhantering",
+            "tasks": [
+            ]
+          },
+          {
+            "id": "js:form-validation",
+            "title": "Validering",
+            "tasks": [
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Optimering och SEO",
+        "sessions": [
+        ]
+      },
+      {
+        "title": "Eget arbete",
+        "sessions": [
+          {
+            "title": "Eget arbete med uppgift 3"
+          }
+        ]
+      },
+      {
+        "title": "Examination",
+        "sessions": [
+          {
+            "title": "Eget arbete med uppgift 3"
+          },
+          {
+            "id": "deadline:assignment-3",
+            "title": "Deadline 3: fredag 27/3 kl. 23:59"
+          }
+        ]
+      }
+    ]
+  }
+]
