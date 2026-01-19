@@ -1,0 +1,283 @@
+---
+title: Responsiv JavaScript
+---
+
+<aside class="first">
+
+#### Syfte
+* Att kunna använda JavaScript för att ändra beteende baserat på skärmstorlek.
+* Att arbeta med CSS-variabler från JavaScript.
+* Att skapa interaktiva UI-komponenter som anpassar sig.
+* Att förstå när JavaScript behövs för responsivitet (och när CSS räcker).
+
+</aside>
+
+<main>
+CSS Media Queries hanterar de flesta responsiva behov, men ibland behöver vi JavaScript för mer komplex logik - ändra antal kolumner dynamiskt, visa/dölj komponenter baserat på interaktion, eller anpassa funktionalitet för olika enheter.
+
+### 0 - Förberedelser
+Skapa en ny mapp `5c` i din `labs`-mapp med `index.html`, `main.js` och `style.css`. Länka gärna även in `global.css`.
+
+### 1 - CSS-variabler från JavaScript
+CSS-variabler (custom properties) kan manipuleras från JavaScript.
+
+1. Definiera en variabel i CSS:
+
+```css
+:root {
+  --columns: 3;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 1fr);
+  gap: 1rem;
+}
+```
+
+2. Skapa en grid med några kort i HTML.
+
+3. Ändra variabeln från JavaScript:
+
+```javascript
+// Läs värdet
+const root = document.documentElement;
+const columns = getComputedStyle(root).getPropertyValue("--columns");
+console.log(columns); // "3"
+
+// Ändra värdet
+root.style.setProperty("--columns", 4);
+```
+
+4. Griden uppdateras automatiskt!
+
+### 2 - Dynamisk kolumnjustering
+Låt användaren styra antal kolumner med en slider.
+
+1. Lägg till en range input:
+
+```html
+<label>
+  Kolumner: <span id="column-value">3</span>
+  <input type="range" id="column-slider" min="1" max="6" value="3">
+</label>
+
+<div class="grid" id="grid">
+  <!-- Grid-items här -->
+</div>
+```
+
+2. Koppla slidern till CSS-variabeln:
+
+```javascript
+const slider = document.querySelector("#column-slider");
+const valueDisplay = document.querySelector("#column-value");
+const root = document.documentElement;
+
+slider.addEventListener("input", () => {
+  const columns = slider.value;
+  root.style.setProperty("--columns", columns);
+  valueDisplay.textContent = columns;
+});
+```
+
+3. Skapa innehåll för din grid och styla den.
+
+### 3 - Lyssna på resize
+Ibland behöver du reagera när fönstret ändrar storlek.
+
+```javascript
+window.addEventListener("resize", () => {
+  console.log(`Fönsterstorlek: ${window.innerWidth} x ${window.innerHeight}`);
+});
+```
+
+**Varning**: Resize-eventet triggas *många* gånger under en storleksändring. Använd debounce eller throttle för att undvika prestandaproblem.
+
+<details>
+<summary>Enkel debounce</summary>
+
+```javascript
+let resizeTimeout;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    // Koden här körs 250ms efter sista resize
+    console.log("Resize klar:", window.innerWidth);
+  }, 250);
+});
+```
+</details>
+
+### 4 - Media Queries i JavaScript
+Du kan lyssna på media queries i JavaScript med `matchMedia`.
+
+```javascript
+const mobileQuery = window.matchMedia("(max-width: 768px)");
+
+function handleMobileChange(e) {
+  if (e.matches) {
+    console.log("Nu är vi i mobil-vy");
+    // Anpassa funktionalitet för mobil
+  } else {
+    console.log("Nu är vi i desktop-vy");
+    // Anpassa funktionalitet för desktop
+  }
+}
+
+// Kör vid sidladdning
+handleMobileChange(mobileQuery);
+
+// Lyssna på förändringar
+mobileQuery.addEventListener("change", handleMobileChange);
+```
+
+### 5 - Praktisk övning: "Läs mer"-funktionalitet
+Skapa kort med text som kan expanderas.
+
+1. Skapa HTML för kort med längre textinnehåll.
+
+2. CSS för att begränsa texten:
+
+```css
+.card-text {
+  overflow: hidden;
+  max-height: var(--text-height, 4.5em); /* 3 rader */
+  transition: max-height 0.3s ease;
+}
+
+.card-text.expanded {
+  max-height: var(--text-height-expanded, 1000px);
+}
+```
+
+3. JavaScript för att toggla:
+
+```javascript
+document.querySelectorAll(".read-more-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = btn.previousElementSibling;
+    text.classList.toggle("expanded");
+    btn.textContent = text.classList.contains("expanded") ? "Visa mindre" : "Läs mer";
+  });
+});
+```
+
+4. Bonusutmaning: Visa bara "Läs mer"-knappen om texten faktiskt är längre än gränsen:
+
+```javascript
+function checkTextOverflow(textElement) {
+  return textElement.scrollHeight > textElement.clientHeight;
+}
+```
+
+### 6 - Responsiv navigering
+Skapa en meny som beter sig olika på mobil vs desktop.
+
+1. På desktop: Horisontell meny som alltid syns
+2. På mobil: Hamburgermeny som expanderar vid klick
+
+Tänk igenom:
+* Vilken markup behövs?
+* Vad kan lösas med enbart CSS?
+* Vad behöver JavaScript?
+
+<details>
+<summary>Tips för hamburgermeny</summary>
+
+```javascript
+const menuToggle = document.querySelector(".menu-toggle");
+const nav = document.querySelector("nav");
+
+menuToggle.addEventListener("click", () => {
+  nav.classList.toggle("open");
+  menuToggle.setAttribute("aria-expanded",
+    nav.classList.contains("open")
+  );
+});
+
+// Stäng menyn när ett alternativ väljs
+nav.addEventListener("click", (e) => {
+  if (e.target.tagName === "A") {
+    nav.classList.remove("open");
+    menuToggle.setAttribute("aria-expanded", "false");
+  }
+});
+```
+
+CSS:
+```css
+@media (max-width: 768px) {
+  nav {
+    display: none;
+  }
+
+  nav.open {
+    display: block;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .menu-toggle {
+    display: none;
+  }
+
+  nav {
+    display: flex;
+  }
+}
+```
+</details>
+
+### 7 - Utmaning: Tillämpa på landing page
+Förbättra din landing page med responsiv JavaScript:
+
+1. **Kolumnjustering**: Låt användaren välja hur många laborationer som visas per rad (på desktop).
+
+2. **Filtrering**: Lägg till knappar för att filtrera efter status (Alla / Klara / Pågående).
+
+3. **Sökfunktion**: Lägg till ett sökfält som filtrerar laborationer i realtid.
+
+4. **Mobil meny**: Om du har en sidnavigering, gör den till en hamburgermeny på mobil.
+
+```javascript
+// Exempel på filtrering
+function filterLabs(status) {
+  const labs = document.querySelectorAll(".lab-item");
+
+  labs.forEach(lab => {
+    if (status === "all" || lab.dataset.status === status) {
+      lab.style.display = "";
+    } else {
+      lab.style.display = "none";
+    }
+  });
+}
+```
+
+```javascript
+// Exempel på sökning
+const searchInput = document.querySelector("#search");
+
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.toLowerCase();
+
+  document.querySelectorAll(".lab-item").forEach(lab => {
+    const title = lab.querySelector(".lab-title").textContent.toLowerCase();
+    lab.style.display = title.includes(query) ? "" : "none";
+  });
+});
+```
+
+**Reflektion**:
+* När behövs JavaScript för responsivitet, och när räcker CSS?
+* Vilka prestandahänsyn finns vid användning av resize-event?
+* Hur kan du göra responsiv funktionalitet tillgänglig (keyboard, screen readers)?
+* Vad är fördelen med att använda CSS-variabler från JavaScript istället för inline styles?
+
+</main>

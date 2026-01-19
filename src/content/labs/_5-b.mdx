@@ -1,0 +1,252 @@
+---
+title: Event Delegation
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå event bubbling och hur events propagerar.
+* Att kunna använda event delegation för effektiv händelsehantering.
+* Att hantera dynamiskt skapade element.
+* Att identifiera rätt element med `e.target` och `.closest()`.
+
+</aside>
+
+<main>
+När du har många klickbara element - en meny med 50 länkar, en lista med 100 produkter - blir det ineffektivt att sätta en lyssnare på varje element. Event delegation låter dig sätta *en* lyssnare på en förälder och hantera klick på alla barn.
+
+### 0 - Förberedelser
+Skapa en ny mapp `5b` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Event bubbling
+När du klickar på ett element "bubblar" händelsen uppåt genom DOM-trädet.
+
+1. Skapa en enkel struktur:
+
+```html
+<div id="outer">
+  <div id="inner">
+    <button id="btn">Klicka mig</button>
+  </div>
+</div>
+```
+
+2. Lägg till lyssnare på alla tre nivåer:
+
+```javascript
+document.querySelector("#outer").addEventListener("click", () => {
+  console.log("Outer klickad");
+});
+
+document.querySelector("#inner").addEventListener("click", () => {
+  console.log("Inner klickad");
+});
+
+document.querySelector("#btn").addEventListener("click", () => {
+  console.log("Button klickad");
+});
+```
+
+3. Klicka på knappen. Vad loggas? I vilken ordning?
+
+<details>
+<summary>Förklaring</summary>
+
+Du bör se:
+```
+Button klickad
+Inner klickad
+Outer klickad
+```
+
+Händelsen "bubblar" från det innersta elementet uppåt till dokumentroten. Varje lyssnare på vägen triggas.
+</details>
+
+### 2 - e.target vs e.currentTarget
+Inom en event handler är det viktigt att förstå skillnaden:
+
+```javascript
+document.querySelector("#outer").addEventListener("click", (e) => {
+  console.log("target:", e.target.id);        // Element som klickades
+  console.log("currentTarget:", e.currentTarget.id); // Element med lyssnaren
+});
+```
+
+Klicka på knappen:
+* `e.target` = "btn" (det du faktiskt klickade på)
+* `e.currentTarget` = "outer" (elementet med lyssnaren)
+
+### 3 - Grundläggande event delegation
+Nu kan vi använda bubbling till vår fördel.
+
+1. Skapa en meny:
+
+```html
+<nav>
+  <ul id="menu">
+    <li><a href="#hem">Hem</a></li>
+    <li><a href="#om">Om oss</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+    <li><a href="#blogg">Blogg</a></li>
+  </ul>
+</nav>
+```
+
+2. Istället för att sätta lyssnare på varje länk, sätt en på `<ul>`:
+
+```javascript
+document.querySelector("#menu").addEventListener("click", (e) => {
+  // Kolla om det var en länk som klickades
+  if (e.target.tagName === "A") {
+    e.preventDefault();
+    console.log("Navigera till:", e.target.getAttribute("href"));
+  }
+});
+```
+
+3. Lägg till fler menyalternativ dynamiskt - de fungerar automatiskt utan nya lyssnare!
+
+### 4 - Problemet med nästlade element
+Vad händer om länken innehåller en ikon?
+
+```html
+<li>
+  <a href="#hem">
+    <span class="icon">🏠</span>
+    <span class="text">Hem</span>
+  </a>
+</li>
+```
+
+Nu kan `e.target` vara `<span>`, inte `<a>`!
+
+**Lösning**: Använd `.closest()` för att hitta närmaste förfader som matchar:
+
+```javascript
+menu.addEventListener("click", (e) => {
+  const link = e.target.closest("a");
+
+  if (link) {
+    e.preventDefault();
+    console.log("Navigera till:", link.getAttribute("href"));
+  }
+});
+```
+
+`.closest("a")` letar uppåt i DOM-trädet och returnerar första `<a>` den hittar (eller `null` om ingen finns).
+
+### 5 - Hantera dynamiska element
+En stor fördel med delegation är att det fungerar för element som läggs till senare.
+
+1. Skapa en tom lista och en knapp för att lägga till:
+
+```html
+<ul id="todo-list"></ul>
+<button id="add-btn">Lägg till</button>
+```
+
+2. Med delegation behöver du inte tänka på när lyssnaren läggs till:
+
+```javascript
+const list = document.querySelector("#todo-list");
+let counter = 1;
+
+// Delegation - lyssnaren finns redan när nya items läggs till
+list.addEventListener("click", (e) => {
+  if (e.target.classList.contains("delete-btn")) {
+    e.target.closest("li").remove();
+  }
+});
+
+document.querySelector("#add-btn").addEventListener("click", () => {
+  const li = document.createElement("li");
+  li.innerHTML = `
+    Item ${counter++}
+    <button class="delete-btn">Ta bort</button>
+  `;
+  list.appendChild(li);
+});
+```
+
+3. Lägg till flera items och ta bort dem - det fungerar utan att du behöver lägga till nya lyssnare!
+
+### 6 - Praktisk övning: Interaktiv meny
+Bygg en komplett navigeringsmeny med följande funktionalitet:
+
+1. Skapa HTML för en meny med minst 5 alternativ. Varje menyalternativ ska ha:
+   * En ikon (emoji eller riktig ikon)
+   * Menytext
+   * Eventuellt en badge (t.ex. antal notifikationer)
+
+2. Använd event delegation för att:
+   * Markera det klickade alternativet som aktivt
+   * Avmarkera tidigare aktiva alternativ
+   * Visa vilket menyalternativ som valdes (i en separat vy)
+
+3. Styla menyn med CSS:
+   * Hover-effekter
+   * Aktiv-markering
+   * Responsiv design (vertikal på mobil, horisontell på desktop)
+
+<details>
+<summary>Tips för aktiv-markering</summary>
+
+```javascript
+menu.addEventListener("click", (e) => {
+  const link = e.target.closest("a");
+  if (!link) return;
+
+  e.preventDefault();
+
+  // Ta bort active från alla
+  menu.querySelectorAll("a").forEach(a => a.classList.remove("active"));
+
+  // Lägg till på den klickade
+  link.classList.add("active");
+});
+```
+</details>
+
+### 7 - Utmaning: Data-attribut för mer info
+Använd `data-*` attribut för att lagra extra information.
+
+```html
+<ul id="products">
+  <li data-id="1" data-price="99">
+    <span class="name">Produkt 1</span>
+    <button class="buy-btn">Köp</button>
+    <button class="info-btn">Info</button>
+  </li>
+</ul>
+```
+
+```javascript
+products.addEventListener("click", (e) => {
+  const item = e.target.closest("li");
+  if (!item) return;
+
+  const productId = item.dataset.id;
+  const price = item.dataset.price;
+
+  if (e.target.classList.contains("buy-btn")) {
+    console.log(`Köp produkt ${productId} för ${price} kr`);
+  }
+
+  if (e.target.classList.contains("info-btn")) {
+    console.log(`Visa info om produkt ${productId}`);
+  }
+});
+```
+
+Bygg ut detta till en enkel produktlista där du kan:
+* Klicka "Köp" för att lägga till i en varukorg
+* Klicka "Info" för att visa mer detaljer
+* Visa totalsumma i varukorgen
+
+**Reflektion**:
+* När är event delegation bättre än individuella lyssnare?
+* Finns det situationer där delegation *inte* passar?
+* Hur påverkar delegation prestanda för stora listor?
+* Vad är för- och nackdelar med `data-*` attribut?
+
+</main>

@@ -1,0 +1,231 @@
+---
+title: Fetch
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå grunderna i `fetch` för att hämta data.
+* Att kunna läsa både textfiler och JSON-filer.
+* Att förstå skillnaden mellan `.then()` och `async/await`.
+* Att hantera asynkrona operationer korrekt.
+
+</aside>
+
+<main>
+Hittills har all data vi arbetat med varit hårdkodad i JavaScript-filer. I verkligheten kommer data ofta från externa källor - filer, databaser eller API:er. `fetch` är webbläsarens inbyggda sätt att hämta data asynkront.
+
+### 0 - Förberedelser
+Skapa en ny mapp `3a` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+**Viktigt**: Precis som med moduler måste du köra sidan via en lokal webbserver (t.ex. Live Server) för att `fetch` ska fungera med lokala filer.
+
+### 1 - Hämta en textfil
+Vi börjar med att hämta en enkel textfil.
+
+1. Skapa en fil `message.txt` i din `3a`-mapp med valfritt innehåll (några meningar).
+
+2. Använd `fetch` för att hämta filen:
+
+```javascript
+fetch("message.txt")
+  .then(response => response.text())
+  .then(text => {
+    console.log(text);
+  });
+```
+
+3. Öppna sidan och titta i konsolen - du bör se innehållet från din textfil.
+
+<details>
+<summary>Vad händer här?</summary>
+
+1. `fetch("message.txt")` startar en nätverksförfrågan och returnerar ett **Promise**
+2. `.then(response => response.text())` väntar på svaret och konverterar det till text
+3. `.then(text => { ... })` väntar på texten och gör något med den
+
+Ett Promise är ett "löfte" om ett framtida värde. Koden fortsätter köra medan vi väntar på svaret.
+</details>
+
+### 2 - Hämta JSON
+JSON-filer är vanligare eftersom de kan innehålla strukturerad data.
+
+1. Skapa en fil `data.json` med följande innehåll:
+
+```json
+{
+  "title": "Min första JSON-fil",
+  "author": "Ditt namn",
+  "items": ["äpple", "banan", "citron"]
+}
+```
+
+2. Hämta och parsa JSON:en:
+
+```javascript
+fetch("data.json")
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    console.log(data.title);
+    console.log(data.items[0]);
+  });
+```
+
+3. Notera skillnaden: `.text()` för text, `.json()` för JSON.
+
+**Testa själv**: Vad händer om du använder `.text()` på en JSON-fil? Vad händer om du använder `.json()` på en textfil som inte är giltig JSON?
+
+### 3 - Async/await
+`.then()` fungerar men kan bli svårläst med många steg. `async/await` ger en mer läsbar syntax.
+
+1. Skriv om din fetch med async/await:
+
+```javascript
+async function loadData() {
+  const response = await fetch("data.json");
+  const data = await response.json();
+  console.log(data);
+}
+
+loadData();
+```
+
+2. `await` pausar funktionen tills Promise:t är klart. Funktionen måste vara markerad med `async`.
+
+3. Du kan också använda async/await på toppnivå i en modul (vilket din fil är om du använder `type="module"`):
+
+```javascript
+const response = await fetch("data.json");
+const data = await response.json();
+console.log(data);
+```
+
+<details>
+<summary>När använda vad?</summary>
+
+* **async/await** - Mer läsbart, speciellt för sekventiella operationer
+* **.then()** - Bra för enkla fall eller när du vill kedja promises
+
+I denna kurs rekommenderar vi async/await för de flesta fall.
+</details>
+
+### 4 - Felhantering
+Vad händer om filen inte finns? Vi behöver hantera fel.
+
+1. Prova att hämta en fil som inte existerar:
+
+```javascript
+const response = await fetch("finns-inte.json");
+console.log(response.status); // 404
+console.log(response.ok);     // false
+```
+
+2. `fetch` kastar inte fel vid 404 - den returnerar ett response med `ok: false`. Du måste kontrollera detta själv:
+
+```javascript
+async function loadData() {
+  const response = await fetch("data.json");
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
+```
+
+3. Använd try-catch för att hantera fel:
+
+```javascript
+try {
+  const data = await loadData();
+  console.log(data);
+} catch (error) {
+  console.error("Kunde inte ladda data:", error.message);
+}
+```
+
+### 5 - Visa data i DOM
+Nu ska vi kombinera fetch med DOM-manipulation.
+
+1. Skapa HTML-element där du kan visa datan (en rubrik, en lista, etc.).
+
+2. Hämta JSON-datan och rendera den till sidan:
+
+```javascript
+async function displayData() {
+  try {
+    const response = await fetch("data.json");
+    if (!response.ok) throw new Error("Kunde inte hämta data");
+
+    const data = await response.json();
+
+    // Uppdatera DOM med datan
+    // Din kod här...
+
+  } catch (error) {
+    // Visa ett felmeddelande för användaren
+  }
+}
+
+displayData();
+```
+
+Tänk på:
+* Vad ska användaren se medan datan laddas?
+* Vad ska användaren se om något går fel?
+
+### 6 - Utmaning: Ladda flera filer
+Ibland behöver du hämta flera filer.
+
+#### Sekventiellt (en i taget)
+```javascript
+const response1 = await fetch("file1.json");
+const data1 = await response1.json();
+
+const response2 = await fetch("file2.json");
+const data2 = await response2.json();
+```
+
+#### Parallellt (samtidigt)
+```javascript
+const [response1, response2] = await Promise.all([
+  fetch("file1.json"),
+  fetch("file2.json")
+]);
+
+const data1 = await response1.json();
+const data2 = await response2.json();
+```
+
+1. Skapa två JSON-filer med olika data.
+
+2. Hämta båda och kombinera informationen på sidan.
+
+3. Mät tidsskillnaden mellan sekventiell och parallell hämtning med `console.time()`:
+
+```javascript
+console.time("fetch");
+// ... din kod
+console.timeEnd("fetch");
+```
+
+<details>
+<summary>Förklaring</summary>
+
+`Promise.all()` startar alla förfrågningar samtidigt och väntar tills alla är klara. Detta är snabbare än att vänta på varje fil i tur och ordning.
+
+Om en fil är 100ms bort och du hämtar 3 filer:
+* Sekventiellt: ~300ms
+* Parallellt: ~100ms
+</details>
+
+**Reflektion**:
+* Varför returnerar `fetch` ett Promise istället för datan direkt?
+* Vad är skillnaden mellan `response.text()` och `response.json()`?
+* Varför måste vi kontrollera `response.ok` manuellt?
+* När är parallell hämtning bättre än sekventiell?
+
+</main>

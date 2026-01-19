@@ -1,0 +1,243 @@
+---
+title: Live-validering
+---
+
+<aside class="first">
+
+#### Syfte
+* Att ge användaren feedback i realtid medan de fyller i formulär.
+* Att skapa dynamiska valideringsindikatorer.
+* Att bygga en lösenordsstyrke-indikator.
+* Att förbättra användarupplevelsen med visuell feedback.
+
+</aside>
+
+<main>
+HTML5-validering visar fel först när man försöker skicka formuläret. Ibland vill vi ge snabbare feedback - visa användaren direkt vad som är rätt och fel. I denna laboration bygger vi live-validering med JavaScript.
+
+### 0 - Förberedelser
+Skapa en ny mapp `7b` i din `labs`-mapp med `index.html`, `main.js` och `style.css`. Länka gärna även in `global.css`.
+
+### 1 - Grundläggande live-validering
+Lyssna på input-events för att validera medan användaren skriver.
+
+1. Skapa ett enkelt formulär med ett fält för e-post.
+
+2. Lägg till en yta för feedback bredvid fältet.
+
+3. Validera medan användaren skriver:
+
+```javascript
+const emailInput = document.querySelector("#email");
+const emailFeedback = document.querySelector("#email-feedback");
+
+emailInput.addEventListener("input", () => {
+  const email = emailInput.value;
+
+  if (email === "") {
+    emailFeedback.textContent = "";
+    emailFeedback.className = "";
+  } else if (emailInput.validity.valid) {
+    emailFeedback.textContent = "✓ Giltig e-post";
+    emailFeedback.className = "valid";
+  } else {
+    emailFeedback.textContent = "✗ Ogiltig e-post";
+    emailFeedback.className = "invalid";
+  }
+});
+```
+
+4. Styla feedback-meddelanden med CSS.
+
+### 2 - Lösenordskrav-checklista
+Skapa en interaktiv checklista som visar lösenordskrav.
+
+1. Definiera kraven:
+   * Minst 8 tecken
+   * Minst en stor bokstav
+   * Minst en liten bokstav
+   * Minst en siffra
+   * Minst ett specialtecken
+
+2. Skapa en lista i HTML som visar alla krav.
+
+3. Uppdatera listan medan användaren skriver:
+
+```javascript
+const passwordInput = document.querySelector("#password");
+const requirements = {
+  length: { regex: /.{8,}/, element: document.querySelector("#req-length") },
+  uppercase: { regex: /[A-Z]/, element: document.querySelector("#req-uppercase") },
+  lowercase: { regex: /[a-z]/, element: document.querySelector("#req-lowercase") },
+  number: { regex: /[0-9]/, element: document.querySelector("#req-number") },
+  special: { regex: /[!@#$%^&*]/, element: document.querySelector("#req-special") }
+};
+
+passwordInput.addEventListener("input", () => {
+  const password = passwordInput.value;
+
+  for (const [key, req] of Object.entries(requirements)) {
+    const isValid = req.regex.test(password);
+    req.element.classList.toggle("valid", isValid);
+    req.element.classList.toggle("invalid", !isValid);
+  }
+});
+```
+
+4. Styla kraven så att uppfyllda krav är tydligt markerade (t.ex. grön med bock, röd med kryss).
+
+### 3 - Lösenordsstyrka-indikator
+Visa en visuell indikator för hur starkt lösenordet är.
+
+1. Skapa en funktion som beräknar styrka:
+
+```javascript
+function calculatePasswordStrength(password) {
+  let score = 0;
+
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
+
+  return score; // 0-6
+}
+```
+
+2. Skapa en visuell indikator:
+   * 0-1: Svagt (röd)
+   * 2-3: Måttligt (orange)
+   * 4-5: Starkt (gul/ljusgrön)
+   * 6: Mycket starkt (grön)
+
+3. Uppdatera indikatorn medan användaren skriver.
+
+<details>
+<summary>Tips för visuell indikator</summary>
+
+HTML:
+```html
+<div class="strength-meter">
+  <div class="strength-fill"></div>
+</div>
+<span class="strength-text"></span>
+```
+
+CSS:
+```css
+.strength-meter {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.strength-fill.weak { width: 25%; background: #e74c3c; }
+.strength-fill.fair { width: 50%; background: #f39c12; }
+.strength-fill.good { width: 75%; background: #9b59b6; }
+.strength-fill.strong { width: 100%; background: #2ecc71; }
+```
+</details>
+
+### 4 - Bekräfta lösenord
+Lägg till ett "bekräfta lösenord"-fält som validerar att båda matchar.
+
+```javascript
+const confirmInput = document.querySelector("#confirm-password");
+
+confirmInput.addEventListener("input", () => {
+  const password = passwordInput.value;
+  const confirm = confirmInput.value;
+
+  if (confirm === "") {
+    // Tom - ingen feedback
+  } else if (password === confirm) {
+    // Matchar!
+  } else {
+    // Matchar inte
+  }
+});
+```
+
+Tänk på:
+* Ska du validera redan efter första tecknet?
+* Vad händer om användaren ändrar det första lösenordet?
+
+### 5 - Praktisk övning: Komplett registreringsformulär
+Bygg ett registreringsformulär med live-validering för alla fält.
+
+Formuläret ska innehålla:
+* Användarnamn (3-20 tecken, endast bokstäver och siffror)
+* E-post (giltig e-post)
+* Lösenord (med alla krav från tidigare)
+* Bekräfta lösenord (måste matcha)
+
+Varje fält ska ha:
+* Live-validering medan användaren skriver
+* Tydlig visuell feedback
+* Informativa felmeddelanden
+
+Submit-knappen ska vara disabled tills alla fält är giltiga:
+
+```javascript
+function updateSubmitButton() {
+  const allValid = /* kontrollera alla fält */;
+  submitButton.disabled = !allValid;
+}
+```
+
+### 6 - Utmaning: Visa/dölj lösenord
+Lägg till en "öga"-ikon för att visa/dölja lösenordet.
+
+1. Skapa en toggle-knapp bredvid lösenordsfältet.
+
+2. Växla mellan `type="password"` och `type="text"`:
+
+```javascript
+toggleButton.addEventListener("click", () => {
+  const isPassword = passwordInput.type === "password";
+  passwordInput.type = isPassword ? "text" : "password";
+  // Uppdatera ikon-visning
+});
+```
+
+3. Styla så att ikonen är tydlig och integrerad med fältet.
+
+4. Tänk på tillgänglighet:
+   * `aria-label` på knappen
+   * Uppdatera label baserat på tillstånd
+
+<details>
+<summary>Tips för tillgänglighet</summary>
+
+```javascript
+toggleButton.setAttribute("aria-pressed", !isPassword);
+toggleButton.setAttribute("aria-label",
+  isPassword ? "Visa lösenord" : "Dölj lösenord"
+);
+```
+</details>
+
+### 7 - Bonus: Tillämpa på landing page
+Tänk på om din landing page skulle kunna ha nytta av någon form av formulär:
+
+* Sökfält med live-validering
+* Filter-formulär för laborationer
+* Kontaktformulär
+* Inställningar för visning
+
+**Reflektion**:
+* Vilken balans finns mellan att ge feedback tidigt och att störa användaren?
+* Hur hanterar du fält som tar tid att fylla i (t.ex. längre texter)?
+* Vilka tillgänglighetshänsyn finns för live-validering?
+* Bör submit-knappen vara disabled eller visa fel vid klick?
+
+</main>

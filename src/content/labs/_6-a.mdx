@@ -1,0 +1,280 @@
+---
+title: Sök-API
+---
+
+<aside class="first">
+
+#### Syfte
+* Att hämta data från ett riktigt webb-API.
+* Att bygga URL:er med query parameters.
+* Att skapa ett sökgränssnitt som kommunicerar med en server.
+* Att förstå och implementera debouncing.
+
+</aside>
+
+<main>
+Hittills har vi hämtat data från lokala filer. Nu tar vi steget till riktiga webb-API:er. Vi ska bygga ett sökgränssnitt mot TVMaze - ett öppet API för TV-seriedata.
+
+### 0 - Förberedelser
+Skapa en ny mapp `6a` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Utforska API:et
+Innan vi kodar, låt oss förstå API:et vi ska använda.
+
+1. Öppna denna URL i webbläsaren:
+   ```
+   https://api.tvmaze.com/search/shows?q=breaking
+   ```
+
+2. Du ser JSON-data med TV-serier som matchar sökningen.
+
+3. Prova ändra `q=breaking` till något annat: `q=simpsons`, `q=friends`, etc.
+
+4. Titta på strukturen - varje resultat har:
+   * `score` - hur bra träffen är
+   * `show` - objekt med serieinfo (name, image, summary, etc.)
+
+<details>
+<summary>Tips: Formatera JSON i webbläsaren</summary>
+
+Installera ett tillägg som "JSON Formatter" för Chrome/Firefox för att se JSON snyggt formaterat i webbläsaren.
+</details>
+
+### 2 - Enkel sökning
+Bygg ett grundläggande sökgränssnitt.
+
+1. Skapa HTML med ett sökfält och ett område för resultat.
+
+2. Hämta data från API:et:
+
+```javascript
+async function searchShows(query) {
+  const response = await fetch(
+    `https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Sökningen misslyckades");
+  }
+
+  return response.json();
+}
+```
+
+3. Koppla sökfältet till funktionen:
+
+```javascript
+const searchInput = document.querySelector("#search");
+const resultsContainer = document.querySelector("#results");
+
+searchInput.addEventListener("input", async () => {
+  const query = searchInput.value.trim();
+
+  if (query.length < 2) {
+    resultsContainer.innerHTML = "";
+    return;
+  }
+
+  try {
+    const results = await searchShows(query);
+    displayResults(results);
+  } catch (error) {
+    resultsContainer.innerHTML = `<p class="error">Något gick fel</p>`;
+  }
+});
+```
+
+4. Skapa `displayResults` som visar resultaten.
+
+<details>
+<summary>Varför encodeURIComponent?</summary>
+
+URL:er kan inte innehålla alla tecken. Om användaren söker på "the office" måste mellanslaget kodas som `%20`. `encodeURIComponent` gör detta automatiskt.
+
+```javascript
+encodeURIComponent("the office") // "the%20office"
+encodeURIComponent("år & dag")   // "%C3%A5r%20%26%20dag"
+```
+</details>
+
+### 3 - Visa resultaten
+Skapa en funktion som renderar sökresultaten.
+
+Varje serie har (bland annat):
+* `show.name` - Seriens namn
+* `show.image` - Objekt med `medium` och `original` bild-URL (kan vara `null`)
+* `show.summary` - HTML-formaterad sammanfattning
+* `show.genres` - Array med genrer
+* `show.rating.average` - Betyg (kan vara `null`)
+
+Tänk på:
+* Hur visar du serier utan bild?
+* Summary innehåller HTML-taggar - hur hanterar du det?
+* Hur hanterar du `null`-värden?
+
+<details>
+<summary>Tips för att visa resultat</summary>
+
+```javascript
+function displayResults(results) {
+  if (results.length === 0) {
+    resultsContainer.innerHTML = "<p>Inga resultat hittades</p>";
+    return;
+  }
+
+  const html = results.map(({ show }) => {
+    const image = show.image?.medium || "placeholder.jpg";
+    const rating = show.rating?.average || "?";
+
+    return `
+      <article class="show-card">
+        <img src="${image}" alt="${show.name}">
+        <h3>${show.name}</h3>
+        <p>Betyg: ${rating}/10</p>
+      </article>
+    `;
+  }).join("");
+
+  resultsContainer.innerHTML = html;
+}
+```
+</details>
+
+### 4 - Debouncing
+Just nu skickas en förfrågan för varje knapptryck. Det är ineffektivt!
+
+**Debouncing** innebär att vänta tills användaren slutat skriva innan vi söker.
+
+```javascript
+function debounce(func, delay) {
+  let timeoutId;
+
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+```
+
+Använd så här:
+
+```javascript
+const debouncedSearch = debounce(async (query) => {
+  if (query.length < 2) {
+    resultsContainer.innerHTML = "";
+    return;
+  }
+
+  const results = await searchShows(query);
+  displayResults(results);
+}, 300);
+
+searchInput.addEventListener("input", () => {
+  debouncedSearch(searchInput.value.trim());
+});
+```
+
+Nu väntar vi 300ms efter sista knapptrycket innan vi söker.
+
+### 5 - Laddningsindikator
+Visa användaren att något händer medan vi väntar på svar.
+
+```javascript
+function showLoading() {
+  resultsContainer.innerHTML = `<p class="loading">Söker...</p>`;
+}
+
+function showError(message) {
+  resultsContainer.innerHTML = `<p class="error">${message}</p>`;
+}
+
+const debouncedSearch = debounce(async (query) => {
+  if (query.length < 2) {
+    resultsContainer.innerHTML = "";
+    return;
+  }
+
+  showLoading();
+
+  try {
+    const results = await searchShows(query);
+    displayResults(results);
+  } catch (error) {
+    showError("Kunde inte hämta resultat. Försök igen.");
+  }
+}, 300);
+```
+
+Styla loading- och error-meddelanden.
+
+### 6 - Visa detaljer
+Lägg till möjlighet att se mer information om en serie.
+
+1. Gör varje resultatkort klickbart.
+
+2. Hämta detaljerad information:
+   ```
+   https://api.tvmaze.com/shows/{id}
+   ```
+
+3. Visa detaljer i en modal, expanderbar sektion, eller ny vy.
+
+<details>
+<summary>Tips för detalj-hämtning</summary>
+
+```javascript
+async function getShowDetails(showId) {
+  const response = await fetch(`https://api.tvmaze.com/shows/${showId}`);
+  return response.json();
+}
+
+// I din event handler
+resultsContainer.addEventListener("click", async (e) => {
+  const card = e.target.closest(".show-card");
+  if (!card) return;
+
+  const showId = card.dataset.showId;
+  const details = await getShowDetails(showId);
+  displayShowDetails(details);
+});
+```
+
+Glöm inte att lägga till `data-show-id` på korten:
+```javascript
+`<article class="show-card" data-show-id="${show.id}">`
+```
+</details>
+
+### 7 - Utmaning: Avancerade funktioner
+Välj en eller flera att implementera:
+
+#### A - Spara sökhistorik
+* Spara senaste sökningarna i localStorage
+* Visa som förslag under sökfältet
+* Klicka för att söka igen
+
+#### B - Favoriter
+* Lägg till "spara som favorit"-knapp på varje serie
+* Spara favoriter i localStorage
+* Visa en separat favorit-lista
+
+#### C - Paginering
+TVMaze-sökningen returnerar max 10 resultat. API:et har också endpoints för att lista alla serier:
+```
+https://api.tvmaze.com/shows?page=0
+https://api.tvmaze.com/shows?page=1
+```
+Implementera "Ladda fler" eller sidnumrering.
+
+#### D - Relaterade serier
+När du visar detaljer, hämta och visa liknande serier eller serier från samma nätverk.
+
+**Reflektion**:
+* Vad är skillnaden mellan att hämta från en lokal fil och ett webb-API?
+* Varför är debouncing viktigt för sökfunktioner?
+* Hur hanterar du fel på ett användarvänligt sätt?
+* Vilka säkerhetsaspekter finns vid användning av externa API:er?
+
+</main>

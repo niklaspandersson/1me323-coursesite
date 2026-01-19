@@ -1,0 +1,245 @@
+---
+title: Kartintegration
+---
+
+<aside class="first">
+
+#### Syfte
+* Att använda ett externt JavaScript-bibliotek (Leaflet).
+* Att integrera kartfunktionalitet i en webbapplikation.
+* Att visa data geografiskt med markörer.
+* Att kombinera API-data med kartvisning.
+
+</aside>
+
+<main>
+Kartor är ett kraftfullt sätt att visualisera geografisk data. Vi ska använda Leaflet - ett populärt, öppet kartbibliotek som fungerar med OpenStreetMap.
+
+### 0 - Förberedelser
+Skapa en ny mapp `6c` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Inkludera Leaflet
+Leaflet behöver både CSS och JavaScript.
+
+Lägg till i din HTML `<head>`:
+
+```html
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+```
+
+Skapa också en container för kartan:
+
+```html
+<div id="map"></div>
+```
+
+Kartan behöver en explicit höjd i CSS:
+
+```css
+#map {
+  height: 500px;
+  width: 100%;
+}
+```
+
+### 2 - Skapa en enkel karta
+Initiera kartan i JavaScript:
+
+```javascript
+// Skapa kartan centrerad på Stockholm
+const map = L.map("map").setView([59.33, 18.07], 13);
+
+// Lägg till kartlager (tiles) från OpenStreetMap
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+```
+
+Parametrar till `setView`:
+* Första: `[latitud, longitud]` - koordinater för mitten
+* Andra: zoom-nivå (1 = hela världen, 18 = enskilda byggnader)
+
+### 3 - Lägg till markörer
+Markörer visar specifika platser på kartan.
+
+```javascript
+// Enkel markör
+const marker = L.marker([59.33, 18.07]).addTo(map);
+
+// Markör med popup
+L.marker([59.33, 18.07])
+  .addTo(map)
+  .bindPopup("Du är här!")
+  .openPopup();
+```
+
+Prova att lägga till markörer på platser du känner till.
+
+### 4 - Interaktiva popups
+Popups kan innehålla HTML:
+
+```javascript
+const popupContent = `
+  <h3>Stockholms Stadshus</h3>
+  <p>Byggt 1923</p>
+  <a href="https://sv.wikipedia.org/wiki/Stockholms_stadshus" target="_blank">
+    Läs mer
+  </a>
+`;
+
+L.marker([59.3275, 18.0545])
+  .addTo(map)
+  .bindPopup(popupContent);
+```
+
+### 5 - Data från JSON
+Nu ska vi kombinera kartan med data från en JSON-fil.
+
+1. Skapa en fil `places.json` med platser:
+
+```json
+{
+  "places": [
+    {
+      "name": "Stockholms Stadshus",
+      "lat": 59.3275,
+      "lng": 18.0545,
+      "description": "Stockholms mest kända byggnad"
+    },
+    {
+      "name": "Kungliga Slottet",
+      "lat": 59.3268,
+      "lng": 18.0717,
+      "description": "Sveriges kungs officiella residens"
+    }
+  ]
+}
+```
+
+2. Ladda datan och skapa markörer:
+
+```javascript
+async function loadPlaces() {
+  const response = await fetch("places.json");
+  const data = await response.json();
+
+  data.places.forEach(place => {
+    L.marker([place.lat, place.lng])
+      .addTo(map)
+      .bindPopup(`<h3>${place.name}</h3><p>${place.description}</p>`);
+  });
+}
+
+loadPlaces();
+```
+
+### 6 - Anpassa markörer
+Du kan ändra utseendet på markörer med custom icons:
+
+```javascript
+const customIcon = L.icon({
+  iconUrl: "marker-icon.png",
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32]
+});
+
+L.marker([59.33, 18.07], { icon: customIcon }).addTo(map);
+```
+
+Eller använd cirkelmarkörer:
+
+```javascript
+L.circleMarker([59.33, 18.07], {
+  radius: 10,
+  fillColor: "#ff7800",
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8
+}).addTo(map);
+```
+
+### 7 - Praktisk övning: Interaktiv platskarta
+Bygg en komplett kartapplikation.
+
+1. Skapa en lista med minst 5-10 intressanta platser i en stad du väljer.
+
+2. Visa platserna både:
+   * Som markörer på kartan
+   * Som en lista bredvid kartan
+
+3. Funktionalitet:
+   * Klicka på ett listobjekt → kartan zoomar till platsen
+   * Klicka på en markör → visa popup med info
+   * Kategorisera platser (restauranger, museer, etc.) med olika färger/ikoner
+
+<details>
+<summary>Tips för att flytta kartan</summary>
+
+```javascript
+// Flytta och zooma till en plats
+map.setView([lat, lng], 15);
+
+// Eller med animation
+map.flyTo([lat, lng], 15, {
+  duration: 1 // sekunder
+});
+```
+</details>
+
+### 8 - Utmaning: Hämta data från API
+Kombinera kartan med ett riktigt API.
+
+#### Alternativ A: Earthquake data
+USGS har ett öppet API för jordbävningar:
+```
+https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson
+```
+
+Visa jordbävningar på en världskarta med cirkelstorlek baserat på magnitud.
+
+#### Alternativ B: Cykelpumpar i Stockholm
+Stockholms stad har öppna data:
+```
+https://openstreetgs.stockholm.se/geoservice/api/...
+```
+
+Utforska [Stockholm Open Data](https://dataportalen.stockholm.se/) för tillgängliga datasets.
+
+#### Alternativ C: Egna koordinater
+Använd OpenWeatherMap (från Lab 6-b) och visa väder för flera städer på en karta.
+
+<details>
+<summary>Tips för GeoJSON</summary>
+
+Leaflet har inbyggt stöd för GeoJSON-format:
+
+```javascript
+const response = await fetch("earthquake-data.geojson");
+const geojson = await response.json();
+
+L.geoJSON(geojson, {
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, {
+      radius: feature.properties.mag * 3
+    });
+  },
+  onEachFeature: function(feature, layer) {
+    layer.bindPopup(feature.properties.place);
+  }
+}).addTo(map);
+```
+</details>
+
+### 9 - Tillämpa på landing page (bonus)
+Om du har koordinater för var du gjort dina laborationer (hemma, skola, bibliotek), varför inte lägga till en liten karta på din landing page som visar var du kodat?
+
+**Reflektion**:
+* Vad är fördelarna med att använda ett bibliotek som Leaflet istället för att bygga egen kartfunktionalitet?
+* Hur påverkar externa bibliotek sidans laddningstid?
+* Vilka tillgänglighetshänsyn finns för kartapplikationer?
+* Hur kan du göra kartan användbar på mobila enheter?
+
+</main>

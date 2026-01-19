@@ -1,0 +1,319 @@
+---
+title: Inkapsling
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå varför inkapsling är viktigt.
+* Att kunna använda privata fält (`#`) för att skydda data.
+* Att validera input genom setters.
+* Att designa klasser med tydliga gränssnitt.
+
+</aside>
+
+<main>
+Inkapsling handlar om att dölja interna detaljer och bara exponera det som behövs. Detta skyddar mot felaktig användning och gör koden lättare att underhålla.
+
+### 0 - Förberedelser
+Skapa en ny mapp `4b` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Problemet utan inkapsling
+Låt oss börja med att se varför inkapsling behövs.
+
+1. Skapa en enkel bankkonto-klass:
+
+```javascript
+class Account {
+  constructor(owner, initialBalance) {
+    this.owner = owner;
+    this.balance = initialBalance;
+  }
+
+  deposit(amount) {
+    this.balance += amount;
+  }
+
+  withdraw(amount) {
+    this.balance -= amount;
+  }
+}
+```
+
+2. Problemet - vem som helst kan manipulera saldot direkt:
+
+```javascript
+const account = new Account("Anna", 1000);
+account.balance = 1000000;  // Fusk!
+account.balance = -500;     // Ogiltigt tillstånd!
+```
+
+3. Vi har inga garantier om att `balance` alltid är giltigt.
+
+### 2 - Privata fält med #
+JavaScript har nu stöd för riktigt privata fält med `#`-prefix.
+
+1. Gör balance privat:
+
+```javascript
+class Account {
+  #balance;  // Privat fält - deklareras först
+
+  constructor(owner, initialBalance) {
+    this.owner = owner;
+    this.#balance = initialBalance;
+  }
+
+  deposit(amount) {
+    this.#balance += amount;
+  }
+
+  withdraw(amount) {
+    this.#balance -= amount;
+  }
+
+  getBalance() {
+    return this.#balance;
+  }
+}
+```
+
+2. Försök komma åt det privata fältet utifrån:
+
+```javascript
+const account = new Account("Anna", 1000);
+console.log(account.#balance);  // SyntaxError!
+account.#balance = 1000000;     // SyntaxError!
+```
+
+3. Nu kan saldot bara ändras genom metoderna vi tillhandahåller.
+
+### 3 - Validering i metoder
+Nu kan vi lägga till validering eftersom all åtkomst går genom våra metoder.
+
+1. Lägg till validering i `deposit` och `withdraw`:
+
+```javascript
+class Account {
+  #balance;
+
+  constructor(owner, initialBalance) {
+    this.owner = owner;
+    this.#balance = initialBalance;
+  }
+
+  deposit(amount) {
+    if (amount <= 0) {
+      throw new Error("Belopp måste vara positivt");
+    }
+    this.#balance += amount;
+  }
+
+  withdraw(amount) {
+    if (amount <= 0) {
+      throw new Error("Belopp måste vara positivt");
+    }
+    if (amount > this.#balance) {
+      throw new Error("Otillräckligt saldo");
+    }
+    this.#balance -= amount;
+  }
+
+  getBalance() {
+    return this.#balance;
+  }
+}
+```
+
+2. Testa valideringen:
+
+```javascript
+const account = new Account("Anna", 1000);
+
+try {
+  account.withdraw(2000);
+} catch (error) {
+  console.log(error.message); // "Otillräckligt saldo"
+}
+```
+
+### 4 - Getter och setter med validering
+Du kan kombinera privata fält med getters och setters.
+
+1. Använd en getter för balance:
+
+```javascript
+class Account {
+  #balance;
+
+  constructor(owner, initialBalance) {
+    this.owner = owner;
+    this.#balance = initialBalance;
+  }
+
+  get balance() {
+    return this.#balance;
+  }
+
+  // Ingen setter - balance kan bara ändras via deposit/withdraw
+}
+```
+
+2. Nu kan du läsa saldot som en property, men inte sätta det:
+
+```javascript
+const account = new Account("Anna", 1000);
+console.log(account.balance);  // 1000 (via getter)
+account.balance = 5000;        // Ignoreras tyst (ingen setter)
+```
+
+3. Du kan också lägga till en setter med validering:
+
+```javascript
+set balance(value) {
+  if (value < 0) {
+    throw new Error("Saldo kan inte vara negativt");
+  }
+  this.#balance = value;
+}
+```
+
+### 5 - Privata metoder
+Även metoder kan vara privata.
+
+```javascript
+class Account {
+  #balance;
+  #transactionLog = [];
+
+  #logTransaction(type, amount) {
+    this.#transactionLog.push({
+      type,
+      amount,
+      date: new Date(),
+      balanceAfter: this.#balance
+    });
+  }
+
+  deposit(amount) {
+    if (amount <= 0) throw new Error("Belopp måste vara positivt");
+    this.#balance += amount;
+    this.#logTransaction("deposit", amount);
+  }
+
+  withdraw(amount) {
+    if (amount <= 0) throw new Error("Belopp måste vara positivt");
+    if (amount > this.#balance) throw new Error("Otillräckligt saldo");
+    this.#balance -= amount;
+    this.#logTransaction("withdrawal", amount);
+  }
+
+  getTransactionHistory() {
+    // Returnera en kopia så att originalet inte kan modifieras
+    return [...this.#transactionLog];
+  }
+}
+```
+
+### 6 - Praktisk övning: Komplett Account-klass
+Bygg ut din Account-klass med full funktionalitet.
+
+Klassen ska ha:
+* Privata fält: `#balance`, `#transactionLog`, `#accountNumber`
+* Getter: `balance`, `accountNumber`
+* Metoder: `deposit(amount)`, `withdraw(amount)`, `transfer(targetAccount, amount)`
+* Validering av alla belopp
+* Transaktionslogg som sparar alla operationer
+
+Skapa sedan ett enkelt UI:
+* Visa saldo
+* Knappar för insättning och uttag
+* Visa transaktionshistorik
+
+<details>
+<summary>Tips för transfer</summary>
+
+```javascript
+transfer(targetAccount, amount) {
+  if (!(targetAccount instanceof Account)) {
+    throw new Error("Ogiltigt målkonto");
+  }
+  this.withdraw(amount);  // Validering sker här
+  targetAccount.deposit(amount);
+  this.#logTransaction("transfer-out", amount);
+}
+```
+</details>
+
+### 7 - Utmaning: Skapa en egen klass med inkapsling
+Välj ett av följande och implementera med korrekta privata fält och validering:
+
+#### Alternativ A: Inventory (lagerhantering)
+* Privat: `#items` (array eller Map)
+* Metoder: `addItem(name, quantity)`, `removeItem(name, quantity)`, `getStock(name)`
+* Validering: Kan inte ta bort mer än som finns
+
+#### Alternativ B: Timer/Stopwatch
+* Privat: `#startTime`, `#isRunning`, `#elapsed`
+* Metoder: `start()`, `stop()`, `reset()`, `getTime()`
+* Validering: Kan inte starta om redan igång
+
+#### Alternativ C: Password Manager (förenklad)
+* Privat: `#passwords` (Map)
+* Metoder: `addPassword(site, password)`, `getPassword(site)`, `removePassword(site)`
+* Validering: Lösenord måste uppfylla vissa krav
+
+Skapa även ett enkelt användargränssnitt för din valda klass.
+
+<details>
+<summary>Förslag på Timer-struktur</summary>
+
+```javascript
+class Timer {
+  #startTime = null;
+  #elapsed = 0;
+  #isRunning = false;
+
+  start() {
+    if (this.#isRunning) {
+      throw new Error("Timer körs redan");
+    }
+    this.#startTime = Date.now();
+    this.#isRunning = true;
+  }
+
+  stop() {
+    if (!this.#isRunning) {
+      throw new Error("Timer körs inte");
+    }
+    this.#elapsed += Date.now() - this.#startTime;
+    this.#isRunning = false;
+  }
+
+  reset() {
+    this.#startTime = null;
+    this.#elapsed = 0;
+    this.#isRunning = false;
+  }
+
+  get isRunning() {
+    return this.#isRunning;
+  }
+
+  getTime() {
+    if (this.#isRunning) {
+      return this.#elapsed + (Date.now() - this.#startTime);
+    }
+    return this.#elapsed;
+  }
+}
+```
+</details>
+
+**Reflektion**:
+* Varför är det viktigt att dölja interna detaljer?
+* Vad är skillnaden mellan att returnera `this.#transactionLog` och `[...this.#transactionLog]`?
+* Hur påverkar inkapsling testbarhet och underhåll av kod?
+* I vilka situationer kan för mycket inkapsling vara negativt?
+
+</main>

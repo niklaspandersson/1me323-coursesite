@@ -1,0 +1,274 @@
+---
+title: Klasser
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå klass-syntax i JavaScript.
+* Att kunna skapa klasser med konstruktor och metoder.
+* Att förstå skillnaden mellan getters och vanliga metoder.
+* Att använda klasser för att strukturera kod.
+
+</aside>
+
+<main>
+I Lab 2-b arbetade vi med objekt och metoder. Klasser ger oss ett sätt att skapa "mallar" för objekt - istället för att skriva samma struktur om och om igen definierar vi den en gång och skapar sedan instanser.
+
+### 0 - Förberedelser
+Skapa en ny mapp `4a` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Din första klass
+En klass är som en ritning för att skapa objekt.
+
+1. Skapa en klass `Rectangle`:
+
+```javascript
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+}
+```
+
+2. Skapa instanser av klassen:
+
+```javascript
+const rect1 = new Rectangle(10, 5);
+const rect2 = new Rectangle(20, 15);
+
+console.log(rect1.width);  // 10
+console.log(rect2.width);  // 20
+```
+
+3. Varje instans har sina egna värden, men delar samma struktur.
+
+<details>
+<summary>Vad är constructor?</summary>
+
+`constructor` är en speciell metod som körs automatiskt när du skapar en ny instans med `new`. Den används för att sätta upp objektets initiala tillstånd.
+
+```javascript
+const rect = new Rectangle(10, 5);
+// constructor körs med width=10, height=5
+// this.width = 10
+// this.height = 5
+```
+</details>
+
+### 2 - Lägg till metoder
+Metoder definieras direkt i klassens kropp.
+
+1. Lägg till en metod för att beräkna omkrets:
+
+```javascript
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  getPerimeter() {
+    return 2 * (this.width + this.height);
+  }
+
+  resize(newWidth, newHeight) {
+    this.width = newWidth;
+    this.height = newHeight;
+  }
+}
+```
+
+2. Testa metoderna:
+
+```javascript
+const rect = new Rectangle(10, 5);
+console.log(rect.getPerimeter()); // 30
+
+rect.resize(20, 10);
+console.log(rect.getPerimeter()); // 60
+```
+
+3. Lägg till fler metoder som är relevanta för en rektangel:
+   * `isSquare()` - returnerar true om det är en kvadrat
+   * `scale(factor)` - skalar båda dimensionerna
+
+### 3 - Getters
+En getter ser ut som en property men beräknas dynamiskt.
+
+1. Lägg till en getter för area:
+
+```javascript
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  get area() {
+    return this.width * this.height;
+  }
+}
+```
+
+2. Notera skillnaden i användning:
+
+```javascript
+const rect = new Rectangle(10, 5);
+
+// Getter - kallas utan parenteser (som en property)
+console.log(rect.area);        // 50
+
+// Vanlig metod - kallas med parenteser
+console.log(rect.getPerimeter()); // 30
+```
+
+3. Getters är bra för beräknade värden som beror på andra egenskaper.
+
+**Testa själv**: Vad händer om du försöker sätta `rect.area = 100`?
+
+### 4 - Setters
+En setter låter dig köra kod när en property sätts.
+
+1. Lägg till en setter för area som beräknar nya dimensioner:
+
+```javascript
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  get area() {
+    return this.width * this.height;
+  }
+
+  set area(newArea) {
+    // Behåll proportionerna, beräkna skalfaktor
+    const ratio = Math.sqrt(newArea / this.area);
+    this.width *= ratio;
+    this.height *= ratio;
+  }
+}
+```
+
+2. Nu kan du sätta arean:
+
+```javascript
+const rect = new Rectangle(10, 5);
+console.log(rect.area);   // 50
+console.log(rect.width);  // 10
+console.log(rect.height); // 5
+
+rect.area = 200;
+console.log(rect.area);   // 200
+console.log(rect.width);  // 20
+console.log(rect.height); // 10
+```
+
+### 5 - Jämför: property vs getter vs metod
+Det är viktigt att förstå när man använder vad.
+
+```javascript
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;          // Property - direkt värde
+    this.height = height;
+  }
+
+  get area() {                   // Getter - beräknat värde
+    return this.width * this.height;
+  }
+
+  scale(factor) {                // Metod - aktion som gör något
+    this.width *= factor;
+    this.height *= factor;
+  }
+}
+
+const rect = new Rectangle(10, 5);
+rect.width;      // Property - hämta lagrat värde
+rect.area;       // Getter - beräkna och returnera
+rect.scale(2);   // Metod - utför aktion, modifierar objektet
+```
+
+**Tumregler**:
+* **Property**: Data som lagras direkt
+* **Getter**: Beräknade värden som beror på properties
+* **Metod**: Aktioner som gör något (ofta modifierar objektet)
+
+### 6 - Praktisk övning: Cirkel-klass
+Skapa en `Circle`-klass på egen hand.
+
+Klassen ska ha:
+* Constructor som tar `radius`
+* Property: `radius`
+* Getter: `diameter` (2 * radius)
+* Getter: `area` (π * r²)
+* Getter: `circumference` (2 * π * r)
+* Setter: `diameter` (som uppdaterar radius)
+* Metod: `scale(factor)`
+
+Testa din klass genom att skapa några cirklar och anropa alla getters och metoder.
+
+<details>
+<summary>Förslag på lösning</summary>
+
+```javascript
+class Circle {
+  constructor(radius) {
+    this.radius = radius;
+  }
+
+  get diameter() {
+    return this.radius * 2;
+  }
+
+  set diameter(d) {
+    this.radius = d / 2;
+  }
+
+  get area() {
+    return Math.PI * this.radius ** 2;
+  }
+
+  get circumference() {
+    return 2 * Math.PI * this.radius;
+  }
+
+  scale(factor) {
+    this.radius *= factor;
+  }
+}
+```
+</details>
+
+### 7 - Utmaning: Visualisera i DOM
+Skapa en visuell representation av dina former.
+
+1. Skapa HTML med ett område där former kan visas.
+
+2. Lägg till en metod `render()` i din Rectangle-klass som returnerar ett HTML-element eller sträng:
+
+```javascript
+render() {
+  const div = document.createElement("div");
+  div.style.width = `${this.width}px`;
+  div.style.height = `${this.height}px`;
+  div.style.backgroundColor = "steelblue";
+  div.textContent = `${this.width}×${this.height}`;
+  return div;
+}
+```
+
+3. Skapa flera rektanglar och visa dem på sidan.
+
+4. Lägg till knappar för att ändra storlek och se uppdateringen i realtid.
+
+**Reflektion**:
+* Vad är fördelen med klasser jämfört med vanliga objekt-literaler?
+* När är getters bättre än metoder?
+* Hur skiljer sig klasser i JavaScript från klasser i andra språk du känner till?
+
+</main>

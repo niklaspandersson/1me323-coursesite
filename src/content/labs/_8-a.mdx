@@ -1,0 +1,215 @@
+---
+title: Lighthouse
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå och använda Lighthouse för att analysera webbsidor.
+* Att identifiera vanliga prestanda- och tillgänglighetsproblem.
+* Att förstå de olika kategorierna i Lighthouse-rapporten.
+* Att prioritera och åtgärda problem.
+
+</aside>
+
+<main>
+Lighthouse är ett verktyg från Google som analyserar webbsidor och ger poäng inom flera kategorier: Performance, Accessibility, Best Practices, och SEO. Det hjälper dig hitta och förstå problem du kanske inte visste fanns.
+
+### 0 - Förberedelser
+Skapa en ny mapp `8a` i din `labs`-mapp. Du kommer att arbeta med en "trasig" sida som du sedan ska förbättra.
+
+### 1 - Skapa en sida med problem
+Skapa medvetet en sida med vanliga problem. Detta blir vår test-sida.
+
+Skapa `index.html` med följande (avsiktliga) problem:
+* Bilder utan `alt`-attribut
+* Bilder med för stora dimensioner
+* Dålig kontrast på text
+* Saknar viewport meta-tag
+* Saknar `<html lang>`
+* Rubriker i fel ordning (t.ex. h1 → h3 → h2)
+* Länkar utan tydligt syfte
+* Ingen semantisk struktur
+
+Skapa också en stor bild (eller använd en högupplöst bild från nätet) som inte behöver vara så stor som den är.
+
+<details>
+<summary>Exempel på trasig HTML</summary>
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Min sida</title>
+</head>
+<body>
+  <div>
+    <div style="font-size: 24px;">Min sida</div>
+  </div>
+
+  <div>
+    <img src="huge-image.jpg" width="200">
+
+    <h3>Välkommen</h3>
+
+    <p style="color: #999; background: #fff;">
+      Detta är lite text som är svår att läsa.
+    </p>
+
+    <a href="page2.html">Klicka här</a>
+  </div>
+</body>
+</html>
+```
+</details>
+
+### 2 - Kör Lighthouse
+1. Öppna din sida i Chrome (via Live Server).
+
+2. Öppna DevTools (F12).
+
+3. Gå till fliken **Lighthouse**.
+
+4. Välj kategorier (börja med alla) och klicka **Analyze page load**.
+
+5. Vänta medan analysen körs.
+
+6. Studera rapporten noggrant.
+
+### 3 - Förstå rapporten
+Lighthouse ger poäng 0-100 i varje kategori:
+
+**Performance** - Hur snabbt laddas sidan?
+* First Contentful Paint (FCP)
+* Largest Contentful Paint (LCP)
+* Time to Interactive (TTI)
+* Cumulative Layout Shift (CLS)
+
+**Accessibility** - Är sidan tillgänglig för alla?
+* Kontrast
+* Alt-texter
+* Semantisk HTML
+* Tangentbordsnavigation
+
+**Best Practices** - Följer sidan bästa praxis?
+* HTTPS
+* Säkerhetsproblem
+* Moderna API:er
+
+**SEO** - Är sidan sökmotoroptimerad?
+* Meta-taggar
+* Semantik
+* Mobilanpassning
+
+### 4 - Åtgärda problem (Accessibility)
+Börja med tillgänglighetsproblemet. Varje problem i rapporten har förklaringar.
+
+1. **Lägg till `lang`-attribut**:
+```html
+<html lang="sv">
+```
+
+2. **Lägg till viewport meta**:
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+3. **Fixa rubrik-hierarki**:
+   * Det ska finnas en `<h1>` på varje sida
+   * Rubriker ska vara i ordning (h1 → h2 → h3)
+
+4. **Lägg till alt-texter**:
+```html
+<img src="bild.jpg" alt="Beskrivning av bilden">
+```
+
+5. **Fixa kontrast**: Använd mörkare textfärg eller ljusare bakgrund.
+
+6. **Förbättra länktexter**:
+```html
+<!-- Dåligt -->
+<a href="page.html">Klicka här</a>
+
+<!-- Bra -->
+<a href="page.html">Läs mer om våra tjänster</a>
+```
+
+Kör Lighthouse igen efter varje fix för att se förbättringen.
+
+### 5 - Åtgärda problem (Performance)
+Bildoptimering är ofta det viktigaste för prestanda.
+
+1. **Rätt bildstorlek**: Skala ner bilder till den storlek de visas i.
+
+2. **Moderna format**: Använd WebP istället för JPG/PNG där möjligt.
+
+3. **Lazy loading**:
+```html
+<img src="bild.jpg" alt="..." loading="lazy">
+```
+
+4. **Dimensioner på bilder** (förhindrar layout shift):
+```html
+<img src="bild.jpg" alt="..." width="400" height="300">
+```
+
+### 6 - Åtgärda problem (SEO)
+Grundläggande SEO-optimering.
+
+1. **Meta description**:
+```html
+<meta name="description" content="En kort beskrivning av sidan (150-160 tecken)">
+```
+
+2. **Semantisk HTML**:
+```html
+<header>...</header>
+<nav>...</nav>
+<main>...</main>
+<footer>...</footer>
+```
+
+3. **Läsbar rubrik-struktur**.
+
+### 7 - Dokumentera förbättringarna
+Skapa en tabell eller lista som visar:
+* Ursprunglig poäng i varje kategori
+* Problem som identifierades
+* Åtgärder du vidtog
+* Ny poäng efter åtgärder
+
+### 8 - Utmaning: 100 i Accessibility
+Målet är att uppnå 100 poäng i Accessibility-kategorin.
+
+Vanliga saker som behöver fixas:
+* Alla bilder har beskrivande alt-texter
+* Tillräcklig färgkontrast (4.5:1 för normal text)
+* Alla formulärfält har labels
+* Fokus-ordning är logisk
+* Interaktiva element är tillräckligt stora (minst 44x44 pixlar)
+* ARIA-attribut används korrekt (eller inte alls om onödigt)
+
+<details>
+<summary>Tips för kontrasttest</summary>
+
+DevTools har ett inbyggt kontrastverktyg:
+1. Inspektera ett text-element
+2. Klicka på färgrutan i Styles-panelen
+3. Se kontrastförhållandet och om det uppfyller WCAG-krav
+</details>
+
+### 9 - Tillämpa på din landing page
+Kör Lighthouse på din landing page från tidigare laborationer.
+
+1. Dokumentera nuvarande poäng.
+2. Identifiera de tre viktigaste problemen.
+3. Åtgärda dem.
+4. Kör Lighthouse igen och dokumentera förbättringen.
+
+**Reflektion**:
+* Vilka typer av problem var vanligast på din sida?
+* Hur prioriterar du vilka problem som ska åtgärdas först?
+* Varför är tillgänglighet viktigt även om din målgrupp "inte har funktionsnedsättningar"?
+* Hur kan du bygga in Lighthouse-tänkande från början i nya projekt?
+
+</main>

@@ -1,0 +1,250 @@
+---
+title: Metoder och this
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå skillnaden mellan egenskaper och metoder.
+* Att kunna skapa metoder som använder `this` för att referera till objektet.
+* Att förstå hur `this` kan ändras beroende på kontext.
+* Att kunna lösa problem med `this` i event-lyssnare.
+
+</aside>
+
+<main>
+Metoder är funktioner som tillhör ett objekt. De kan använda nyckelordet `this` för att komma åt objektets egna egenskaper, vilket gör dem kraftfulla för att skapa självständiga, återanvändbara komponenter.
+
+### 0 - Förberedelser
+Skapa en ny mapp `2b` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css` från labs-roten.
+
+### 1 - Skapa en metod
+En metod är helt enkelt en funktion som är en egenskap på ett objekt.
+
+1. Skapa ett objekt med en metod:
+
+```javascript
+const person = {
+  firstName: "Grace",
+  lastName: "Hopper",
+
+  getFullName: function() {
+    return this.firstName + " " + this.lastName;
+  }
+};
+
+console.log(person.getFullName()); // "Grace Hopper"
+```
+
+2. `this` refererar till objektet som metoden tillhör. Lägg till en `introduce`-metod som loggar en hälsning:
+
+```javascript
+introduce: function() {
+  console.log(`Hej, jag heter ${this.firstName}!`);
+}
+```
+
+3. Det finns en kortare syntax för metoder:
+
+```javascript
+const person = {
+  firstName: "Grace",
+
+  // Kortare syntax (rekommenderas)
+  introduce() {
+    console.log(`Hej, jag heter ${this.firstName}!`);
+  }
+};
+```
+
+### 2 - Ett räknar-objekt
+Låt oss skapa ett objekt som håller reda på ett värde och kan modifiera det.
+
+1. Skapa ett `counter`-objekt:
+
+```javascript
+const counter = {
+  value: 0,
+
+  increment() {
+    this.value++;
+    console.log(this.value);
+  },
+
+  decrement() {
+    this.value--;
+    console.log(this.value);
+  },
+
+  reset() {
+    this.value = 0;
+    console.log(this.value);
+  }
+};
+```
+
+2. Testa metoderna i konsolen:
+```javascript
+counter.increment(); // 1
+counter.increment(); // 2
+counter.decrement(); // 1
+counter.reset();     // 0
+```
+
+3. Skapa en enkel HTML-sida med:
+   * Ett element som visar räknarens värde
+   * Knappar för att öka, minska och nollställa
+
+4. Koppla ihop knapparna med räknarens metoder och uppdatera visningen.
+
+### 3 - Problemet med this
+Nu ska vi utforska ett klassiskt JavaScript-problem: `this` beter sig inte alltid som man förväntar sig.
+
+1. Prova att spara en metod i en variabel:
+
+```javascript
+const myFunc = counter.increment;
+myFunc(); // Vad händer?
+```
+
+2. Titta i konsolen. Värdet blir troligen `NaN` (Not a Number). Varför?
+
+<details>
+<summary>Förklaring</summary>
+
+När du sparar metoden i en variabel och anropar den "tappar" den sin koppling till objektet. `this` refererar då inte längre till `counter`-objektet, utan till `window` (i webbläsaren) eller `undefined` (i strict mode).
+
+```javascript
+const myFunc = counter.increment;
+myFunc(); // this === window (eller undefined)
+// window.value++ → NaN
+```
+</details>
+
+3. Samma problem uppstår med event-lyssnare. Prova:
+
+```javascript
+const button = document.querySelector("#incrementBtn");
+button.addEventListener("click", counter.increment);
+// Klicka på knappen - vad händer?
+```
+
+### 4 - Lösningar på this-problemet
+Det finns flera sätt att se till att `this` pekar på rätt objekt.
+
+#### Lösning A: Wrapper-funktion
+Wrap metoden i en anonym funktion:
+
+```javascript
+button.addEventListener("click", function() {
+  counter.increment();
+});
+```
+
+#### Lösning B: Arrow function
+Arrow functions har inte eget `this`, så de "ärver" från omgivande scope:
+
+```javascript
+button.addEventListener("click", () => {
+  counter.increment();
+});
+```
+
+#### Lösning C: bind()
+Metoden `bind()` skapar en ny funktion där `this` är permanent bundet:
+
+```javascript
+button.addEventListener("click", counter.increment.bind(counter));
+```
+
+Implementera någon av dessa lösningar för dina knappar och verifiera att räknaren fungerar.
+
+<details>
+<summary>Vilken lösning ska jag välja?</summary>
+
+* **Arrow function** är oftast enklast och mest läsbar för enkla fall
+* **bind()** är bra när du behöver skicka runt en funktion men vill behålla rätt `this`
+* **Wrapper-funktion** är tydligast men lite mer verbose
+
+I modern JavaScript är arrow functions vanligast.
+</details>
+
+### 5 - Arrow functions som metoder (varning!)
+En vanlig fälla är att använda arrow functions för att definiera metoder.
+
+1. Prova detta:
+
+```javascript
+const brokenPerson = {
+  name: "Test",
+
+  // ⚠️ Fungerar INTE som förväntat!
+  introduce: () => {
+    console.log(`Hej, jag heter ${this.name}`);
+  }
+};
+
+brokenPerson.introduce(); // "Hej, jag heter undefined"
+```
+
+2. Varför fungerar det inte?
+
+<details>
+<summary>Förklaring</summary>
+
+Arrow functions har inte eget `this` - de ärver `this` från den omgivande kontexten där de *definierades*. När objektet skapas är `this` inte objektet självt, utan det yttre scopet (oftast `window`).
+
+**Regel**: Använd aldrig arrow functions för objektmetoder som behöver `this`.
+
+```javascript
+// ❌ Fel
+const obj = {
+  method: () => { this.x }  // this är inte obj!
+};
+
+// ✅ Rätt
+const obj = {
+  method() { this.x }       // this är obj
+};
+```
+</details>
+
+### 6 - Utmaning: Interaktiv komponent
+Skapa ett objekt som representerar en enkel toggle-switch (på/av).
+
+Objektet ska ha:
+* En egenskap `isOn` (boolean)
+* En metod `toggle()` som växlar tillståndet
+* En metod `getStatus()` som returnerar "På" eller "Av"
+
+Skapa sedan HTML med:
+* En knapp som togglar
+* Ett element som visar aktuell status
+* Styling som visuellt visar om switchen är på eller av (t.ex. olika bakgrundsfärger)
+
+Se till att `this` fungerar korrekt i event-lyssnaren!
+
+<details>
+<summary>Förslag på objektstruktur</summary>
+
+```javascript
+const toggle = {
+  isOn: false,
+
+  toggle() {
+    this.isOn = !this.isOn;
+  },
+
+  getStatus() {
+    return this.isOn ? "På" : "Av";
+  }
+};
+```
+</details>
+
+**Reflektion**:
+* Varför är `this` användbart i metoder?
+* Vilka problem kan uppstå med `this` och hur löser man dem?
+* När bör man använda vanliga funktioner vs arrow functions?
+
+</main>

@@ -1,0 +1,321 @@
+---
+title: Semantik och SEO
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå vikten av semantisk HTML för sökmotorer och tillgänglighet.
+* Att kunna använda rätt HTML-element för rätt syfte.
+* Att implementera Open Graph-taggar för delning på sociala medier.
+* Att skapa en välstrukturerad sida som är lätt att hitta och dela.
+
+</aside>
+
+<main>
+Semantisk HTML handlar om att använda element som beskriver *vad* innehållet är, inte bara hur det ska se ut. Detta hjälper sökmotorer förstå din sida och gör den tillgänglig för alla användare.
+
+### 0 - Förberedelser
+Skapa en ny mapp `8c` i din `labs`-mapp med `index.html`. Du kommer också att jobba med din landing page.
+
+### 1 - Problemet med div-soppa
+Här är ett exempel på dålig struktur ("div-soppa"):
+
+```html
+<div class="header">
+  <div class="logo">Min Sida</div>
+  <div class="nav">
+    <div class="nav-item">Hem</div>
+    <div class="nav-item">Om</div>
+  </div>
+</div>
+<div class="content">
+  <div class="title">Välkommen</div>
+  <div class="text">Lite text här...</div>
+</div>
+```
+
+Problemen:
+* Sökmotorer förstår inte strukturen
+* Skärmläsare kan inte navigera effektivt
+* Koden är svårare att underhålla
+
+### 2 - Semantiska element
+HTML5 introducerade element med meningsfulla namn:
+
+```html
+<header>
+  <h1>Min Sida</h1>
+  <nav>
+    <ul>
+      <li><a href="/">Hem</a></li>
+      <li><a href="/om">Om</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h2>Välkommen</h2>
+    <p>Lite text här...</p>
+  </article>
+</main>
+
+<footer>
+  <p>© 2025 Min Sida</p>
+</footer>
+```
+
+### 3 - Viktiga semantiska element
+
+| Element | Användning |
+|---------|-----------|
+| `<header>` | Sidhuvud eller artikelhuvud |
+| `<nav>` | Navigation |
+| `<main>` | Huvudinnehåll (endast en per sida) |
+| `<article>` | Självständigt innehåll |
+| `<section>` | Tematisk gruppering |
+| `<aside>` | Sidoinnehåll, relaterat material |
+| `<footer>` | Sidfot eller artikelfot |
+| `<figure>` | Illustrationer, diagram |
+| `<figcaption>` | Bildtext |
+| `<time>` | Datum och tid |
+| `<address>` | Kontaktinformation |
+
+### 4 - Praktisk övning: Omstrukturera
+Ta denna "div-soppa" och gör om den till semantisk HTML:
+
+```html
+<div id="page">
+  <div class="top-bar">
+    <div class="site-name">Nyheter Sverige</div>
+    <div class="menu">
+      <span>Inrikes</span>
+      <span>Utrikes</span>
+      <span>Sport</span>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="story">
+      <div class="headline">Stor händelse inträffade</div>
+      <div class="meta">Publicerad 15 januari 2025</div>
+      <div class="body">
+        <div class="image-holder">
+          <img src="bild.jpg">
+          <div class="caption">Foto: Fotograf</div>
+        </div>
+        <div class="text">Nyhetstext här...</div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="related-title">Relaterat</div>
+      <div class="related-link">Annan nyhet</div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div>Kontakt: redaktion@exempel.se</div>
+    <div>© 2025</div>
+  </div>
+</div>
+```
+
+Gör om detta till korrekt semantisk HTML. Tänk på vilka element som bäst beskriver varje del.
+
+<details>
+<summary>Förslag på lösning</summary>
+
+```html
+<header>
+  <h1>Nyheter Sverige</h1>
+  <nav>
+    <ul>
+      <li><a href="/inrikes">Inrikes</a></li>
+      <li><a href="/utrikes">Utrikes</a></li>
+      <li><a href="/sport">Sport</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <header>
+      <h2>Stor händelse inträffade</h2>
+      <time datetime="2025-01-15">Publicerad 15 januari 2025</time>
+    </header>
+
+    <figure>
+      <img src="bild.jpg" alt="Beskrivning av bilden">
+      <figcaption>Foto: Fotograf</figcaption>
+    </figure>
+
+    <p>Nyhetstext här...</p>
+  </article>
+
+  <aside>
+    <h3>Relaterat</h3>
+    <ul>
+      <li><a href="...">Annan nyhet</a></li>
+    </ul>
+  </aside>
+</main>
+
+<footer>
+  <address>
+    Kontakt: <a href="mailto:redaktion@exempel.se">redaktion@exempel.se</a>
+  </address>
+  <p>© 2025</p>
+</footer>
+```
+</details>
+
+### 5 - Meta-taggar för SEO
+Lägg till viktiga meta-taggar i `<head>`:
+
+```html
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <title>Sidtitel - Max 60 tecken</title>
+  <meta name="description" content="Beskrivning av sidan, 150-160 tecken. Visas i sökresultat.">
+
+  <!-- Övriga -->
+  <meta name="author" content="Ditt namn">
+  <link rel="canonical" href="https://example.com/sidan">
+</head>
+```
+
+### 6 - Open Graph för sociala medier
+Open Graph-taggar styr hur din sida visas när den delas på sociala medier.
+
+```html
+<head>
+  <!-- Open Graph -->
+  <meta property="og:title" content="Sidans titel">
+  <meta property="og:description" content="Beskrivning för delning">
+  <meta property="og:image" content="https://example.com/bild.jpg">
+  <meta property="og:url" content="https://example.com/sidan">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sidans titel">
+  <meta name="twitter:description" content="Beskrivning">
+  <meta name="twitter:image" content="https://example.com/bild.jpg">
+</head>
+```
+
+### 7 - Testa Open Graph
+Verifiera dina OG-taggar med dessa verktyg:
+* [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
+* [Twitter Card Validator](https://cards-dev.twitter.com/validator)
+* [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
+
+**OBS**: Dessa kräver att din sida är publicerad på nätet. För lokal testning kan du inspektera taggarna manuellt.
+
+### 8 - Schema.org och strukturerad data
+För ännu bättre sökmotorförståelse kan du lägga till strukturerad data:
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Artikelrubrik",
+  "author": {
+    "@type": "Person",
+    "name": "Författarnamn"
+  },
+  "datePublished": "2025-01-15"
+}
+</script>
+```
+
+Detta hjälper sökmotorer visa "rich snippets" i sökresultat.
+
+### 9 - Tillämpa på din landing page
+Din landing page är ett perfekt projekt att optimera!
+
+1. **Semantisk struktur**:
+   * Använd `<header>`, `<main>`, `<footer>`
+   * Varje veckas laborationer kan vara en `<section>` eller `<article>`
+   * Navigering i `<nav>`
+
+2. **Meta-taggar**:
+   * Beskrivande `<title>`
+   * Meta description
+   * Open Graph-taggar (om du planerar dela sidan)
+
+3. **Rubrik-hierarki**:
+   * En `<h1>` för huvudrubriken
+   * `<h2>` för varje vecka
+   * `<h3>` för varje laboration
+
+4. **Tillgänglighet**:
+   * Skip-länk till huvudinnehåll
+   * Meningsfulla länktexter
+   * Bra kontrast
+
+<details>
+<summary>Skip-länk exempel</summary>
+
+```html
+<body>
+  <a href="#main-content" class="skip-link">
+    Hoppa till huvudinnehåll
+  </a>
+
+  <header>...</header>
+
+  <main id="main-content">
+    ...
+  </main>
+</body>
+```
+
+```css
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+```
+</details>
+
+### 10 - Utmaning: Sitemap
+Skapa en `sitemap.xml` som listar alla dina laborationer:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://example.com/</loc>
+    <lastmod>2025-01-15</lastmod>
+  </url>
+  <url>
+    <loc>https://example.com/1a/</loc>
+    <lastmod>2025-01-10</lastmod>
+  </url>
+  <!-- Fler URLs -->
+</urlset>
+```
+
+**Reflektion**:
+* Varför är semantisk HTML viktig även för sidor som "ingen annan kommer se"?
+* Hur hjälper semantik skärmläsare och andra hjälpmedel?
+* Vad är skillnaden mellan `<section>` och `<article>`?
+* Hur kan du testa om din sida är tillgänglig utan att använda skärmläsare?
+
+</main>

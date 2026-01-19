@@ -1,0 +1,278 @@
+---
+title: Template Element
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå `<template>`-elementet och dess fördelar.
+* Att kunna klona och återanvända HTML-mallar.
+* Att separera markup från JavaScript-logik.
+* Att effektivt skapa upprepade UI-element.
+
+</aside>
+
+<main>
+Hittills har vi skapat HTML i JavaScript med template literals eller `createElement`. Elementet `<template>` ger oss ett bättre sätt - vi skriver HTML i HTML-filen och klonar den vid behov.
+
+### 0 - Förberedelser
+Skapa en ny mapp `5a` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Vad är template?
+Ett `<template>`-element innehåller HTML som inte renderas direkt på sidan, men kan klonas och användas av JavaScript.
+
+1. Lägg till en template i din HTML:
+
+```html
+<template id="greeting-template">
+  <div class="greeting">
+    <h2>Hej!</h2>
+    <p>Välkommen till sidan.</p>
+  </div>
+</template>
+
+<main id="output">
+  <!-- Här kommer innehållet -->
+</main>
+```
+
+2. Öppna sidan - du ser ingenting! Template-innehållet är dolt.
+
+3. Klona och lägg till i JavaScript:
+
+```javascript
+const template = document.querySelector("#greeting-template");
+const clone = template.content.cloneNode(true);
+document.querySelector("#output").appendChild(clone);
+```
+
+4. Nu syns innehållet!
+
+<details>
+<summary>Varför cloneNode(true)?</summary>
+
+* `template.content` ger oss ett DocumentFragment med mallens innehåll
+* `cloneNode(true)` skapar en djup kopia (inkl. alla barn)
+* `cloneNode(false)` kopierar bara elementet självt, inte barnen
+* Vi måste klona eftersom originalet bara kan användas en gång
+</details>
+
+### 2 - Fylla i data
+Mallar blir kraftfulla när vi fyller i dynamisk data.
+
+1. Skapa en template för ett kontaktkort:
+
+```html
+<template id="contact-template">
+  <article class="contact-card">
+    <h3 class="name"></h3>
+    <p class="email"></p>
+    <p class="phone"></p>
+  </article>
+</template>
+```
+
+2. Klona och fyll i data:
+
+```javascript
+function createContactCard(contact) {
+  const template = document.querySelector("#contact-template");
+  const clone = template.content.cloneNode(true);
+
+  clone.querySelector(".name").textContent = contact.name;
+  clone.querySelector(".email").textContent = contact.email;
+  clone.querySelector(".phone").textContent = contact.phone;
+
+  return clone;
+}
+
+const contact = {
+  name: "Anna Andersson",
+  email: "anna@example.com",
+  phone: "070-123 45 67"
+};
+
+document.querySelector("#output").appendChild(createContactCard(contact));
+```
+
+### 3 - Rendera en lista
+Templates passar perfekt för att rendera listor med data.
+
+1. Skapa data (eller hämta från JSON):
+
+```javascript
+const contacts = [
+  { name: "Anna Andersson", email: "anna@example.com", phone: "070-111 11 11" },
+  { name: "Björn Berg", email: "bjorn@example.com", phone: "070-222 22 22" },
+  { name: "Cecilia Carlsson", email: "cecilia@example.com", phone: "070-333 33 33" }
+];
+```
+
+2. Skapa en funktion som renderar alla kontakter:
+
+```javascript
+function renderContacts(contacts) {
+  const output = document.querySelector("#output");
+  output.innerHTML = ""; // Rensa först
+
+  contacts.forEach(contact => {
+    output.appendChild(createContactCard(contact));
+  });
+}
+
+renderContacts(contacts);
+```
+
+3. Skapa din egen styling för kontaktkorten.
+
+### 4 - Jämför med andra metoder
+Templates är ett av flera sätt att skapa dynamisk HTML.
+
+#### Template literals (i JS)
+```javascript
+function createCard(contact) {
+  return `
+    <article class="contact-card">
+      <h3>${contact.name}</h3>
+      <p>${contact.email}</p>
+    </article>
+  `;
+}
+output.innerHTML = contacts.map(createCard).join("");
+```
+
+#### createElement (DOM API)
+```javascript
+function createCard(contact) {
+  const article = document.createElement("article");
+  article.className = "contact-card";
+  const h3 = document.createElement("h3");
+  h3.textContent = contact.name;
+  article.appendChild(h3);
+  // ... mer kod
+  return article;
+}
+```
+
+#### Template element
+```javascript
+function createCard(contact) {
+  const clone = template.content.cloneNode(true);
+  clone.querySelector(".name").textContent = contact.name;
+  // ...
+  return clone;
+}
+```
+
+**Fördelar med template:**
+* HTML skrivs i HTML-filen (bättre separation)
+* Syntax highlighting och validering
+* Lättare för designers att redigera
+* Ingen risk för XSS om du använder `textContent`
+
+### 5 - Praktisk övning
+Skapa en produktkatalog med templates.
+
+1. Designa en template för ett produktkort med:
+   * Produktbild
+   * Namn
+   * Pris
+   * Kort beskrivning
+   * "Köp"-knapp
+
+2. Skapa produktdata (array av objekt) eller hämta från en JSON-fil.
+
+3. Rendera alla produkter till sidan.
+
+4. Styla produktkorten så de ser tilltalande ut.
+
+### 6 - Event listeners på template-innehåll
+En utmaning med templates är att koppla event listeners.
+
+```javascript
+function createContactCard(contact) {
+  const clone = template.content.cloneNode(true);
+
+  clone.querySelector(".name").textContent = contact.name;
+
+  // Hitta knappen och lägg till lyssnare
+  const deleteBtn = clone.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", () => {
+    console.log(`Ta bort ${contact.name}`);
+  });
+
+  return clone;
+}
+```
+
+**Viktigt**: Du måste lägga till event listeners *innan* du lägger till clone i DOM, eller så får du inte referensen till knappen.
+
+<details>
+<summary>Alternativ: Event delegation</summary>
+
+Istället för lyssnare på varje kort kan du använda event delegation:
+
+```javascript
+output.addEventListener("click", (e) => {
+  if (e.target.classList.contains("delete-btn")) {
+    const card = e.target.closest(".contact-card");
+    const name = card.querySelector(".name").textContent;
+    console.log(`Ta bort ${name}`);
+  }
+});
+```
+
+Detta är ofta mer effektivt för stora listor.
+</details>
+
+### 7 - Utmaning: Generisk template-funktion
+Skapa en återanvändbar funktion som fyller i en template baserat på data.
+
+```javascript
+function fillTemplate(templateId, data) {
+  const template = document.querySelector(templateId);
+  const clone = template.content.cloneNode(true);
+
+  // Fyll i alla element som har data-field attribut
+  for (const [key, value] of Object.entries(data)) {
+    const element = clone.querySelector(`[data-field="${key}"]`);
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  return clone;
+}
+```
+
+Template HTML:
+```html
+<template id="card-template">
+  <div class="card">
+    <h3 data-field="title"></h3>
+    <p data-field="description"></p>
+    <span data-field="price"></span>
+  </div>
+</template>
+```
+
+Användning:
+```javascript
+const card = fillTemplate("#card-template", {
+  title: "Produkt",
+  description: "En fin produkt",
+  price: "99 kr"
+});
+```
+
+Utöka funktionen så den kan:
+* Sätta attribut (t.ex. `src` för bilder)
+* Hantera arrays (skapa flera element)
+* Hantera nästlade objekt
+
+**Reflektion**:
+* När är templates bättre än template literals?
+* Vilka nackdelar har template-elementet?
+* Hur påverkar valet av metod kodens läsbarhet och underhållbarhet?
+
+</main>

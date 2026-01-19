@@ -1,0 +1,240 @@
+---
+title: Lazy Loading
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå varför lazy loading förbättrar prestanda.
+* Att använda det inbyggda `loading="lazy"`-attributet.
+* Att implementera egen lazy loading med Intersection Observer.
+* Att mäta och jämföra prestandaförbättringar.
+
+</aside>
+
+<main>
+När en sida har många bilder laddar webbläsaren normalt alla direkt, även de som inte syns. Lazy loading innebär att bilder laddas först när de är på väg att bli synliga. Detta sparar bandbredd och gör sidan snabbare.
+
+### 0 - Förberedelser
+Skapa en ny mapp `8b` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Skapa en sida med många bilder
+Vi behöver en sida med tillräckligt många bilder för att se effekten.
+
+1. Skapa HTML med 50-100 bilder. Använd placeholder-tjänster:
+
+```html
+<div class="gallery">
+  <img src="https://picsum.photos/400/300?random=1" alt="Bild 1">
+  <img src="https://picsum.photos/400/300?random=2" alt="Bild 2">
+  <!-- ... fler bilder -->
+</div>
+```
+
+2. Du kan generera bildtaggar med JavaScript för enklare test:
+
+```javascript
+const gallery = document.querySelector(".gallery");
+
+for (let i = 1; i <= 100; i++) {
+  const img = document.createElement("img");
+  img.src = `https://picsum.photos/400/300?random=${i}`;
+  img.alt = `Bild ${i}`;
+  gallery.appendChild(img);
+}
+```
+
+3. Lägg till enkel CSS för ett grid av bilder.
+
+### 2 - Mät utan lazy loading
+Innan vi optimerar, mät hur det ser ut nu.
+
+1. Öppna DevTools → Network-fliken.
+
+2. Kryssa i "Disable cache".
+
+3. Välj "Fast 3G" under throttling för att simulera långsammare nätverk.
+
+4. Ladda om sidan.
+
+5. Notera:
+   * Hur många requests görs?
+   * Hur mycket data laddas?
+   * Hur lång tid tar det?
+
+### 3 - Natives lazy loading
+HTML har inbyggt stöd för lazy loading - det enklaste sättet!
+
+```html
+<img src="bild.jpg" alt="..." loading="lazy">
+```
+
+1. Lägg till `loading="lazy"` på alla bilder (utom de första som syns direkt).
+
+2. Ladda om sidan och observera Network-fliken.
+
+3. Scrolla ner och se hur bilder laddas efterhand.
+
+**Tips**: Bilder "above the fold" (som syns utan scrollning) bör *inte* ha lazy loading - det kan faktiskt göra dem långsammare.
+
+```html
+<!-- Första bilderna - ladda direkt -->
+<img src="hero.jpg" alt="Hero" loading="eager">
+
+<!-- Bilder längre ner - lazy load -->
+<img src="bild.jpg" alt="..." loading="lazy">
+```
+
+### 4 - Intersection Observer
+För mer kontroll kan vi använda Intersection Observer API.
+
+```javascript
+// Skapa observer
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      // Ladda bilden
+      img.src = img.dataset.src;
+      // Sluta observera
+      observer.unobserve(img);
+    }
+  });
+}, {
+  rootMargin: "100px" // Börja ladda 100px innan synlig
+});
+
+// Observera alla bilder
+document.querySelectorAll("img[data-src]").forEach(img => {
+  observer.observe(img);
+});
+```
+
+HTML:
+```html
+<img data-src="riktig-bild.jpg"
+     src="placeholder.jpg"
+     alt="Beskrivning">
+```
+
+### 5 - Jämför metoderna
+Skapa tre versioner av samma sida:
+1. Utan lazy loading
+2. Med `loading="lazy"`
+3. Med Intersection Observer
+
+Mät och jämför:
+* Initial laddningstid
+* Antal initiala requests
+* Total datamängd vid sidladdning
+* Användarupplevelse vid scrollning
+
+### 6 - Placeholder och laddningseffekter
+För bättre UX, visa något medan bilden laddas.
+
+#### Blur-up placeholder
+Ladda först en liten, suddig version:
+
+```html
+<div class="image-container">
+  <img class="placeholder" src="tiny-blur.jpg" alt="">
+  <img class="full-image" data-src="full-image.jpg" alt="Beskrivning">
+</div>
+```
+
+```css
+.image-container {
+  position: relative;
+}
+
+.placeholder {
+  filter: blur(10px);
+  transform: scale(1.1); /* Dölj suddiga kanter */
+}
+
+.full-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.full-image.loaded {
+  opacity: 1;
+}
+```
+
+#### Färg-placeholder
+Använd bildens dominanta färg som bakgrund:
+
+```html
+<div class="image-container" style="background-color: #3498db;">
+  <img data-src="image.jpg" alt="...">
+</div>
+```
+
+### 7 - Praktisk övning: Bildgalleri
+Bygg ett komplett bildgalleri med lazy loading.
+
+1. **Layout**: Responsivt grid med bilder i olika storlekar.
+
+2. **Lazy loading**: Implementera med Intersection Observer.
+
+3. **Placeholders**: Visa något meningsfullt medan bilder laddas.
+
+4. **Laddningsindikator**: Visa en spinner eller shimmer-effekt.
+
+5. **Felhantering**: Visa fallback om en bild inte kan laddas.
+
+<details>
+<summary>Tips för felhantering</summary>
+
+```javascript
+img.addEventListener("error", () => {
+  img.src = "fallback-image.jpg";
+  img.alt = "Bilden kunde inte laddas";
+});
+```
+</details>
+
+### 8 - Utmaning: Lazy load för annat innehåll
+Intersection Observer fungerar inte bara för bilder!
+
+Testa att lazy-loada:
+* Iframes (t.ex. inbäddade videor)
+* Tunga komponenter
+* Tredjepartsinnehåll
+
+```javascript
+// Lazy load iframe
+const iframeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const iframe = entry.target;
+      iframe.src = iframe.dataset.src;
+      iframeObserver.unobserve(iframe);
+    }
+  });
+});
+
+document.querySelectorAll("iframe[data-src]").forEach(iframe => {
+  iframeObserver.observe(iframe);
+});
+```
+
+### 9 - Tillämpa på landing page
+Om din landing page har bilder (eller kan ha bilder), implementera lazy loading.
+
+Överväg:
+* Ska du lägga till bilder/ikoner för varje laboration?
+* Vilka bilder ska laddas direkt vs lazy?
+* Behövs placeholders?
+
+**Reflektion**:
+* Vad är skillnaden mellan `loading="lazy"` och Intersection Observer?
+* När ska du *inte* använda lazy loading?
+* Hur påverkar lazy loading SEO och tillgänglighet?
+* Vilka andra optimeringar kan göras för bilder (format, storlek, komprimering)?
+
+</main>

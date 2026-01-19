@@ -1,0 +1,258 @@
+---
+title: HTML5-formulär
+---
+
+<aside class="first">
+
+#### Syfte
+* Att kunna skapa semantiskt korrekta formulär.
+* Att använda HTML5-validering med inbyggda attribut.
+* Att styla formulär och valideringstillstånd.
+* Att förstå tillgänglighet i formulär.
+
+</aside>
+
+<main>
+Formulär är grundläggande för interaktivitet på webben. HTML5 ger oss kraftfulla verktyg för validering direkt i webbläsaren, utan JavaScript. I denna laboration fokuserar vi på att bygga formulär rätt från grunden.
+
+### 0 - Förberedelser
+Skapa en ny mapp `7a` i din `labs`-mapp med `index.html` och `style.css`. Länka gärna även in `global.css`.
+
+### 1 - Grundläggande formulärstruktur
+Ett bra formulär har tydlig struktur och rätt element för varje typ av input.
+
+```html
+<form id="signup-form">
+  <label for="name">Namn</label>
+  <input type="text" id="name" name="name">
+
+  <label for="email">E-post</label>
+  <input type="email" id="email" name="email">
+
+  <button type="submit">Skicka</button>
+</form>
+```
+
+**Viktigt om labels:**
+* `for`-attributet måste matcha `id` på input
+* Labels gör formuläret tillgängligt (skärmläsare)
+* Klick på label fokuserar input-fältet
+
+### 2 - Input-typer
+HTML5 introducerade många specialiserade input-typer:
+
+```html
+<input type="text">      <!-- Vanlig text -->
+<input type="email">     <!-- E-post (valideras) -->
+<input type="password">  <!-- Dolt lösenord -->
+<input type="number">    <!-- Endast siffror -->
+<input type="tel">       <!-- Telefonnummer -->
+<input type="url">       <!-- Webb-URL -->
+<input type="date">      <!-- Datumväljare -->
+<input type="time">      <!-- Tidsväljare -->
+<input type="color">     <!-- Färgväljare -->
+<input type="range">     <!-- Slider -->
+<input type="file">      <!-- Filuppladdning -->
+```
+
+Testa de olika typerna och se hur webbläsaren anpassar tangentbordet på mobil och ger inbyggd validering.
+
+### 3 - Validering med attribut
+HTML5 ger kraftfull validering utan JavaScript.
+
+```html
+<!-- Obligatoriskt fält -->
+<input type="text" required>
+
+<!-- Minsta/längsta längd -->
+<input type="text" minlength="2" maxlength="50">
+
+<!-- Min/max för tal -->
+<input type="number" min="0" max="100">
+
+<!-- Steg för tal -->
+<input type="number" step="0.5">
+
+<!-- Mönster med regex -->
+<input type="text" pattern="[A-Za-z]{3}" title="Tre bokstäver">
+
+<!-- Placeholder (tips, inte label!) -->
+<input type="text" placeholder="t.ex. Anna">
+```
+
+Webbläsaren visar automatiskt felmeddelanden och hindrar inskick om valideringen misslyckas.
+
+### 4 - Praktisk övning: Anmälningsformulär
+Bygg ett komplett anmälningsformulär för en fiktiv konferens.
+
+Formuläret ska innehålla:
+
+1. **Personlig information**
+   * Namn (obligatoriskt, minst 2 tecken)
+   * E-post (obligatoriskt, måste vara giltig e-post)
+   * Telefon (valfritt)
+
+2. **Konferensinformation**
+   * T-shirt storlek (dropdown med S, M, L, XL)
+   * Matpreferens (radio: Kött, Fisk, Vegetariskt, Veganskt)
+   * Allergier (checkboxar: Gluten, Laktos, Nötter, Annat)
+
+3. **Övrigt**
+   * Hur hörde du om konferensen? (dropdown)
+   * Kommentarer (textarea)
+   * Godkänner villkor (checkbox, obligatorisk)
+
+Bygg formuläret steg för steg. Tänk på semantik och tillgänglighet.
+
+<details>
+<summary>Tips för select (dropdown)</summary>
+
+```html
+<label for="tshirt">T-shirt storlek</label>
+<select id="tshirt" name="tshirt" required>
+  <option value="">Välj storlek...</option>
+  <option value="S">Small</option>
+  <option value="M">Medium</option>
+  <option value="L">Large</option>
+  <option value="XL">X-Large</option>
+</select>
+```
+</details>
+
+<details>
+<summary>Tips för radio buttons</summary>
+
+```html
+<fieldset>
+  <legend>Matpreferens</legend>
+
+  <input type="radio" id="meat" name="food" value="meat">
+  <label for="meat">Kött</label>
+
+  <input type="radio" id="fish" name="food" value="fish">
+  <label for="fish">Fisk</label>
+
+  <!-- Alla radio med samma name hör ihop -->
+</fieldset>
+```
+</details>
+
+<details>
+<summary>Tips för checkboxar</summary>
+
+```html
+<fieldset>
+  <legend>Allergier</legend>
+
+  <input type="checkbox" id="gluten" name="allergies" value="gluten">
+  <label for="gluten">Gluten</label>
+
+  <input type="checkbox" id="lactose" name="allergies" value="lactose">
+  <label for="lactose">Laktos</label>
+
+  <!-- Checkboxar med samma name kan ha flera valda -->
+</fieldset>
+```
+</details>
+
+### 5 - Styla formulär och validering
+CSS har pseudo-klasser för att styla formulärtillstånd.
+
+```css
+/* Fält som har fått fokus */
+input:focus {
+  outline: 2px solid blue;
+}
+
+/* Obligatoriska fält */
+input:required {
+  border-left: 3px solid orange;
+}
+
+/* Giltiga fält */
+input:valid {
+  border-left: 3px solid green;
+}
+
+/* Ogiltiga fält */
+input:invalid {
+  border-left: 3px solid red;
+}
+
+/* Endast visa ogiltigt om användaren försökt */
+input:invalid:not(:placeholder-shown) {
+  border-left: 3px solid red;
+}
+```
+
+Styla ditt formulär så att:
+* Det är tydligt vilka fält som är obligatoriska
+* Användaren får visuell feedback på validering
+* Fokus-tillståndet är tydligt
+
+### 6 - Gruppera med fieldset
+Använd `<fieldset>` och `<legend>` för att gruppera relaterade fält.
+
+```html
+<form>
+  <fieldset>
+    <legend>Personlig information</legend>
+    <!-- Namn, e-post, etc. -->
+  </fieldset>
+
+  <fieldset>
+    <legend>Konferensinformation</legend>
+    <!-- T-shirt, mat, etc. -->
+  </fieldset>
+
+  <button type="submit">Anmäl mig</button>
+</form>
+```
+
+Detta förbättrar både semantik och tillgänglighet.
+
+### 7 - Utmaning: Anpassade felmeddelanden
+Webbläsarens standard-felmeddelanden kan anpassas.
+
+1. Använd `title`-attributet för hints:
+```html
+<input type="text" pattern="[0-9]{4}"
+       title="Ange fyra siffror">
+```
+
+2. För mer kontroll, använd JavaScript:
+```javascript
+const input = document.querySelector("#special-field");
+
+input.addEventListener("invalid", (e) => {
+  if (input.validity.patternMismatch) {
+    input.setCustomValidity("Vänligen ange i formatet XX-XXX");
+  }
+});
+
+input.addEventListener("input", () => {
+  input.setCustomValidity(""); // Reset för att tillåta ny validering
+});
+```
+
+3. Skapa egna felmeddelanden för alla fält i ditt formulär.
+
+<details>
+<summary>Validity-egenskaper</summary>
+
+`input.validity` har flera boolean-egenskaper:
+* `valid` - Är fältet giltigt?
+* `valueMissing` - Är required och tomt?
+* `typeMismatch` - Fel typ (t.ex. ogiltig e-post)?
+* `patternMismatch` - Matchar inte pattern?
+* `tooShort` / `tooLong` - Fel längd?
+* `rangeUnderflow` / `rangeOverflow` - Utanför min/max?
+</details>
+
+**Reflektion**:
+* Varför är det viktigt att använda rätt `type` på inputs?
+* Vad är skillnaden mellan `placeholder` och `label`?
+* Hur påverkar `fieldset` och `legend` tillgängligheten?
+* Vilka valideringar bör göras på klienten vs servern?
+
+</main>
