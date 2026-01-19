@@ -1,0 +1,115 @@
+---
+title: GitHub Setup
+---
+
+<aside class="first">
+
+#### Syfte
+* Att kunna skapa ett repository på GitHub.
+* Att koppla ett lokalt Git-repository till GitHub.
+* Att förstå skillnaden mellan lokalt repository och remote.
+* Att kunna pusha och synkronisera ändringar med GitHub.
+
+</aside>
+
+<main>
+Hittills har du arbetat med Git lokalt på din dator. Nu är det dags att koppla ditt repository till GitHub - en molnbaserad plattform för att lagra och dela kod. Detta ger dig en säkerhetskopia av din kod och möjligheten att komma åt den från andra datorer.
+
+### 0 - Förberedelser
+Se till att du har:
+* Ett GitHub-konto. Om du inte har ett, skapa ett på [github.com](https://github.com).
+* Ditt `labs`-repository öppet i VS Code med minst ett par commits från tidigare laborationer.
+
+Du kan verifiera att du har commits genom att titta i Source Control-panelens Graph.
+
+### 1 - Skapa ett repository på GitHub
+
+1. Logga in på [github.com](https://github.com).
+
+2. Klicka på **+** ikonen uppe till höger och välj **New repository**.
+
+3. Fyll i följande:
+   * **Repository name**: `1me323-labs` (eller valfritt namn)
+   * **Description**: Valfritt, t.ex. "Laborationer för kurs 1ME323"
+   * **Visibility**: Välj **Private** (rekommenderat för kursarbete)
+   * **Lämna övriga alternativ omarkerade** - vi har redan ett lokalt repository med innehåll
+      * Du kan behöver kryssa ur **Add a README file** om du inte redan ha
+   
+
+4. Klicka på **Create repository**.
+
+5. GitHub visar nu instruktioner för att koppla ett befintligt repository. Vi kommer att använda alternativet **"...or push an existing repository from the command line"**. Låt sidan vara öppen - vi behöver URL:en snart.
+
+### 2 - Koppla ditt lokala repository till GitHub
+
+Nu ska vi koppla ihop ditt lokala `labs`-repository med det nya GitHub-repositoryt.
+
+1. Kopiera HTTPS-URL:en från GitHub-sidan. Den ser ut ungefär så här:
+   ```
+   https://github.com/dittanvändarnamn/1me323-labs.git
+   ```
+
+2. I VS Code, öppna Source Control-panelen.
+
+3. Klicka på de tre prickarna **...** uppe till höger i Source Control-panelen och välj **remote** -> **Add Remote...**.
+
+4. Läs texten noga:
+   * För **Remote URL**, klistra in den kopierade URL:en från GitHub och tryck Enter.
+   * För **Remote name**, skriv `origin` (standardnamn för remote).
+
+#### Vad betyder "origin"?
+`origin` är det konventionella namnet för ditt huvudsakliga remote repository. Du kan ha flera remotes med olika namn, men `origin` är standard för det primära.
+
+### 3 - Pusha till GitHub
+
+Nu ska vi ladda upp (pusha) alla dina lokala commits till GitHub.
+
+1. I VS Code, titta längst ner till vänster. Du ser troligen ditt branch-namn (t.ex. **main**) följt av en molnikon eller pilar. Det kan också vara så att du ser en stor blå knapp i Source Control panelen med texten "Publish" eller liknande. Klicka på knappen eller molnikonen.
+2. VS Code kan fråga om du vill publicera branchen - acceptera.
+3. Om det är första gången kan VS Code be dig logga in på GitHub. Följ instruktionerna för att autentisera.
+4. VS Code pushar nu dina commits till GitHub.
+
+### 4 - Verifiera på GitHub
+
+1. Gå tillbaka till din repository-sida på GitHub (uppdatera sidan om den fortfarande visar setup-instruktionerna).
+2. Du bör nu se:
+   * Alla dina filer och mappar från `labs`-repositoryt
+   * Din commit-historik (klicka på "commits" för att se alla)
+   * Branch-information
+3. Klicka runt och utforska:
+   * Klicka på en fil för att se dess innehåll
+   * Klicka på en commit för att se vilka ändringar som gjordes
+   * Utforska fliken "Insights" → "Network" för en visuell graf
+
+### 5 - Synkronisera ändringar
+
+Nu när ditt repository är kopplat till GitHub, låt oss öva på att synkronisera ändringar.
+
+1. Gör en liten ändring i någon fil (t.ex. lägg till en kommentar i `math.js`).
+2. Stagea och committa ändringen som vanligt.
+3. Titta längst ner i VS Code - du ser nu en siffra bredvid pilarna (t.ex. **↑1**) som visar att du har en commit som inte är pushad.
+4. Klicka på synkroniserings-ikonen (två pilar som bildar en cirkel) eller på branch-namnet och välj **Sync**.
+5. Gå till GitHub och verifiera att din nya commit syns.
+
+#### Push vs Sync
+
+* **Push** - Laddar upp dina lokala commits till GitHub
+* **Pull** - Hämtar commits från GitHub till din lokala dator
+* **Sync** - Gör både pull och push (praktiskt för att hålla allt uppdaterat)
+
+### 6 - Utmaning: Utforska GitHub-gränssnittet
+
+GitHub har många funktioner utöver att bara lagra kod. Utforska följande:
+
+3. **Issues**: Under fliken "Issues" kan du skapa ärenden för att hålla koll på buggar eller nya funktioner.
+
+4. **Settings**: Utforska inställningarna för ditt repository. Här kan du bland annat:
+   * Bjuda in collaborators
+   * Ändra synlighet (public/private)
+   * Hantera branches
+
+**Reflektion**:
+* Varför är det bra att ha en remote kopia av sitt repository?
+* När kan det vara lämpligt att ha ett public vs private repository?
+
+</main>

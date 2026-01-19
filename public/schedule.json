@@ -9,12 +9,73 @@
             "id": "js:modules",
             "title": "Moduler",
             "tasks": [
+              {
+                "type": "reading",
+                "title": "Javascript moduler",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules",
+                "note": "Till och med 'Importing features into your script'"
+              },
+              {
+                "type": "reading",
+                "title": "Fler sätt att importera och exportera",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#default_exports_versus_named_exports",
+                "note": "Till och med 'Creating a module object'"
+              },
+              {
+                "type": "reading",
+                "title": "nyckelordet export",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"
+              },
+              {
+                "type": "reading",
+                "title": "nyckelordet import",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"
+              },
+              {
+                "id": "js:modules",
+                "type": "exercise",
+                "title": "Hello Modules",
+                "link": "../laborationer/1a/"
+              }
             ]
           },
           {
             "id": "git:version-control",
             "title": "Intro till versionshantering",
             "tasks": [
+              {
+                "type": "reading",
+                "title": "Pro Git",
+                "link": "https://git-scm.com/book/en/v2",
+                "note": [
+                  "Kapitel 1 - Getting Started",
+                  "Kapitel 2 - Git Basics"
+                ]
+              },
+              {
+                "id": "git:basics",
+                "type": "exercise",
+                "title": "Grundläggande Git",
+                "link": "../laborationer/1b/"
+              },
+              {
+                "id": "git:branches",
+                "type": "exercise",
+                "title": "Återställning och grenar",
+                "link": "../laborationer/1c/"
+              },
+              {
+                "id": "git:github",
+                "type": "exercise",
+                "title": "GitHub",
+                "link": "../laborationer/1d/"
+              },
+              {
+                "id": "git:labs-homepage",
+                "type": "exercise",
+                "title": "Samlingssida för laborationer",
+                "link": "../laborationer/1e/"
+              }
             ]
           }
         ]
@@ -25,20 +86,17 @@
           {
             "id": "js:object",
             "title": "Objekt",
-            "tasks": [
-            ]
+            "tasks": []
           },
           {
             "id": "js:JSON",
             "title": "JSON",
-            "tasks": [
-            ]
+            "tasks": []
           },
           {
             "id": "js:localStorage",
             "title": "localStorage",
-            "tasks": [
-            ]
+            "tasks": []
           }
         ]
       },
@@ -48,14 +106,12 @@
           {
             "id": "web:http",
             "title": "HTTP",
-            "tasks": [
-            ]
+            "tasks": []
           },
           {
             "id": "js:fetch",
             "title": "Fetch och \"löften\"",
-            "tasks": [
-            ]
+            "tasks": []
           },
           {
             "id": "deadline:assignment-1",
@@ -69,15 +125,13 @@
           {
             "id": "js:classes",
             "title": "Klasser och objekt",
-            "tasks": [
-            ]
+            "tasks": []
           }
         ]
       },
       {
         "title": "DOM och responsivitet för dynamsika webbsidor",
-        "sessions": [
-        ]
+        "sessions": []
       },
       {
         "title": "API och webbtjänster",
@@ -85,14 +139,12 @@
           {
             "id": "web:http-advanced",
             "title": "Fördjupning i HTTP",
-            "tasks": [
-            ]
+            "tasks": []
           },
           {
             "id": "web:web-apier",
             "title": "Webb-APIer",
-            "tasks": [
-            ]
+            "tasks": []
           },
           {
             "id": "deadline:assignment-2",
@@ -106,21 +158,18 @@
           {
             "id": "html:form-advanced",
             "title": "Input-element och formulärhantering",
-            "tasks": [
-            ]
+            "tasks": []
           },
           {
             "id": "js:form-validation",
             "title": "Validering",
-            "tasks": [
-            ]
+            "tasks": []
           }
         ]
       },
       {
         "title": "Optimering och SEO",
-        "sessions": [
-        ]
+        "sessions": []
       },
       {
         "title": "Eget arbete",

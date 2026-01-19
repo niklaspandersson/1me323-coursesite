@@ -1,0 +1,193 @@
+---
+title: Labs Landing Page
+---
+
+<aside class="first">
+
+#### Syfte
+* Att skapa en välstrukturerad startsida för ditt labs-repository.
+* Att öva på semantisk HTML och grundläggande CSS.
+* Att dokumentera ditt arbete med en README-fil.
+* Att använda relativa länkar för navigation.
+
+</aside>
+
+<main>
+Nu när du har en mappstruktur och versionshantering på plats är det dags att skapa en startsida för ditt labs-repository. Detta blir din "portfolio" för kursen - en plats där du enkelt kan navigera till alla dina laborationer.
+
+**En sida som växer med dig**: Vi kommer att återvända till denna startsida flera gånger under kursens gång. Allt eftersom du lär dig nya tekniker kommer du att förbättra sidan - till exempel göra den datadriven med JSON och `fetch` och lägga till dynamisk rendering.
+
+### 0 - Förberedelser
+Se till att du har `labs`-mappen öppen i VS Code och att Git är initierat (från tidigare laborationer).
+
+Din mappstruktur bör se ut ungefär så här:
+```
+labs/
+├── .git/
+├── .gitignore
+└── 1a/
+    ├── index.html
+    ├── main.js
+    ├── utils.js
+    └── constants.js
+```
+
+### 1 - Skapa startsidan
+Skapa en `index.html` direkt i `labs`-mappen (inte i `1a`). Detta blir din startsida.
+
+Tänk igenom vilken information som bör finnas på sidan:
+* En rubrik och kort beskrivning av vad repositoryt innehåller
+* En lista över laborationer, grupperade per vecka
+* Varje laboration bör ha en länk, titel och kort beskrivning
+* Information om vem som skapat sidan
+
+Använd semantiska HTML-element för att strukturera innehållet. Tänk på vilka element som passar för de olika delarna av sidan (`<header>`, `<main>`, `<footer>`, `<section>`, `<nav>`, etc.).
+
+### 2 - Relativa länkar
+När du skapar länkar till dina laborationer, använd **relativa sökvägar**:
+
+```html
+<a href="1a/index.html">Lab 1a</a>
+```
+
+<details>
+<summary>Varför relativa sökvägar?</summary>
+
+Relativa sökvägar gör att din sida fungerar oavsett var den ligger:
+* `1a/index.html` - relativ (bra!)
+* `/Users/namn/labs/1a/index.html` - absolut (fungerar bara på din dator)
+* `file:///C:/labs/1a/index.html` - absolut med protokoll (fungerar inte alls på webben)
+
+Med relativa sökvägar kan du flytta hela `labs`-mappen eller lägga upp den på en webbserver utan att behöva ändra något.
+</details>
+
+### 3 - Grundläggande styling
+Skapa en `global.css` i `labs`-mappen och länka in den i din HTML.
+
+Genom att kalla filen `global.css` signalerar du att detta är gemensam styling som kan återanvändas. Du kan sedan länka in samma fil från dina individuella laborationer:
+
+```html
+<!-- Från labs/1a/index.html -->
+<link rel="stylesheet" href="../global.css">
+```
+
+Styla sidan så att den blir läsbar och visuellt tilltalande. Några saker att tänka på:
+* Begränsa textbredden för bättre läsbarhet
+* Använd tillräckligt med whitespace (padding/margin)
+* Skapa visuell hierarki med typografi
+* Ge länkarna tydlig styling
+
+Experimentera och hitta en stil du tycker om!
+
+### 4 - Skapa en README
+En README-fil är standard i alla repositories. Den förklarar vad projektet innehåller och visas automatiskt på GitHub/GitLab.
+
+1. Skapa filen `README.md` i `labs`-mappen.
+
+2. Skriv en beskrivning i Markdown-format. Inkludera:
+   * En rubrik
+   * Kort beskrivning av repositoryt
+   * Lista över laborationer (grupperade per vecka)
+   * Instruktioner för hur man kör projektet
+   * Ditt namn
+
+<details>
+<summary>Markdown-syntax</summary>
+
+Markdown är ett enkelt sätt att formatera text:
+* `# Rubrik` - stor rubrik (h1)
+* `## Underrubrik` - mindre rubrik (h2)
+* `**fet text**` - **fet text**
+* `- punkt` - punktlista
+* `[text](url)` - länk
+* ``` `kod` ``` - inline-kod
+
+GitHub, GitLab och VS Code visar automatiskt README.md-filer snyggt formaterade.
+</details>
+
+### 5 - Committa allt
+Spara ditt arbete i Git:
+
+1. Öppna Source Control-panelen i VS Code.
+2. Stagea de nya filerna (`index.html`, `global.css`, `README.md`).
+3. Skriv ett beskrivande commit-meddelande.
+4. Klicka **Commit**.
+
+### 6 - Utmaning: Utöka startsidan
+
+#### Del A - Förbered för framtiden
+Lägg till sektioner för kommande veckor (Vecka 2, 3, etc.) med placeholder-text som "Kommer snart...". Detta ger dig en struktur att fylla i efterhand.
+
+#### Del B - Status-badges
+Lägg till visuella indikatorer som visar vilka laborationer som är klara respektive pågående.
+
+<details>
+<summary>Förslag på implementation</summary>
+
+HTML-struktur:
+```html
+<a href="1a/index.html">Lab 1a - Hello Modules</a>
+<span class="badge done">Klar</span>
+```
+
+CSS för badges:
+```css
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.badge.done {
+  background-color: #c6f6d5;
+  color: #276749;
+}
+
+.badge.wip {
+  background-color: #fefcbf;
+  color: #975a16;
+}
+```
+</details>
+
+#### Del C - Favicon
+Lägg till en favicon för att ge sidan en mer professionell känsla.
+
+<details>
+<summary>Tips: Emoji som favicon</summary>
+
+Du kan använda en emoji som favicon utan att skapa en bildfil:
+```html
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+```
+</details>
+
+### 7 - Slutlig mappstruktur
+Efter denna laboration bör din mappstruktur se ut så här:
+
+```
+labs/
+├── .git/
+├── .gitignore
+├── index.html      ← Startsidan
+├── global.css      ← Gemensam styling
+├── README.md       ← Dokumentation
+└── 1a/
+    ├── index.html
+    ├── main.js
+    ├── utils.js
+    └── constants.js
+```
+
+**Glöm inte** att committa dina ändringar när du är klar med utmaningarna!
+
+**Reflektion**:
+* Varför är det bra att ha en central startsida för alla laborationer?
+* Hur hjälper README-filen någon som tittar på ditt repository?
+* Vilka fördelar finns med att använda relativa sökvägar?
+* Hur kan du använda denna struktur för framtida projekt?
+
+</main>

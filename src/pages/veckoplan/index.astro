@@ -121,10 +121,19 @@ import PageLayout from "../../layouts/PageLayout.astro";
 
         .note {
           margin: 0;
+          margin-top: 0.25rem;
           padding-left: 1em;
           font-size: 0.9em;
           font-style: italic;
           list-style-type: none;
+        }
+
+        ul.note {
+          list-style-type: disc;
+          li {
+            margin-left: 1.2em;
+            margin-bottom: 0;
+          }
         }
       }
     }
@@ -272,10 +281,21 @@ import PageLayout from "../../layouts/PageLayout.astro";
       li.append(task.title);
     }
     if (task.note) {
-      const note = document.createElement("p");
-      note.className = "note";
-      note.textContent = task.note;
-      li.appendChild(note);
+      if (Array.isArray(task.note)) {
+        const notes = document.createElement("ul");
+        notes.className = "note";
+        task.note.forEach((n: string) => {
+          const noteItem = document.createElement("li");
+          noteItem.textContent = n;
+          notes.appendChild(noteItem);
+        });
+        li.appendChild(notes);
+      } else {
+        const note = document.createElement("p");
+        note.className = "note";
+        note.textContent = task.note;
+        li.appendChild(note);
+      }
     }
 
     return li;
@@ -304,7 +324,7 @@ import PageLayout from "../../layouts/PageLayout.astro";
   }
 
   const schedule = await fetch(import.meta.env.BASE_URL + "schedule.json").then(
-    (r) => r.json()
+    (r) => r.json(),
   );
 
   const parts = schedule.flatMap((s: any) => s.parts);

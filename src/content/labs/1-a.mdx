@@ -1,0 +1,227 @@
+---
+title: Hello Modules
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå `import` och `export` samt browser-stöd (`type="module"`).
+* Att kunna skapa och använda moduler i JavaScript.
+* Att kunna exportera funktioner som `default` och som namngivna exporter.
+* Att strukturera kod i separata filer.
+
+</aside>
+
+<main>
+JavaScript-moduler låter oss dela upp vår kod i mindre, återanvändbara delar. Istället för att ha all kod i en enda stor fil kan vi organisera den i logiska enheter som är lättare att underhålla och förstå.
+
+### 0 - Förberedelser
+Vi börjar med att skapa en mappstruktur för alla laborationer i kursen.
+
+1. Skapa en mapp som heter `labs` på valfri plats på din dator (t.ex. i din hemkatalog eller i en kursmapp).
+
+2. Inuti `labs`-mappen, skapa en undermapp som heter `1a`.
+
+Din mappstruktur ska se ut så här:
+```
+labs/
+└── 1a/
+```
+
+**Varför denna struktur?** I nästa laboration kommer vi att versionshantera vårt arbete med Git. Genom att samla alla laborationer i en gemensam `labs`-mapp kan vi använda ett enda Git-repository för hela kursen. Detta gör det enkelt att spåra din progression och ha all kod samlad på ett ställe.
+
+3. Öppna mappen `labs` i VS Code (File → Open Folder).
+
+4. Inuti `1a`-mappen, skapa filerna `index.html`, `main.js` och `math.js`.
+
+5. I HTML-filen, länka in `main.js` med `type="module"`:
+```html
+<script type="module" src="main.js"></script>
+```
+
+**Viktigt**: För att moduler ska fungera måste du köra sidan via en lokal webbserver (t.ex. Live Server i VS Code). Moduler fungerar inte om du bara öppnar HTML-filen direkt i webbläsaren.
+
+### 1 - Namngivna exporter
+Vi börjar med att skapa några matematiska funktioner i `math.js` och exportera dem.
+
+1. I `math.js`, skapa följande funktioner:
+    * `add(a, b)` - returnerar summan av a och b
+    * `subtract(a, b)` - returnerar differensen
+    * `multiply(a, b)` - returnerar produkten
+2. Exportera funktionerna genom att sätta `export` framför varje funktion, på det här sättet:
+```javascript
+export function add(a, b) {
+  return a + b;
+}
+```
+
+3. I `main.js`, importera funktionerna:
+```javascript
+import { add, subtract, multiply } from './math.js';
+```
+
+4. Testa att använda funktionerna och logga resultaten till konsolen.
+
+<details>
+<summary>Förslag på lösning</summary>
+
+math.js:
+```javascript
+export function add(a, b) {
+  return a + b;
+}
+
+export function subtract(a, b) {
+  return a - b;
+}
+
+export function multiply(a, b) {
+  return a * b;
+}
+```
+
+main.js:
+```javascript
+import { add, subtract, multiply } from './math.js';
+
+console.log(add(5, 3));        // 8
+console.log(subtract(10, 4));  // 6
+console.log(multiply(3, 7));   // 21
+```
+</details>
+
+**Testa själv**:
+* Vad händer om du glömmer `.js` i sökvägen vid import?
+* Vad händer om du försöker importera en funktion som inte är exporterad?
+
+### 2 - Default export
+Förutom namngivna exporter kan varje modul ha en *default export*. Detta är användbart när modulen huvudsakligen exporterar en enda sak.
+
+1. Skapa en ny funktion `divide(a, b)` i `math.js`.
+2. Exportera den som default:
+```javascript
+export default function divide(a, b) {
+  return a / b;
+}
+```
+3. I `main.js`, importera default-exporten. Notera att du inte behöver klammerparenteser och kan ge den valfritt namn:
+```javascript
+import divide from './math.js';
+```
+4. Du kan kombinera default och namngivna importer på samma rad:
+```javascript
+import divide, { add, subtract, multiply } from './math.js';
+```
+
+<details>
+<summary>Förslag på lösning</summary>
+
+math.js (komplett):
+```javascript
+export function add(a, b) {
+  return a + b;
+}
+
+export function subtract(a, b) {
+  return a - b;
+}
+
+export function multiply(a, b) {
+  return a * b;
+}
+
+export default function divide(a, b) {
+  return a / b;
+}
+```
+
+main.js:
+```javascript
+import divide, { add, subtract, multiply } from './math.js';
+
+console.log(add(5, 3));       // 8
+console.log(divide(20, 4));   // 5
+```
+</details>
+
+### 3 - Exportera variabler och konstanter
+Det är inte bara funktioner som kan exporteras. Du kan också exportera konstanter (variabler går tekniskt sett också att importera, men det rekommenderas inte).
+
+2. Definiera och exportera någon konstant i `math.js`, till exempel:
+```javascript
+export const PI = 3.14159;
+export const SECRET_SAUCE = 42;
+```
+3. Importera och använd konstanterna i `main.js`.
+
+<details>
+<summary>Förslag på lösning</summary>
+
+math.js:
+```javascript
+export const PI = 3.14159;
+export const SECRET_SAUCE = 42;
+```
+
+main.js:
+```javascript
+import divide, { add, subtract, multiply, PI, SECRET_SAUCE } from './math.js';
+
+console.log(SECRET_SAUCE);
+console.log(`PI är ungefär ${PI}`);
+```
+</details>
+
+### 4 - Utmaning: Alias och namespace
+
+#### Del A - Import med alias
+Ibland kan namn krocka mellan moduler, eller så vill du ge en import ett mer beskrivande namn.
+
+1. Använd `as` för att ge en import ett alias:
+```javascript
+import { add as addition } from './math.js';
+```
+2. Testa att importera `PI` från `constants.js` med ett annat namn.
+
+#### Del B - Namespace import
+Du kan importera allt från en modul som ett objekt med `* as`:
+
+1. Importera alla funktioner från `math.js` som ett namespace:
+```javascript
+import * as MathUtils from './math.js';
+```
+2. Använd funktionerna via objektet:
+```javascript
+console.log(MathUtils.add(2, 3));
+console.log(MathUtils.multiply(4, 5));
+```
+
+<details>
+<summary>Förslag på lösning</summary>
+
+main.js:
+```javascript
+// Alias import
+import { add as addition, subtract as subtraction } from './math.js';
+import { PI as piValue } from './constants.js';
+
+console.log(addition(5, 3));     // 8
+console.log(subtraction(10, 4)); // 6
+console.log(piValue);            // 3.14159
+
+// Namespace import
+import * as MathUtils from './math.js';
+import * as Config from './constants.js';
+
+console.log(MathUtils.add(2, 3));      // 5
+console.log(MathUtils.multiply(4, 5)); // 20
+console.log(Config.GREETING);          // Hej och välkommen!
+```
+</details>
+
+**Reflektion**:
+* När är det lämpligt att använda namngivna exporter vs default export?
+* Vilka fördelar ger moduler jämfört med att ha all kod i en fil?
+* Hur kan namespace-import hjälpa till att organisera kod?
+
+</main>

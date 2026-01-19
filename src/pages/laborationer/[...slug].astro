@@ -16,7 +16,7 @@ export async function getStaticPaths() {
         result[groupKey].push(currentValue.slug);
         return result;
       },
-      {} as Record<string, string[]>
+      {} as Record<string, string[]>,
     );
   }
 
@@ -97,17 +97,6 @@ const { Content } = await entry.render();
         </aside>
       ))
   }
-  <aside>
-    <h3>Examination och betyg:</h3>
-    <p>
-      Kursen examineras på tre olika moment, som alla måste vara godkända för
-      att bli godkänd på kursen:
-    </p>
-    <ul>
-      <li>Inlämningsuppgifter: (2.5 hp, U/G)</li>
-      <li>Slutuppgift: (2.5 hp, U/G)</li>
-      <li>Skriftlig tentamen: (2.5 hp, U/G/VG)</li>
-    </ul>
-  </aside>
+
   <div class="imported labs"><Content /></div>
 </PageLayout>

@@ -1,0 +1,135 @@
+---
+title: Ångra ändringar och branching
+---
+
+<aside class="first">
+
+#### Syfte
+* Att kunna återställa filer till tidigare versioner.
+* Att förstå och använda branches för att experimentera säkert.
+* Att kunna ångra ändringar och commits.
+
+</aside>
+
+<main>
+En av de största fördelarna med Git är möjligheten att "resa i tiden" - återställa filer, ångra ändringar, och experimentera utan rädsla. I denna laboration utforskar vi dessa kraftfulla funktioner med hjälp av VS Codes grafiska gränssnitt.
+
+### 0 - Förberedelser
+Fortsätt arbeta i samma repository som Lab 1-b. Kontrollera att du har minst tre commits genom att titta i Source Control-panelens Graph.
+
+Om du inte har tre commits, gå tillbaka och gör några fler ändringar och commits först.
+
+### 1 - Återställa en fil (Discard Changes)
+Ibland gör man ändringar som man vill ångra innan man committat. VS Code gör det enkelt att återställa filer till senaste committade version.
+
+1. Öppna `math.js` och gör en ändring som "pajar" koden. Till exempel, ta bort en funktion eller lägg till syntax-fel.
+
+2. Spara filen. Du ser nu `math.js` med **M** i Source Control-panelen.
+
+3. Högerklicka på `math.js` i Source Control-panelen och välj **Discard Changes**.
+
+4. Bekräfta att du vill ångra ändringarna.
+
+5. Öppna filen igen - ändringen är borta! Filen är återställd till senaste commit.
+
+#### Alternativt sätt
+
+Du kan också:
+1. Hålla muspekaren över filen i Source Control
+2. Klicka på **↶** (böjd pil) ikonen som dyker upp
+
+**Varning**: Discard Changes går inte att ångra! Ändringar som inte är committade kan gå förlorade permanent.
+
+**Testa själv**:
+* Vad händer om du försöker göra Discard Changes på en fil som inte har ändrats?
+* Prova att återställa en stagead fil (du måste först "Unstage" den med **-** knappen).
+
+### 2 - Skapa en branch
+Branches låter dig skapa en parallell version av din kod där du kan experimentera utan att påverka huvudkoden.
+
+1. Längst ner till vänster i VS Code-fönstret ser du namnet på din nuvarande branch (troligen **main**). Klicka på den.
+
+2. En meny öppnas högst upp. Välj **Create new branch...**.
+
+3. Skriv namnet `experiment` och tryck Enter.
+
+4. VS Code skapar branchen och byter automatiskt till den. Du ser nu **experiment** längst ner till vänster istället för **main**.
+
+<details>
+<summary>Alternativt via Source Control</summary>
+
+Du kan också skapa branches via Source Control-panelen:
+1. Klicka på **...** (tre punkter) i Source Control-panelen
+2. Välj **Branch** → **Create Branch...**
+3. Skriv branch-namnet
+</details>
+
+### 3 - Experimentera på branchen
+Nu när du är på `experiment`-branchen kan du göra vågade ändringar utan oro.
+
+1. Skapa en ny fil `rectangles.js` med följande innehåll:
+```javascript
+// Funktion för att beräkna area av en rektangel
+export function rectangleArea(width, height) {
+  return width * height;
+}
+
+// Funktion för att beräkna omkrets av en rektangel
+export function rectanglePerimeter(width, height) {
+  return 2 * (width + height);
+}
+```
+
+2. Öppna `main.js` och lägg till:
+```javascript
+import { rectangleArea, rectanglePerimeter } from './rectangles.js';
+
+console.log(`Area of 5x10 rectangle: ${rectangleArea(5, 10)}`);     // 50
+console.log(`Perimeter of 5x10 rectangle: ${rectanglePerimeter(5, 10)}`); // 30
+```
+
+3. Gå till Source Control-panelen. Du ser nu både `rectangles.js` (ny fil) och `main.js` (modifierad).
+
+4. Stagea alla filer genom att klicka på **+** bredvid "Changes".
+
+5. Skriv commit-meddelandet: `Add rectangle math functions`
+6. Klicka **Commit**.
+
+7. Gör gärna ytterligare en commit med fler ändringar för att bygga upp historiken.
+
+### 4 - Byt tillbaka till main
+Nu ska vi se magin med branches - dina experiment-ändringar finns bara på experiment-branchen.
+
+1. Klicka på **experiment** längst ner till vänster i VS Code.
+
+2. Välj **main** från listan som dyker upp.
+
+3. Titta på filerna i Explorer-panelen - `rectangles.js` finns inte längre! Och `main.js` ser ut som innan.
+
+4. Byt tillbaka till **experiment** genom att klicka på branch-namnet igen och välja **experiment**.
+
+5. Nu är alla filer tillbaka!
+
+**Testa själv**:
+* I Graph-panelen kan du manuellt välja vilka brancher som skall visas. "Auto" inställningen som är standard visar bara den branch som är aktiv. 
+   * Klicka på "Auto" och välj istället "All". 
+   * Granska grafen för att se hur de två brancherna visas grafiskt
+* Notera hur filerna fysiskt ändras i Explorer när du byter branch
+
+### 5 - Ångra ändringar med Timeline
+VS Code har en inbyggd Timeline-vy som låter dig se och återställa tidigare versioner av en fil.
+
+1. Se till att du är på **main** branch.
+2. Öppna `main.js`.
+3. I Explorer-panelen (vänster sidofält), scrolla ner och expandera **Timeline** sektionen längst ner.
+4. Du ser nu en lista över alla commits som påverkat denna fil, plus eventuella osparade ändringar.
+5. Klicka på en tidigare commit i Timeline för att se hur filen såg ut då.
+6. Du kan högerklicka på en commit och välja **Restore Contents** för att återställa filen till den versionen.
+
+
+**Reflektion**:
+* När är det lämpligt att använda branches?
+* Vad är skillnaden mellan att ångra ostageade ändringar och att ångra en commit?
+* Hur kan branches hjälpa vid samarbete i team?
+
+</main>

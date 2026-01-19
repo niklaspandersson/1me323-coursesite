@@ -1,0 +1,201 @@
+---
+title: Git Basics
+---
+
+<aside class="first">
+#### Läsanvisning
+* [Pro Git](https://git-scm.com/book/en/v2) (Kapitel 2: Git Basics)
+</aside>
+
+<aside class="first">
+
+#### Syfte
+* Att förstå grunderna i versionshantering med Git.
+* Att kunna initiera ett repository och göra commits.
+* Att förstå arbetsflödet med staging area och commits.
+* Att kunna använda `.gitignore` för att ignorera filer.
+
+</aside>
+
+
+<main>
+Git är ett versionshanteringssystem som låter dig spåra ändringar i din kod över tid. Det är ett ovärderligt verktyg för alla utvecklare, både för att kunna gå tillbaka till tidigare versioner och för att samarbeta med andra.
+
+I denna laboration använder vi VS Codes inbyggda Git-stöd via **Source Control**-panelen.
+
+### 0 - Förberedelser
+Kontrollera att Git är installerat på din dator. Du kan verifiera detta genom att öppna terminalen i VS Code (View → Terminal) och skriva:
+```bash
+git --version
+```
+
+Om du inte har konfigurerat Git tidigare behöver du ställa in ditt namn och email (detta behöver bara göras en gång):
+```bash
+git config --global user.name "Ditt Namn"
+git config --global user.email "din@email.com"
+```
+
+### 1 - Initiera ett repository
+Vi ska nu börja versionshantera `labs`-mappen som du skapade i Lab 1-a. Genom att initiera Git i rotmappen `labs` (inte i `1a`) kommer alla framtida laborationer automatiskt att ingå i samma repository.
+
+1. Se till att du har `labs`-mappen öppen i VS Code (File → Open Folder). Du bör se `1a`-mappen i Explorer-panelen.
+
+2. Klicka på **Source Control**-ikonen i sidofältet (eller tryck `Ctrl+Shift+G` / `Cmd+Shift+G` på Mac).
+
+3. Klicka på knappen **Initialize Repository**.
+
+4. Du bör nu se dina filer från `1a`-mappen listade under "Changes" med bokstaven **U** (Untracked) bredvid varje fil. Detta betyder att Git ser filerna men inte spårar dem ännu.
+
+#### Varför initiera i labs-mappen?
+
+Genom att ha ett repository för hela `labs`-mappen får du:
+* **En samlad historik** - du kan se hur din kod utvecklats genom hela kursen
+* **Enklare hantering** - ett repository istället för ett per laboration
+* **Bättre överblick** - alla laborationer på samma ställe
+
+Din mappstruktur kommer att växa så här under kursens gång:
+```
+labs/           ← Git-repository initieras här
+├── 1a/
+├── 1b/
+├── 2a/
+└── ...
+```
+
+#### Vad betyder bokstäverna?
+
+I Source Control-panelen ser du bokstäver bredvid filnamnen:
+* **U** (Untracked) - Ny fil som Git inte spårar ännu
+* **M** (Modified) - Filen har ändrats sedan senaste commit
+* **A** (Added) - Filen är stagead och redo att committas
+* **D** (Deleted) - Filen har tagits bort
+
+
+### 2 - Lägga till filer (staging)
+Innan vi kan spara en version (commit) måste vi "stagea" filerna - det vill säga markera vilka filer som ska inkluderas i nästa commit.
+
+1. I Source Control-panelen, håll muspekaren över **Changes** och klicka på **+** ikonen för att stagea alla filer.
+
+2. Alternativt kan du stagea enskilda filer genom att hålla muspekaren över en specifik fil och klicka på **+**.
+
+3. De stagade filerna flyttas nu till en ny sektion som heter **Staged Changes**.
+
+#### Tips: Ångra staging
+
+Om du råkar stagea en fil du inte ville ha med:
+1. Håll muspekaren över filen under "Staged Changes"
+2. Klicka på **-** ikonen för att ta bort den från staging
+
+### 3 - Skapa en commit
+Nu när filerna är stagade kan vi skapa vår första commit - en sparad ögonblicksbild av koden.
+
+1. I Source Control-panelen finns ett textfält högst upp med placeholder-texten "Message".
+
+2. Skriv ett beskrivande commit-meddelande, till exempel:
+   ```
+   Lab 1-a: Initial commit with math functions
+   ```
+
+3. Klicka på **Commit**-knappen (eller tryck `Ctrl+Enter` / `Cmd+Enter`).
+
+4. Efter committen bör Source Control-panelen vara tom (inga ändringar att visa).
+
+**Tips för bra commit-meddelanden**:
+* Skriv i imperativ form: "Add feature" inte "Added feature"
+* Var kortfattad men beskrivande
+* Förklara *vad* som ändrats och *varför*, inte *hur*
+
+### 4 - Göra ändringar och nya commits
+Låt oss göra några ändringar och committa dem.
+
+1. Öppna `math.js` och lägg till en ny funktion:
+```javascript
+export function circleArea(radius) {
+  return Math.PI * radius * radius;
+}
+```
+
+2. Spara filen. I Source Control-panelen ser du nu `math.js` med bokstaven **M** (Modified).
+
+3. Klicka på filnamnet `math.js` i Source Control-panelen för att se en **diff-vy** som visar exakt vad som ändrats (borttaget i rött, tillagt i grönt).
+
+4. Stagea filen genom att klicka på **+** bredvid filnamnet.
+
+5. Skriv commit-meddelandet: `Lab 1-a: Add circleArea function`
+
+6. Klicka på **Commit**.
+
+### 5 - Se commit-historiken
+VS Code låter dig se alla tidigare commits.
+
+1. I Source Control-panelen, klicka på **...** (tre punkter) längst upp till höger.
+
+2. Kontrollera att alternativet **Graph** är valt för att se en grafisk vy av commit-historiken.
+
+3. Du bör nu se en panel med rubriken "Graph". Klicka på rubriken för att expandera panelen om den inte är öppen. Här kan du se en grafisk översikt över dina commits med meddelanden, datum och tider.
+
+#### Förväntat resultat i Git Graph
+
+Du bör se dina commits listade med commits-meddelande och namn. Om du håller muspekaren över en commit kan du se mer detaljerad information som:
+* Datum och tid
+* En unik commit-hash (t.ex. abc123...)
+* Antal ändrade filer och rader
+
+### 6 - Skapa .gitignore
+Vissa filer vill vi inte versionshantera, till exempel systemfiler, vissa inställningar som bara gäller din dator, beroenden som kan installeras automatiskt (mer om det i senare kurser) eller filer med känslig information.
+
+1. Skapa en ny fil `.gitignore` i projektmappen (notera punkten i början).
+
+2. Lägg till följande innehåll:
+```
+# Systemfiler
+.DS_Store
+Thumbs.db
+
+# Editor-filer
+.vscode/
+*.swp
+```
+
+3. Spara filen. Du ser nu `.gitignore` i Source Control med **U** (Untracked).
+
+4. Stagea och committa filen med meddelandet: `Add .gitignore file`
+
+**Testa själv**:
+* Skapa en fil som heter `test.swp` - den bör **inte** dyka upp i Source Control.
+* Skapa en mapp `.vscode` (om den inte redan finns) med en fil i - den bör inte heller dyka upp.
+
+#### Förklaring av .gitignore-mönster
+
+* `*.swp` - Ignorerar alla filer som slutar på `.swp`
+* `.vscode/` - Ignorerar hela mappen `.vscode`
+* `Thumbs.db` - Ignorerar en specifik fil
+* `#` - Kommentarer (ignoreras av Git)
+
+### 7 - Utmaning: Utforska diff-vyn
+
+1. Gör en ändring i `main.js` (lägg till en console.log eller kommentar).
+
+2. Innan du committar, klicka på filnamnet i Source Control-panelen för att öppna diff-vyn.
+
+3. I diff-vyn kan du:
+   * Se exakt vilka rader som lagts till (gröna) och tagits bort (röda)
+   * Klicka på **+** ikonen bredvid specifika ändringar för att stagea bara delar av filen
+   * Använda "Stage Selected Ranges" för att välja exakt vilka ändringar som ska med
+
+4. Prova att göra ändringar i flera filer och stagea bara vissa av dem.
+
+#### Tips: Inline diff
+
+Du kan också se ändringar direkt i editorn:
+1. Öppna en modifierad fil
+2. I marginalen till vänster ser du färgade markeringar (blå = ändrad, grön = tillagd, röd = borttagen)
+3. Klicka på markeringen för att se den gamla versionen
+
+
+**Reflektion**:
+* Varför är det bra att göra många små commits istället för få stora?
+* Vilka filer bör typiskt finnas i `.gitignore`?
+* Vad är skillnaden mellan "working directory", "staging area" och "repository"?
+
+</main>

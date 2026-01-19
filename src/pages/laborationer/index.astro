@@ -14,7 +14,7 @@ function groupBy(array: CollectionEntry<"labs">[]) {
       result[groupKey].push(currentValue.slug);
       return result;
     },
-    {} as Record<string, string[]>
+    {} as Record<string, string[]>,
   );
 }
 
@@ -39,17 +39,5 @@ const localNav = sections.map(([section, entries]) => {
   <Fragment slot="header">
     <h2>Laborationer</h2>
   </Fragment>
-  <aside>
-    <h3>Examination och betyg:</h3>
-    <p>
-      Kursen examineras på tre olika moment, som alla måste vara godkända för
-      att bli godkänd på kursen:
-    </p>
-    <ul>
-      <li>Inlämningsuppgifter: (2.5 hp, U/G)</li>
-      <li>Slutuppgift: (2.5 hp, U/G)</li>
-      <li>Skriftlig tentamen: (2.5 hp, U/G/VG)</li>
-    </ul>
-  </aside>
   <div class="imported"><Content /></div>
 </PageLayout>
