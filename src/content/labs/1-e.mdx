@@ -23,7 +23,6 @@ Se till att du har `labs`-mappen öppen i VS Code och att Git är initierat (fr�
 Din mappstruktur bör se ut ungefär så här:
 ```
 labs/
-├── .git/
 ├── .gitignore
 └── 1a/
     ├── index.html
@@ -39,6 +38,7 @@ Tänk igenom vilken information som bör finnas på sidan:
 * En rubrik och kort beskrivning av vad repositoryt innehåller
 * En lista över laborationer, grupperade per vecka
 * Varje laboration bör ha en länk, titel och kort beskrivning
+   * Denna veckan är det bara laboration 1-a som behöver länkas, då de andra inte har något eget innehåll. Men lista de andra laborationerna också med titel åtminstone. 
 * Information om vem som skapat sidan
 
 Använd semantiska HTML-element för att strukturera innehållet. Tänk på vilka element som passar för de olika delarna av sidan (`<header>`, `<main>`, `<footer>`, `<section>`, `<nav>`, etc.).
@@ -74,25 +74,22 @@ Genom att kalla filen `global.css` signalerar du att detta är gemensam styling 
 Styla sidan så att den blir läsbar och visuellt tilltalande. Några saker att tänka på:
 * Begränsa textbredden för bättre läsbarhet
 * Använd tillräckligt med whitespace (padding/margin)
-* Skapa visuell hierarki med typografi
 * Ge länkarna tydlig styling
 
 Experimentera och hitta en stil du tycker om!
 
-### 4 - Skapa en README
-En README-fil är standard i alla repositories. Den förklarar vad projektet innehåller och visas automatiskt på GitHub/GitLab.
+### 4 - Committa din startsida
+Spara ditt arbete i Git:
 
-1. Skapa filen `README.md` i `labs`-mappen.
+1. Öppna Source Control-panelen i VS Code.
+2. Stagea de nya filerna (`index.html`, `global.css`,).
+3. Skriv ett beskrivande commit-meddelande.
+4. Klicka **Commit**.
 
-2. Skriv en beskrivning i Markdown-format. Inkludera:
-   * En rubrik
-   * Kort beskrivning av repositoryt
-   * Lista över laborationer (grupperade per vecka)
-   * Instruktioner för hur man kör projektet
-   * Ditt namn
+### 5 - Skapa en README
+En README-fil är standard i alla repositories. Den förklarar vad projektet innehåller och visas automatiskt på GitHub/GitLab. README-filer skrivs i Markdown-format och heter `README.md`. Markdown är ett enkelt sätt att formatera text med rubriker, listor, länkar, kodblock med mera.
 
-<details>
-<summary>Markdown-syntax</summary>
+#### Markdown-syntax
 
 Markdown är ett enkelt sätt att formatera text:
 * `# Rubrik` - stor rubrik (h1)
@@ -103,17 +100,26 @@ Markdown är ett enkelt sätt att formatera text:
 * ``` `kod` ``` - inline-kod
 
 GitHub, GitLab och VS Code visar automatiskt README.md-filer snyggt formaterade.
-</details>
 
-### 5 - Committa allt
+#### Skapa README.md
+1. Skapa filen `README.md` i `labs`-mappen.
+
+2. Skriv en beskrivning i Markdown-format. Inkludera:
+   * En rubrik
+   * Kort beskrivning av repositoryt
+   * Ditt namn
+
+
+### 5 - Committa README
 Spara ditt arbete i Git:
 
 1. Öppna Source Control-panelen i VS Code.
-2. Stagea de nya filerna (`index.html`, `global.css`, `README.md`).
+2. Stagea `README.md`
 3. Skriv ett beskrivande commit-meddelande.
 4. Klicka **Commit**.
+5. Pusha ändringarna till GitHub.
 
-### 6 - Utmaning: Utöka startsidan
+### 6 - Utöka startsidan
 
 #### Del A - Förbered för framtiden
 Lägg till sektioner för kommande veckor (Vecka 2, 3, etc.) med placeholder-text som "Kommer snart...". Detta ger dig en struktur att fylla i efterhand.
@@ -126,8 +132,7 @@ Lägg till visuella indikatorer som visar vilka laborationer som är klara respe
 
 HTML-struktur:
 ```html
-<a href="1a/index.html">Lab 1a - Hello Modules</a>
-<span class="badge done">Klar</span>
+<a href="1a/index.html">Lab 1a - Hello Modules</a> <span class="badge done">Klar</span>
 ```
 
 CSS för badges:
@@ -170,7 +175,6 @@ Efter denna laboration bör din mappstruktur se ut så här:
 
 ```
 labs/
-├── .git/
 ├── .gitignore
 ├── index.html      ← Startsidan
 ├── global.css      ← Gemensam styling
@@ -178,11 +182,10 @@ labs/
 └── 1a/
     ├── index.html
     ├── main.js
-    ├── utils.js
-    └── constants.js
+    └── math.js
 ```
 
-**Glöm inte** att committa dina ändringar när du är klar med utmaningarna!
+**Glöm inte** att committa och pusha dina ändringar när du är klar med utmaningarna!
 
 **Reflektion**:
 * Varför är det bra att ha en central startsida för alla laborationer?
