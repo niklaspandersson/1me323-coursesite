@@ -1,7 +1,57 @@
 ---
-title: Uppgift 1
+title: Uppgift 1 - Samlingssida för inlämningsuppgifter
 ---
 
 <main>
-Under den här avdelningen kommer instruktionerna för kursens inlämningsuppgifterna att finnas tillgängliga.
+
+I denna uppgift ska du skapa ett nytt repository för alla inlämningsuppgifter i kursen och publicera det på GitHub Pages.
+
+### Bakgrund
+
+Under kursens gång kommer du att göra flera inlämningsuppgifter. Precis som du har ett `labs`-repository för laborationer ska du nu skapa ett separat `assignments`-repository för uppgifterna. Detta repository ska publiceras på webben via GitHub Pages. Du kommer alltså att skapa alla inlämningsuppgifter i separata katalogen i detta repository. För att underlätta navigering mellan uppgifterna ska du skapa en landningssida som innehåller länkar till alla inlämningsuppgifter.
+
+### Krav
+
+#### Repository och versionshantering
+* Skapa ett **nytt** lokalt Git-repository för inlämningarna (separat från ditt `labs`-repository).
+* Repositoryt ska ha en `.gitignore`-fil med lämpliga undantag.
+* Repositoryt ska ha en `README.md` som beskriver vad repositoryt innehåller.
+
+#### landningssida
+* Skapa en `index.html` som fungerar som startsida för dina inlämningsuppgifter. Sidan ska innehålla:
+    * En header med kursens namn och kod samt en global navigation.
+    * Den globala navigationen ska vara konsekvent på alla sidor. 
+      * Du skall använda javascript för att dynamiskt generera navigationen på varje sida utifrån en gemensam datastruktur
+      * Koden för detta skall ligga i en separat `.js`-fil som inkluderas i huvudscriptfilen för landningssidan och varje inlämningsuppgift.
+      * Koden skall även inkludera logik för att markera den aktuella sidan i navigationen.
+    * Innehållet på landningssidan skall bestå av "kort" med korta beskrivningar av varje inlämningsuppgift, inklusive titel och länk till respektive uppgift. Dessa kort skall genereras dynamiskt med JavaScript utifrån samma datastruktur som används för navigationen.
+    * Kort information om dig själv (namn, kurs, och användarnamn).
+* Använd semantiska HTML-element för struktur.
+* Sidan ska ha en tillhörande CSS-fil med grundläggande styling
+   * Precis som på laborationssidan är det tänkt att det skall finnas en global CSS-fil som används på alla inlämningssidor.
+   * De separata inlämningssidorna skall dock också ha egna CSS-filer för specifik styling.
+
+#### Data struktur för navigation och uppgifter
+* Skapa en JavaScript-fil (t.ex. `assignments.js`) som innehåller en datastruktur (t.ex. en array av objekt) som representerar alla inlämningsuppgifter i kursen.
+* Varje objekt i datastrukturen ska innehålla följande information:
+   * `id`: En unik identifierare för uppgiften (t.ex. "assignment1").
+   * `title`: Titeln på uppgiften (t.ex. "Uppgift 1 - Samlingssida för inlämningsuppgifter").
+   * `link`: Länken till uppgiftens sida (t.ex. "assignment1/index.html").
+   * `description`: En kort beskrivning av uppgiften.
+
+#### Sida för uppgift 1
+* Skapa en separat katalog för uppgift 1, t.ex. `assignment1/`
+* Eftersom uppgift 1 handlar om att bygga själva landningssidan, kan du på uppgiftssidan bara lägga in en rubrik och en kort beskrivning av vad uppgiften går ut på samt en länk tillbaka till landningssidan (Använd datat som du skapade i `assignments.js`).
+* Använd samma globala css som används på landningssidan.
+
+#### GitHub och publicering
+* Skapa ett **publikt** repository på GitHub.
+* Koppla ditt lokala repository till GitHub och pusha din kod.
+* Konfigurera **GitHub Pages** att publicera från `main`-branchen.
+* Verifiera att din sida är tillgänglig på webben via din GitHub Pages-URL.
+
+### Inlämning
+
+Lämna in URL:en till ditt publicerade GitHub Pages-webbplats i `moodle`
+
 </main>
