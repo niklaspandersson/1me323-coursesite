@@ -1,0 +1,256 @@
+---
+title: Grundläggande JS-objekt
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå objekt-literaler och hur de används för att gruppera data.
+* Att kunna skapa nästlade objekt.
+* Att kunna läsa och skriva egenskaper med punkt- och hakparentesnotation.
+* Att kunna lägga till och ta bort egenskaper dynamiskt.
+
+</aside>
+
+<main>
+Objekt är en av de viktigaste datastrukturerna i JavaScript. De låter oss gruppera relaterad data och funktionalitet tillsammans, vilket gör koden mer organiserad och lättare att förstå. Vi har tidigare använt många objekt, till exempel `console`, `Math` och DOM-element, men nu ska vi skapa våra egna. Lyckligtvis fungerar egenskapade objekt på precis samma sätt som inbyggda objekt.
+
+### 0 - Förberedelser
+Skapa en ny mapp `2a` i din `labs`-mapp.
+
+```
+labs/
+├── 1a/
+├── ...
+└── 2a/
+```
+
+Skapa en `index.html` och en `main.js`. Länka in JavaScript-filen som en modul. Du kan även länka in din `global.css` från labs-mappen om du vill ha samma grundstil. Lägg in en rubrik i HTML-filen som talar om att detta är labb 2a, samt en instruktion om att öppna konsolen för att se resultatet av JavaScript-koden.
+
+### 1 - Skapa ett objekt
+Ett objekt är en samling av egenskaper (properties), där varje egenskap har ett namn (nyckel) och ett värde. Värdet kan vara av vilken typ som helst som finns i javascript: sträng, tal, boolean, array, funktion eller till och med ett annat objekt.
+
+Använd `{}` (måsvingar) för att skapa sk. "objekt-literaler" (dvs värden som är objekt). Jämför med hur använder `[]` för att skapa arrayer, och `""` eller `''` för att skapa strängar. Innanför måsvingarna definierar du egenskaper som nyckel-värde-par, separerade med kommatecken.
+
+**Exempel:**
+```javascript
+const cat = {
+  name: "Misse", 
+  age: 5,
+  isIndoor: true
+};
+
+// Punktnotation (vanligast)
+console.log(cat.name); 
+
+// Hakparentesnotation (användbart för variabler eller speciella tecken)
+console.log(cat["age"]);
+```
+
+#### Övning
+1. I `main.js`, skapa ett objekt i en variabel `person` som representerar dig själv, eller någon karaktär från en bok eller film. Objektet ska ha följande egenskaper:
+   * `firstName` (sträng),
+   * `lastName` (sträng),
+   * `age` (tal),
+   * `occupation`: (sträng)
+
+2. Logga hela objektet till konsolen.
+3. Logga egenskapen `firstName` med punktnotation.
+4. Logga egenskapen `lastName` med hakparentesnotation.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const person = {
+  firstName: "Niklas",
+  lastName: "Andersson",
+  age: 35, // plus minus några år
+  occupation: "Teacher"
+};
+
+console.log(person);
+console.log(person.firstName);
+console.log(person["lastName"]);
+```
+</details>
+
+**Testa själv**: Vad är skillnaden mellan `person.age` och `person["age"]`? När kan hakparentesnotation vara användbart?
+
+<details>
+<summary>När använder man hakparenteser?</summary>
+
+Hakparentesnotation är nödvändig när:
+* Egenskapsnamnet innehåller mellanslag eller specialtecken: `person["full name"]`
+* Egenskapsnamnet är lagrat i en variabel:
+```javascript
+const key = "firstName";
+console.log(person[key]); // "Niklas"
+```
+* Egenskapsnamnet är ett tal: `obj[0]`
+</details>
+
+### 2 - Nästlade objekt
+Objekt kan innehålla andra objekt som värden, vilket låter dig skapa mer komplexa datastrukturer.
+
+**Exempel:**
+Här lägger vi till information om ägaren inuti katt-objektet:
+```javascript
+const cat = {
+  name: "Misse",
+  owner: {
+    firstName: "Pelle",
+    phone: "070-123 45 67"
+  }
+};
+
+// Kedja punkter för att nå djupare nivåer
+console.log("Misses ägare är: ", cat.owner.firstName); // "Pelle"
+```
+
+#### Övning
+1. Uppdatera ditt `person`-objekt med en nästlad `address`-egenskap. Den ska innehålla:
+   * `street` (sträng),
+   * `city` (sträng),
+   * `country` (sträng)
+
+2. Logga ut personens stad ("London").
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+// I objekt-definitionen:
+address: {
+  street: "Slottsallén",
+  city: "Växjö",
+  country: "Sverige"
+}
+
+// Logga ut:
+console.log("Min stad: ", person.address.city);
+```
+</details>
+
+3. Skapa ett eget objekt som representerar något du väljer själv (en bok, en film, en bil, etc.). Inkludera minst:
+   * 3-4 enkla egenskaper (strängar, tal, booleans)
+   * 1 nästlat objekt
+   * 1 array
+
+<details>
+<summary>Exempel på struktur</summary>
+
+```javascript
+const book = {
+  title: "Frankenstein",
+  author: "Mary Shelley",
+  published: 1818,
+  isAvailable: true,
+  publisher: {
+    name: "Lackington, Hughes, Harding, Mavor & Jones",
+    city: "London"
+  },
+  genres: ["Gothic", "Science Fiction", "Horror"]
+};
+```
+</details>
+
+### 3 - Dynamiska egenskaper
+Till skillnad från många andra programmeringsspråk kan du lägga till och ta bort egenskaper från JavaScript-objekt när som helst. Med nyckelordet `in` kan du formulera villkor som är sanna om ett objekt har en viss egenskap.
+
+**Exempel:**
+```javascript
+// Lägg till ny egenskap
+cat.color = "Grå";
+
+// Ändra en befintlig
+cat.age = 6;
+
+// Ta bort en egenskap
+delete cat.isIndoor;
+
+// Kontrollera om en egenskap finns
+console.log("Har katten ett namn? ", "name" in cat); // true
+```
+
+#### Övning
+Utgå från ditt `person`-objekt:
+1. Lägg till en ny egenskap `hobby`.
+2. Ändra `age` till 37.
+3. Ta bort egenskapen `occupation`.
+4. Använd `in`-operatorn för att bekräfta att `occupation` inte längre finns i objektet.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+person.hobby = "gräva";
+person.age = 37; 
+delete person.occupation;
+
+console.log(person.email);
+console.log("Har jag en sysselsättning? ", "occupation" in person); // false
+```
+</details>
+
+**Testa själv**: Vad händer om du försöker läsa en egenskap som inte finns?
+
+### 4 - Visa objektdata i DOM
+Nu ska vi koppla ihop JavaScript-objekten för personen och den sak du själv valt med HTML för att visa datan på sidan.
+
+1. Skapa två HTML-element där du kan visa informationen (t.ex. en `<section>` eller `<div>` med unika IDn).
+
+2. Skriv JavaScript som läser ut egenskaperna från ditt objekt och genererar html-kod som vi kan lägga in i DOM med hjälp av `innerHTML`.
+
+**Tips**: Använd template-strängar (backticks `` ` ``) för att enkelt skapa flerradiga strängar med inbäddade uttryck `${}`, till exempel:
+```javascript
+const html = `
+  <h2>${obj.title}</h2>
+  <p class="description">${obj.shortDescription}</p>
+`;
+```
+
+Tänk på:
+* Hur vill du strukturera informationen semantiskt?
+* Vilka HTML-element passar för olika typer av data?
+* Hur hanterar du nästlade objekt och arrayer?
+
+<details>
+<summary>Tips för att komma igång</summary>
+
+```javascript
+const person = document.getElementById("person");
+person.innerHTML = `
+  <h2>${person.firstName} ${person.lastName}</h2>
+  <p>Ålder: ${person.age}</p>
+`;
+```
+
+För arrayer kan du använda `join()`:
+```javascript
+const genres = book.genres.join(", ");
+```
+</details>
+
+### 5 - Utmaning: Iterera över ett objekt
+Ibland vill man loopa igenom alla egenskaper i ett objekt utan att veta namnen i förväg.
+
+1. Använd `Object.keys()` för att få en array med alla nyckelnamn:
+```javascript
+const keys = Object.keys(person);
+console.log(keys); // ["firstName", "lastName", "age", ...]
+```
+
+3. Använd `Object.entries()` för att få par av nycklar och värden i form av arrayer med två element ([key, value]):
+```javascript
+for (const pair of Object.entries(person)) {
+  console.log(`${pair[0]}: ${pair[1]}`);
+}
+```
+
+**Reflektion**:
+* Vilka fördelar har objekt jämfört med att ha många separata variabler?
+* När är det lämpligt att använda nästlade objekt?
+* Hur skiljer sig objekt från arrayer? När använder man vad?
+
+</main>

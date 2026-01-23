@@ -1,0 +1,107 @@
+---
+title: Labs Landing Page 2.0
+---
+
+<aside class="first">
+
+#### Syfte
+* Att applicera kunskaper om objekt och arrayer i ett riktigt scenario.
+* Att ersätta hårdkodad HTML med datadriven DOM-manipulation.
+* Att skapa en skalbar struktur för din portfolio.
+</aside>
+
+<main>
+Nu är det dags att damma av din "Labs Landing Page" (som du skapade i labb 1-e) och göra den smartare. Förra veckan hårdkodade du information om varje labb i filen. Det fungerar för några få laborationer, men det blir snabbt mycket repetition och risken att något blir fel någonstans är stor. Nu när du behärskar objekt och arrayer ska vi bygga om sidan så att den genereras utifrån data istället.
+
+### 0 - Förberedelser
+Öppna din `labs`-mapp i VS Code. Du ska arbeta i roten av denna mapp (där din `index.html` ligger).
+
+Om du inte redan har en `main.js` i roten av `labs`-mappen, skapa en och länka in den i din `index.html` (glöm inte `type="module"`).
+
+### 1 - Skapa din data
+Istället för att skriva HTML för varje labb, ska vi beskriva våra laborationer som data.
+
+I din `main.js`, skapa en array som innehåller objekt. Varje objekt representerar en laboration. Fundera själv på vilka egenskaper som är relevanta, och vilken struktur som känns logisk. Vill du organisera per vecka, eller bara ha en lång lista? Vill du ha med status (avklarad/inte avklarad), och så vidare?
+
+<details>
+  <summary>Exempel på en möjlig struktur</summary>
+  ```javascript
+  const labs = [
+    { id: '1a', title: 'Moduler', description: '...', completed: true, link: true },
+    { id: '1b', title: 'Git grunder', description: '...', completed: true },
+    // ... fyll på med de labbar du gjort hittills ...
+    { id: '2e', title: 'Labs Landing Page 2.0', description: '...', completed: false }
+  ];
+  ```
+</details>
+
+### 2 - Förbered HTML-strukturen
+Gå till `index.html`. klipp ut elementet för en av dina hårdkodade labbar och ta bort resten. Den utklippta koden kan du använda som mall när vi dymaniskt skapar nya element utifrån objekten i datastrukturen ovan. Lägg istället in ett id på själva list-elementet så att vi enkelt kan hitta det med JavaScript.
+
+<details>
+  <summary>Exempel</summary>
+  ```html
+  <!-- index.html -->
+  <main>
+    <h1>Mina Laborationer</h1>
+    <ul id="labs-container">
+      <!-- Här kommer labbarna att hamna via JS -->
+    </ul>
+  </main>
+  ```
+</details>
+
+### 3 - Generera HTML med JavaScript
+Nu ska vi skriva koden som tar vår data (`labs`-arrayen) och skapar HTML-element.
+
+I `main.js`, gör följande:
+1. Hämta en referens till ditt tomma list-element.
+2. Loopa igenom din `labs`-array.
+3. För varje labb, skapa en sträng med html som beskriver ett labb-element. Här kan du utgå ifrån den html-kod du klippte ut tidigare. Om du använder en template sträng (med backticks `` ` ``) kan du enkelt infoga värden från objektet med `${}`-syntaxen.
+4. Ersätta de hårdkodade värdena i html-koden du klippte ut med värden från det aktuella labb-objektet i loopen.
+5. Lägg till elementet i behållaren med `innerHTML +=`.
+
+<details>
+  
+  <summary>Exempel på hur loopen kan se ut / starthjälp</summary>
+  
+  ```javascript
+  const container = document.querySelector('#labs-container');
+  
+  for(const lab of labs) {
+    // Bygg html-strängen för varje labb
+
+    //kolla om labben skall länkar
+    let link = "";
+    if(lab.link) {
+      link = `<a href="./${lab.id}/index.html">${lab.title}</a>`;
+    }
+  
+    // generera html för labben
+    const html = `<li class="lab-card">
+      ${link}
+      <p>${lab.description}</p>
+    </li>`;
+  
+    // Lägg till i containern
+    container.innerHTML += html;
+  }
+  ```
+</details>
+
+### 4 - Snygga till det (CSS)
+Om du inte redan har gjort det, stilsätt listan med labbar i din CSS för att ge labbarna ett snyggt och enhetligt utseende.
+
+### 5 - Versionshantering
+När du är klar och ser att listan genereras korrekt:
+1. Commit:a dina ändringar i Git med ett beskrivande meddelande, t.ex. "Lab 2-e: Dynamisk labs-landing page med objekt och arrayer".
+2. Pusha till GitHub.
+
+Nu har du en portfolio som är lätt att uppdatera - i framtiden behöver du bara lägga till ett nytt objekt i din array för att en ny labb ska dyka upp!
+
+### 6 - Extra utmaning: Klarmarkering
+Om du vill kan du lägga till en visuell markering för de labbar som är avklarade (t.ex. en bock eller annan ikon). Du kan använda en extra egenskap i dina labb-objekt för att hålla reda på detta, och sedan använda en villkorssats i din loop för att lägga till en klass eller ikon baserat på om labben är avklarad eller inte.
+
+Genom att använda `localStorage` kan du även låta användaren markera labbar som avklarade genom att klicka på dem och spara detta mellan sidladdningar. 
+
+</main>
