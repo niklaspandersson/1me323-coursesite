@@ -16,18 +16,20 @@ title: localStorage
 Ibland vill vi att webbplatsen ska "komma ihåg" saker - användarens namn, inställningar, eller var de var i ett formulär. `localStorage` ger oss ett enkelt sätt att spara data i webbläsaren som överlever både sidladdningar och att webbläsaren stängs.
 
 ### 0 - Förberedelser
-Skapa en ny mapp `2c` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+* Skapa en ny mapp `2c` i din `labs`-mapp uppsättningar filer `index.html` + `index.js` och `page2.html` + `page2.js`. 
+* Skapa grundstrukturer i båda html-filerna och läs in respektive JavaScript-fil som vanligt. 
+* Länka gärna in `global.css` på båda sidorna också. 
+* Lägg in en rubrik i HTML-filerna som talar om att detta är labb 2c, samt en instruktion om att öppna konsolen för att se resultatet av JavaScript-koden.
 
 ### 1 - Grunderna i localStorage
-`localStorage` är ett enkelt nyckel-värde-lager som finns inbyggt i alla moderna webbläsare.
+`localStorage` är ett enkelt nyckel-värde-lager som finns inbyggt i alla moderna webbläsare. Värdena som sparas går att läsa ut på alla sidor från samma ursprung (samma domän), i praktiken betyder det samma webbplats. Data i `localStorage` sparas som strängar och finns kvar tills de tas bort via kod.
 
-1. Öppna webbläsarens konsol och prova:
-
+**Exempel:**
 ```javascript
-// Spara ett värde
+// Spara ett värde under nyckeln "greeting"
 localStorage.setItem("greeting", "Hej världen!");
 
-// Läsa ett värde
+// Läsa värdet kopplat till nyckeln "greeting"
 const message = localStorage.getItem("greeting");
 console.log(message); // "Hej världen!"
 
@@ -38,180 +40,189 @@ localStorage.removeItem("greeting");
 localStorage.clear();
 ```
 
-2. Spara ett värde och ladda om sidan. Läs sedan ut värdet igen - det finns kvar!
+#### Övning
+1. Spara ditt favoritdjur i `localStorage` ifrån `index.js`, använd nycken `animal`.
 
-3. Du kan också se vad som är sparat i localStorage via DevTools:
-   * Öppna DevTools (F12)
-   * Gå till fliken **Application** (Chrome) eller **Storage** (Firefox)
-   * Expandera **Local Storage** i sidomenyn
+2. I `page2.js`, läs ut värdet och logga det i konsolen.
 
-### 2 - Kom ihåg användarens namn
-Nu ska vi bygga en sida som kommer ihåg användarens namn.
+3. Skapa en knapp i `page2.html` som när den klickas tar bort det sparade djuret från localStorage. Antingen genom att använda `localStorage.removeItem` eller `localStorage.clear`. 
+   * Klicka på knappen och ladda om sidan för att verifiera att värdet är borta.
 
-1. Skapa HTML med:
-   * Ett textfält för att skriva sitt namn
-   * En rubrik eller text som hälsar användaren
+4. Öppna DevTools och hitta var localStorage-data visas:
+   * **Application**-fliken (Chrome) eller **Storage**-fliken (Firefox)
+   * Expandera **Local Storage**
 
-2. I JavaScript:
-   * När sidan laddas: Kolla om det finns ett sparat namn och fyll i fältet
-   * När användaren skriver: Spara värdet till localStorage
+<details>
+<summary>Lösningsförslag steg 1 - 2</summary>
 
-3. Lyssna på `input`-eventet för att spara direkt när användaren skriver:
-
+index.js:
 ```javascript
-nameInput.addEventListener("input", function() {
-  localStorage.setItem("userName", this.value);
-});
+localStorage.setItem("animal", "katt");
 ```
 
-4. Vid sidladdning, läs upp värdet:
-
+page2.js:
 ```javascript
-const savedName = localStorage.getItem("userName");
+const savedAnimal = localStorage.getItem("animal");
+console.log(savedAnimal); // "katt" (om sparat tidigare)
+```
+</details>
+
+<details>
+<summary>Lösningsförslag steg 3</summary>
+
+page2.html:
+```html
+<!-- resten av HTML-koden -->
+
+<button id="removeAnimalBtn">Ta bort sparat djur</button>
+```
+
+page2.js:
+```javascript
+// [...] Tidigare kod för att läsa djuret
+
+document.getElementById("removeAnimalBtn").addEventListener("click", function() {
+  localStorage.removeItem("animal");
+  console.log("Sparat djur borttaget");
+});
+```
+</details>
+
+
+**Testa själv**: Vad händer om du försöker läsa en nyckel som inte finns?
+
+### 2 - Kom ihåg besökarens namn
+Nu ska vi lägga in ett textfält som kommer ihåg besökarens namn mellan sidladdningar.
+
+#### Övning
+1. Börja i `index.html` och lägg till ett textfält där användaren kan skriva sitt namn (ge det ett id, t.ex. `nameInput`).
+
+2. Implementera JavaScript som:
+   * Läser ett eventuellt sparat namn från localStorage när sidan laddas och fyller i textfältet med det om det finns (använd `localStorage.getItem` för att läsa värdet, och elementets `value`-egenskap för att sätta det)
+   * Sparar namnet i localStorage direkt när användaren skriver (koppla en lyssnare till `input`-eventet på textfältet, och använd `localStorage.setItem` för att spara värdet)
+
+3. Testa genom att skriva ditt namn, ladda om sidan - namnet ska finnas kvar i textfältet.
+
+**Extra:** Lägg till en "Rensa"-knapp som tar bort det sparade namnet och tömmer textfältet.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+index.html:
+```html
+<!-- [...] resten av HTML-koden -->
+
+<label for="nameInput">Namn: </label>
+<input type="text" id="nameInput" placeholder="Skriv ditt namn här">
+```
+
+index.js:
+```javascript
+const nameInput = document.getElementById('nameInput');
+
+// När sidan laddas: läs eventuellt sparat namn
+const savedName = localStorage.getItem("name");
 if (savedName) {
   nameInput.value = savedName;
 }
+
+// Spara när användaren skriver
+nameInput.addEventListener("input", function() {
+  localStorage.setItem("name", nameInput.value);
+});
 ```
-
-5. Uppdatera även hälsningen baserat på namnet.
-
-**Testa**: Skriv ditt namn, ladda om sidan - namnet ska finnas kvar!
-
-### 3 - Hantera saknade värden
-`localStorage.getItem()` returnerar `null` om nyckeln inte finns. Detta är viktigt att hantera.
-
-1. Prova:
-```javascript
-const doesNotExist = localStorage.getItem("xyzNotHere");
-console.log(doesNotExist); // null
-```
-
-2. Använd en fallback med `||` eller nullish coalescing `??`:
-
-```javascript
-// Med || (använder fallback för alla "falsy" värden)
-const name = localStorage.getItem("userName") || "Gäst";
-
-// Med ?? (använder fallback endast för null/undefined)
-const name = localStorage.getItem("userName") ?? "Gäst";
-```
-
-<details>
-<summary>Skillnaden mellan || och ??</summary>
-
-```javascript
-localStorage.setItem("count", "0");
-
-// || behandlar "0" som falsy och använder fallback
-const a = localStorage.getItem("count") || "10"; // "10" (fel!)
-
-// ?? använder endast fallback för null/undefined
-const b = localStorage.getItem("count") ?? "10"; // "0" (rätt!)
-```
-
-Använd `??` när tomma strängar eller "0" är giltiga värden.
 </details>
 
-### 4 - Begränsningar
+### 4 - Begränsningar och viktiga detaljer
 localStorage har några viktiga begränsningar att känna till:
 
-1. **Endast strängar**: Allt sparas som strängar.
+#### Endast strängar
 ```javascript
 localStorage.setItem("age", 25);
 const age = localStorage.getItem("age");
 console.log(typeof age); // "string" (inte "number"!)
-console.log(age + 5);    // "255" (strängkonkatenering!)
+console.log(age + 5);    // "255" (strängkonkatenering, inte addition!)
+
+// Lösning för tal:
+const correctAge = Number(localStorage.getItem("age"));
+console.log(correctAge + 5); // 30
 ```
 
-2. **Lösning för tal**:
-```javascript
-const age = Number(localStorage.getItem("age"));
-// eller
-const age = parseInt(localStorage.getItem("age"), 10);
-```
+#### Andra begränsningar
 
-3. **Objekt fungerar inte direkt**:
-```javascript
-localStorage.setItem("person", { name: "Ada" });
-console.log(localStorage.getItem("person")); // "[object Object]" (trasigt!)
-```
+* **Objekt fungerar inte direkt**: `localStorage.setItem("obj", {name: "Ada"})` blir `"[object Object]"` - vi löser detta med JSON i nästa labb
+* **Storleksbegränsning**: Ca 5-10 MB beroende på webbläsare
+* **Säkerhet**: Spara aldrig känsliga uppgifter som lösenord. Som du såg ovan så sparas allt i klartext och kan lätt läsas av andra skript på sidan eller via utvecklarpanelen.
 
-Vi löser detta med JSON i nästa laboration!
+### 5 - Utmaning: Användarpreferenser
+Lägg in fält med vilka användaren kan anpassa olika inställningar som sparas mellan besök.
 
-4. **Storleksbegränsning**: Ca 5-10 MB beroende på webbläsare.
+#### Uppgift
+Exempel på inställningar som användaren skulle kunna göra:
 
-5. **Synkront**: localStorage blockerar huvudtråden, så undvik att spara stora mängder data ofta.
+1. **Tema-väljare**: Radio-buttons för "Ljust", "Mörkt", "Auto"
+3. **Textsstorlek**: Slider eller radio-knappar för "Liten", "Normal", "Stor"
+4. **Namn**: Textfält (som du redan gjort)
 
-### 5 - Utmaning: "Glöm mig"-knapp
-Utöka din sida med en knapp som låter användaren radera sina sparade uppgifter.
+* Alla inställningar ska sparas i localStorage direkt när de ändras
+* Inställningarna ska tillämpas när sidan laddas
+* CSS ska ändras baserat på användarens val
+* En "Återställ allt"-knapp som rensar alla inställningar
 
-1. Lägg till en knapp "Glöm mig" i din HTML.
-
-2. När användaren klickar:
-   * Ta bort det sparade namnet från localStorage
-   * Rensa textfältet
-   * Uppdatera hälsningen till något generiskt
-
-3. Fundera på UX:
-   * Ska du be om bekräftelse innan du raderar?
-   * Ska knappen bara synas om det finns sparad data?
+#### Tips för implementation
+* Använd olika localStorage-nycklar för varje inställning
+* Skapa funktioner som `applyTheme()`, `applyFontSize()` osv.
+* Testa alla kombinationer av inställningar
 
 <details>
-<summary>Tips för bekräftelse</summary>
+<summary>Exempel på tema-implementation</summary>
 
+index.html:
+```html
+<!-- [...] resten av HTML-koden -->
+
+<h2>Välj tema:</h2>
+<label>
+  <input type="radio" name="theme" value="light"> Ljust
+</label>
+<label>
+  <input type="radio" name="theme" value="dark"> Mörkt
+</label>
+```
+
+index.js:
 ```javascript
-if (confirm("Är du säker på att du vill radera dina uppgifter?")) {
-  localStorage.removeItem("userName");
-  // ... rensa UI
+const themeRadios = document.querySelectorAll('input[name="theme"]');
+let savedTheme =  "light"; // default värde
+if (localStorage.getItem('selectedTheme')) {
+  savedTheme = localStorage.getItem('selectedTheme');
 }
+
+// Tillämpa sparat tema
+document.body.className = savedTheme + '-theme';
+document.querySelector(`input[value="${savedTheme}"]`).checked = true;
+
+// Lyssna på ändringar
+themeRadios.forEach(radio => {
+  radio.addEventListener('change', function() {
+    localStorage.setItem('selectedTheme', this.value);
+    document.body.className = this.value + '-theme';
+  });
+});
 ```
-</details>
-
-### 6 - Utmaning: Spara tema-inställning
-Skapa en möjlighet för användaren att välja mellan ljust och mörkt tema.
-
-1. Lägg till en knapp eller toggle för att byta tema.
-
-2. När användaren byter tema:
-   * Uppdatera sidans utseende (t.ex. genom att lägga till/ta bort en CSS-klass på `<body>`)
-   * Spara valet i localStorage
-
-3. När sidan laddas:
-   * Läs upp det sparade temat
-   * Applicera det innan sidan renderas (för att undvika "flash")
-
-<details>
-<summary>Tips för tema-implementation</summary>
 
 CSS:
 ```css
-body.dark-theme {
-  background-color: #1a1a1a;
+.light-theme {
+  background: white;
+  color: black;
+}
+
+.dark-theme {
+  background: #1a1a1a;
   color: #f0f0f0;
 }
 ```
-
-JavaScript:
-```javascript
-// Läs vid sidladdning
-const savedTheme = localStorage.getItem("theme");
-if (savedTheme === "dark") {
-  document.body.classList.add("dark-theme");
-}
-
-// Spara vid byte
-function toggleTheme() {
-  document.body.classList.toggle("dark-theme");
-  const isDark = document.body.classList.contains("dark-theme");
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-}
-```
 </details>
-
-**Reflektion**:
-* Vilken typ av data passar att spara i localStorage?
-* Vilken data bör man *inte* spara i localStorage? (Tänk säkerhet)
-* Hur skiljer sig localStorage från cookies?
-* Vad händer om användaren rensar sin webbläsardata?
 
 </main>

@@ -1,250 +1,373 @@
 ---
-title: Metoder och this
+title: Konstruktor funktioner och this
 ---
 
 <aside class="first">
 
 #### Syfte
-* Att förstå skillnaden mellan egenskaper och metoder.
-* Att kunna skapa metoder som använder `this` för att referera till objektet.
-* Att förstå hur `this` kan ändras beroende på kontext.
-* Att kunna lösa problem med `this` i event-lyssnare.
+* Att förstå constructor functions som en mall för att skapa objekt.
+* Att förstå hur `this` fungerar i constructor functions.
+* Att kunna skapa flera objekt från samma mall.
+* Att förstå skillnaden mellan vanliga funktioner och constructors.
 
 </aside>
 
 <main>
-Metoder är funktioner som tillhör ett objekt. De kan använda nyckelordet `this` för att komma åt objektets egna egenskaper, vilket gör dem kraftfulla för att skapa självständiga, återanvändbara komponenter.
+Hittills har vi skapat objekt en och en med objekt-literaler (`{}`). Men vad händer om vi vill skapa många liknande objekt? Constructor functions ger oss en mall för att skapa objekt av samma "typ", och stöter vi på ett nytt nyckelord som vi kommer att använda mycket framöver: `this`.
 
 ### 0 - Förberedelser
 Skapa en ny mapp `2b` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css` från labs-roten.
 
-### 1 - Skapa en metod
-En metod är helt enkelt en funktion som är en egenskap på ett objekt.
-
-1. Skapa ett objekt med en metod:
-
+### 1 - Problemet med upprepning
+Tänk dig att vi vill skapa flera personer för vår webbsida. Med objekt-literaler blir det mycket upprepning:
 ```javascript
-const person = {
-  firstName: "Grace",
-  lastName: "Hopper",
-
-  getFullName: function() {
-    return this.firstName + " " + this.lastName;
-  }
+const person1 = {
+  firstName: "Anna",
+  lastName: "Andersson",
+  age: 25
 };
 
-console.log(person.getFullName()); // "Grace Hopper"
+const person2 = {
+  firstName: "Erik",
+  lastName: "Eriksson", 
+  age: 30
+};
+
+const person3 = {
+  firstName: "Maria",
+  lastName: "Johansson",
+  age: 28
+};
+// ... och så vidare för hundra personer? 😰
 ```
 
-2. `this` refererar till objektet som metoden tillhör. Lägg till en `introduce`-metod som loggar en hälsning:
+#### Övning
+Föreställ dig att du ska skapa en webbsida för ett företag med 10 anställda. Varje anställd ska representeras av ett objekt med egenskaperna:
+* `name` (fullständigt namn)
+* `title` (jobbtitel)
+* `email`
+* `phoneNumber`
+
+**Reflektion**: Hur mycket kod skulle du behöva skriva? Vad händer om du vill lägga till en ny egenskap (t.ex. `department`) till alla anställda?
+
+### 2 - Konstruktor funktioner - en mall för objekt
+En konstruktor funktion är en vanlig funktion som används som "mall" för att skapa objekt.
+
+**Exempel:**
+```javascript
+// Konstruktor funktion (börjar med stor bokstav per konvention)
+function Person(firstName, lastName, age) {
+  this.firstName = firstName;
+  this.lastName = lastName;
+  this.age = age;
+}
+
+// Skapa objekt med 'new'-nyckelordet
+const anna = new Person("Anna", "Andersson", 25);
+const erik = new Person("Erik", "Eriksson", 30);
+const maria = new Person("Maria", "Johansson", 28);
+
+console.log(anna.firstName); // "Anna"
+console.log(erik.age);       // 30
+```
+
+**Vad händer här?**
+1. `new Person()` skapar ett nytt tomt objekt
+2. `this` inuti funktionen refererar till det nya objektet
+3. Egenskaper läggs till på objektet via `this.egenskap = värde`
+4. Det nya objektet returneras automatiskt
+
+#### Övning
+1. Skapa en constructor function `Car` som tar parametrarna:
+   * `brand` (märke)
+   * `model` 
+   * `year` (årsmodell)
+   * `color` (färg)
+
+2. Skapa tre olika bil-objekt från din constructor.
+
+3. Logga ut informationen för varje bil.
+
+<details>
+<summary>Lösningsförslag</summary>
 
 ```javascript
-introduce: function() {
-  console.log(`Hej, jag heter ${this.firstName}!`);
+function Car(brand, model, year, color) {
+  this.brand = brand;
+  this.model = model;
+  this.year = year;
+  this.color = color;
+}
+
+const car1 = new Car("Volvo", "V40", 2018, "blå");
+const car2 = new Car("Toyota", "Corolla", 2020, "röd");
+const car3 = new Car("BMW", "X3", 2019, "svart");
+
+console.log(car1); // Car { brand: "Volvo", model: "V40", ... }
+console.log(`${car2.color} ${car2.brand} ${car2.model} från ${car2.year}`);
+```
+</details>
+
+### 3 - Vad är `this`?
+I en constructor function refererar `this` till det objekt som håller på att skapas.
+
+**Visualisering av vad som händer:**
+```javascript
+function Person(name, age) {
+  // new Person() skapar ett tomt objekt: {}
+  // this refererar nu till detta objekt
+  
+  this.name = name;  // {} blir { name: "Anna" }
+  this.age = age;    // { name: "Anna" } blir { name: "Anna", age: 25 }
+  
+  // Objektet returneras automatiskt
+}
+
+const anna = new Person("Anna", 25);
+// anna är nu { name: "Anna", age: 25 }
+```
+
+#### Övning
+1. Skapa en constructor function `Book` som representerar en bok:
+   * `title` (titel)
+   * `author` (författare) 
+   * `pages` (antal sidor)
+   * `isRead` (läst eller inte, börja med `false`)
+
+2. Skapa ett bibliotek med 3 böcker.
+
+3. **Experiment**: Vad händer om du glömmer `new`-nyckelordet? Prova:
+```javascript
+const book = Book("Test", "Author", 100); // Utan 'new'
+console.log(book); // undefined
+```
+
+4. **Fördjupning**: Kontrollera vad `this` refererar till utan `new`:
+```javascript
+function TestConstructor(name) {
+  console.log("this är:", this);
+  this.name = name;
+}
+
+TestConstructor("test"); // Vad loggas?
+```
+
+<details>
+<summary>Förklaring av vad som händer utan 'new'</summary>
+
+Utan `new`-nyckelordet:
+- Inget nytt objekt skapas
+- `this` refererar till `window` (globalt objekt) eller `undefined` (i strict mode)
+- Du förorenar det globala scopet eller får fel
+- Funktionen returnerar `undefined` istället för ett objekt
+
+**Därför**: Använd alltid `new` med constructor functions!
+</details>
+
+### 4 - Metoder i constructor functions
+Du kan även lägga till metoder (funktioner) i constructor functions.
+
+**Exempel:**
+```javascript
+function Person(firstName, lastName) {
+  this.firstName = firstName;
+  this.lastName = lastName;
+  
+  // Metod som använder objektets egenskaper
+  this.getFullName = function() {
+    return this.firstName + " " + this.lastName;
+  };
+  
+  this.introduce = function() {
+    return `Hej, jag heter ${this.getFullName()}!`;
+  };
+}
+
+const person = new Person("Ada", "Lovelace");
+console.log(person.getFullName()); // "Ada Lovelace"
+console.log(person.introduce());   // "Hej, jag heter Ada Lovelace!"
+```
+
+#### Övning
+1. Utöka din `Car`-constructor med en metod `getDescription()` som returnerar en beskrivning som: "2018 Volvo V40 i blå färg".
+
+2. Lägg till en metod `honk()` som loggar "Tut tut!" och bilens märke.
+
+3. Skapa en `BankAccount`-constructor med:
+   * Egenskaper: `owner` (kontoinnehavare), `balance` (saldo, startar med 0)
+   * Metoder:
+     - `deposit(amount)` - sätt in pengar
+     - `withdraw(amount)` - ta ut pengar (bara om det finns tillräckligt saldo)
+     - `getBalance()` - visa aktuellt saldo
+     - `getInfo()` - visa kontoinformation
+
+4. Skapa två bankkonton och testa alla metoder.
+
+<details>
+<summary>Lösningsförslag för BankAccount</summary>
+
+```javascript
+function BankAccount(owner) {
+  this.owner = owner;
+  this.balance = 0;
+  
+  this.deposit = function(amount) {
+    if (amount > 0) {
+      this.balance += amount;
+      console.log(`Satte in ${amount} kr. Nytt saldo: ${this.balance} kr`);
+    }
+  };
+  
+  this.withdraw = function(amount) {
+    if (amount > 0 && amount <= this.balance) {
+      this.balance -= amount;
+      console.log(`Tog ut ${amount} kr. Nytt saldo: ${this.balance} kr`);
+    } else {
+      console.log("Otillräckligt saldo eller ogiltigt belopp");
+    }
+  };
+  
+  this.getBalance = function() {
+    return this.balance;
+  };
+  
+  this.getInfo = function() {
+    return `Konto för ${this.owner}, saldo: ${this.balance} kr`;
+  };
+}
+
+const account1 = new BankAccount("Anna Andersson");
+account1.deposit(1000);
+account1.withdraw(300);
+console.log(account1.getInfo());
+```
+</details>
+
+### 5 - Constructor vs vanlig funktion
+Viktiga skillnader att komma ihåg:
+
+| Constructor Function | Vanlig Funktion |
+|---------------------|----------------|
+| Börjar med stor bokstav (konvention) | Börjar med liten bokstav |
+| Anropas med `new` | Anropas direkt |
+| `this` refererar till nytt objekt | `this` refererar till anroparen |
+| Returnerar nytt objekt automatiskt | Måste explicit returnera värde |
+
+#### Övning
+**Debugging-övning**: Hitta och fixa problemen i denna kod:
+
+```javascript
+// Problem 1: Vad är fel här?
+function calculator(initialValue) {
+  this.value = initialValue;
+  this.add = function(num) {
+    this.value += num;
+  };
+}
+
+const calc = calculator(10); // Utan 'new'
+calc.add(5); // Vad händer?
+
+// Problem 2: Vad händer här?
+function Counter() {
+  this.count = 0;
+  this.increment = function() {
+    this.count++;
+  };
+  return "Detta returneras istället"; // Explicit return
+}
+
+const counter = new Counter();
+console.log(counter); // Vad blir resultatet?
+```
+
+<details>
+<summary>Lösningar</summary>
+
+**Problem 1**: Glömt `new`-nyckelordet. `calc` blir `undefined`.
+```javascript
+const calc = new calculator(10); // Lägg till 'new'
+```
+
+**Problem 2**: Explicit `return` av primitiv typ ignoreras i constructor functions, men returnar man ett objekt så används det istället för det skapade objektet. Bästa praxis är att inte ha explicit `return` alls i constructors.
+```javascript
+function Counter() {
+  this.count = 0;
+  this.increment = function() {
+    this.count++;
+  };
+  // Ta bort explicit return
 }
 ```
-
-3. Det finns en kortare syntax för metoder:
-
-```javascript
-const person = {
-  firstName: "Grace",
-
-  // Kortare syntax (rekommenderas)
-  introduce() {
-    console.log(`Hej, jag heter ${this.firstName}!`);
-  }
-};
-```
-
-### 2 - Ett räknar-objekt
-Låt oss skapa ett objekt som håller reda på ett värde och kan modifiera det.
-
-1. Skapa ett `counter`-objekt:
-
-```javascript
-const counter = {
-  value: 0,
-
-  increment() {
-    this.value++;
-    console.log(this.value);
-  },
-
-  decrement() {
-    this.value--;
-    console.log(this.value);
-  },
-
-  reset() {
-    this.value = 0;
-    console.log(this.value);
-  }
-};
-```
-
-2. Testa metoderna i konsolen:
-```javascript
-counter.increment(); // 1
-counter.increment(); // 2
-counter.decrement(); // 1
-counter.reset();     // 0
-```
-
-3. Skapa en enkel HTML-sida med:
-   * Ett element som visar räknarens värde
-   * Knappar för att öka, minska och nollställa
-
-4. Koppla ihop knapparna med räknarens metoder och uppdatera visningen.
-
-### 3 - Problemet med this
-Nu ska vi utforska ett klassiskt JavaScript-problem: `this` beter sig inte alltid som man förväntar sig.
-
-1. Prova att spara en metod i en variabel:
-
-```javascript
-const myFunc = counter.increment;
-myFunc(); // Vad händer?
-```
-
-2. Titta i konsolen. Värdet blir troligen `NaN` (Not a Number). Varför?
-
-<details>
-<summary>Förklaring</summary>
-
-När du sparar metoden i en variabel och anropar den "tappar" den sin koppling till objektet. `this` refererar då inte längre till `counter`-objektet, utan till `window` (i webbläsaren) eller `undefined` (i strict mode).
-
-```javascript
-const myFunc = counter.increment;
-myFunc(); // this === window (eller undefined)
-// window.value++ → NaN
-```
 </details>
 
-3. Samma problem uppstår med event-lyssnare. Prova:
+### 6 - Utmaning: Kontaktlista
+Skapa en komplett kontaktlista-applikation.
 
-```javascript
-const button = document.querySelector("#incrementBtn");
-button.addEventListener("click", counter.increment);
-// Klicka på knappen - vad händer?
-```
+#### Uppgift
+1. **Constructor**: Skapa en `Contact`-constructor med:
+   - `name`, `email`, `phone`, `company`
+   - Metod `getDisplayInfo()` som returnerar formaterad information
+   - Metod `updatePhone(newPhone)` för att uppdatera telefonnummer
 
-### 4 - Lösningar på this-problemet
-Det finns flera sätt att se till att `this` pekar på rätt objekt.
+2. **Data**: Skapa en array med minst 5 kontakter
 
-#### Lösning A: Wrapper-funktion
-Wrap metoden i en anonym funktion:
+3. **HTML**: Bygg en sida som visar alla kontakter
 
-```javascript
-button.addEventListener("click", function() {
-  counter.increment();
-});
-```
+4. **Funktionalitet**: 
+   - Visa alla kontakter i en snygg lista
+   - Lägg till formulär för att skapa nya kontakter
+   - Lägg till knapp för att uppdatera telefonnummer
 
-#### Lösning B: Arrow function
-Arrow functions har inte eget `this`, så de "ärver" från omgivande scope:
-
-```javascript
-button.addEventListener("click", () => {
-  counter.increment();
-});
-```
-
-#### Lösning C: bind()
-Metoden `bind()` skapar en ny funktion där `this` är permanent bundet:
-
-```javascript
-button.addEventListener("click", counter.increment.bind(counter));
-```
-
-Implementera någon av dessa lösningar för dina knappar och verifiera att räknaren fungerar.
+**Extra utmaning**: Lägg till sök-funktionalitet för att filtrera kontakter.
 
 <details>
-<summary>Vilken lösning ska jag välja?</summary>
-
-* **Arrow function** är oftast enklast och mest läsbar för enkla fall
-* **bind()** är bra när du behöver skicka runt en funktion men vill behålla rätt `this`
-* **Wrapper-funktion** är tydligast men lite mer verbose
-
-I modern JavaScript är arrow functions vanligast.
-</details>
-
-### 5 - Arrow functions som metoder (varning!)
-En vanlig fälla är att använda arrow functions för att definiera metoder.
-
-1. Prova detta:
+<summary>Grund-struktur</summary>
 
 ```javascript
-const brokenPerson = {
-  name: "Test",
+function Contact(name, email, phone, company) {
+  this.name = name;
+  this.email = email;
+  this.phone = phone;
+  this.company = company;
+  
+  this.getDisplayInfo = function() {
+    return `
+      <div class="contact">
+        <h3>${this.name}</h3>
+        <p>Email: ${this.email}</p>
+        <p>Phone: ${this.phone}</p>
+        <p>Company: ${this.company}</p>
+      </div>
+    `;
+  };
+  
+  this.updatePhone = function(newPhone) {
+    this.phone = newPhone;
+  };
+}
 
-  // ⚠️ Fungerar INTE som förväntat!
-  introduce: () => {
-    console.log(`Hej, jag heter ${this.name}`);
-  }
-};
+// Skapa kontakter
+const contacts = [
+  new Contact("Anna Andersson", "anna@example.com", "070-123-4567", "Tech AB"),
+  new Contact("Erik Eriksson", "erik@example.com", "070-987-6543", "Design Studio"),
+  // ... fler kontakter
+];
 
-brokenPerson.introduce(); // "Hej, jag heter undefined"
-```
-
-2. Varför fungerar det inte?
-
-<details>
-<summary>Förklaring</summary>
-
-Arrow functions har inte eget `this` - de ärver `this` från den omgivande kontexten där de *definierades*. När objektet skapas är `this` inte objektet självt, utan det yttre scopet (oftast `window`).
-
-**Regel**: Använd aldrig arrow functions för objektmetoder som behöver `this`.
-
-```javascript
-// ❌ Fel
-const obj = {
-  method: () => { this.x }  // this är inte obj!
-};
-
-// ✅ Rätt
-const obj = {
-  method() { this.x }       // this är obj
-};
-```
-</details>
-
-### 6 - Utmaning: Interaktiv komponent
-Skapa ett objekt som representerar en enkel toggle-switch (på/av).
-
-Objektet ska ha:
-* En egenskap `isOn` (boolean)
-* En metod `toggle()` som växlar tillståndet
-* En metod `getStatus()` som returnerar "På" eller "Av"
-
-Skapa sedan HTML med:
-* En knapp som togglar
-* Ett element som visar aktuell status
-* Styling som visuellt visar om switchen är på eller av (t.ex. olika bakgrundsfärger)
-
-Se till att `this` fungerar korrekt i event-lyssnaren!
-
-<details>
-<summary>Förslag på objektstruktur</summary>
-
-```javascript
-const toggle = {
-  isOn: false,
-
-  toggle() {
-    this.isOn = !this.isOn;
-  },
-
-  getStatus() {
-    return this.isOn ? "På" : "Av";
-  }
-};
+// Visa kontakter
+function displayContacts() {
+  const container = document.getElementById('contacts');
+  container.innerHTML = contacts.map(contact => 
+    contact.getDisplayInfo()
+  ).join('');
+}
 ```
 </details>
 
 **Reflektion**:
-* Varför är `this` användbart i metoder?
-* Vilka problem kan uppstå med `this` och hur löser man dem?
-* När bör man använda vanliga funktioner vs arrow functions?
+* Varför är constructor functions användbart jämfört med objekt-literaler?
+* När är `this` användbart och vad refererar det till?
+* Vad skulle hända om alla webbsidor bara använde objekt-literaler för allt?
 
 </main>
+

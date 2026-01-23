@@ -1,0 +1,395 @@
+---
+title: Metoder och this
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå skillnaden mellan egenskaper och metoder.
+* Att kunna skapa metoder som använder `this` för att referera till objektet.
+* Att förstå hur `this` kan ändras beroende på kontext.
+* Att kunna lösa problem med `this` i event-lyssnare.
+
+</aside>
+
+<main>
+Metoder är funktioner som tillhör ett objekt. De kan använda nyckelordet `this` för att komma åt objektets egna egenskaper, vilket gör dem kraftfulla för att skapa självständiga, återanvändbara komponenter.
+
+### 0 - Förberedelser
+Skapa en ny mapp `2b` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css` från labs-roten.
+
+### 1 - Skapa en metod
+En metod är helt enkelt en funktion som är en egenskap på ett objekt. `this` refererar till objektet som metoden tillhör.
+
+**Exempel:**
+```javascript
+const person = {
+  firstName: "Grace",
+  lastName: "Hopper",
+
+  getFullName: function() {
+    return this.firstName + " " + this.lastName;
+  },
+
+  // Kortare syntax (rekommenderas)
+  introduce() {
+    console.log(`Hej, jag heter ${this.firstName}!`);
+  }
+};
+
+console.log(person.getFullName()); // "Grace Hopper"
+person.introduce(); // "Hej, jag heter Grace!"
+```
+
+#### Övning
+1. Skapa ett objekt `car` med egenskaperna:
+   * `brand` (t.ex. "Volvo")
+   * `model` (t.ex. "V40")
+   * `year` (t.ex. 2018)
+
+2. Lägg till en metod `getDescription()` som returnerar en sträng som beskriver bilen, t.ex. "2018 Volvo V40".
+
+3. Lägg till en metod `honk()` som loggar "Tut tut!" till konsolen.
+
+4. Testa båda metoderna.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const car = {
+  brand: "Volvo",
+  model: "V40", 
+  year: 2018,
+
+  getDescription() {
+    return `${this.year} ${this.brand} ${this.model}`;
+  },
+
+  honk() {
+    console.log("Tut tut!");
+  }
+};
+
+console.log(car.getDescription()); // "2018 Volvo V40"
+car.honk(); // "Tut tut!"
+```
+</details>
+
+### 2 - Ett räknar-objekt
+Nu ska vi skapa ett objekt som håller reda på ett värde och kan modifiera det.
+
+**Exempel:**
+```javascript
+const counter = {
+  value: 0,
+
+  increment() {
+    this.value++;
+  },
+
+  decrement() {
+    this.value--;
+  },
+
+  reset() {
+    this.value = 0;
+  }
+};
+
+// Testa metoderna
+console.log("Värde initialt: "; counter.value); // 0
+counter.increment();
+console.log("Värde efter en ökning: "; counter.value); // 1
+counter.increment();
+console.log("Värde efter nästa ökning: "; counter.value); // 2
+counter.decrement(); 
+console.log("Värde efter minskning: "; counter.value); // 1
+counter.reset();     
+console.log("Värde efter reset: "; counter.value); // 0
+```
+
+#### Övning
+1. Skapa ett objekt `temperature` som håller reda på temperatur i Celsius:
+   * Egenskap: `celsius` (startvärde 20)
+   * Metod: `increase()` - ökar med 1 grad och loggar nya värdet
+   * Metod: `decrease()` - minskar med 1 grad och loggar nya värdet  
+   * Metod: `setTemp(newTemp)` - sätter ny temperatur och loggar värdet
+   * Metod: `getFahrenheit()` - returnerar temperaturen i Fahrenheit: `(celsius * 9/5) + 32`
+
+2. Testa alla metoder i konsolen.
+
+3. Skapa sedan en enkel HTML-sida med:
+   * Ett element som visar aktuell temperatur i både Celsius och Fahrenheit
+   * Knappar för att öka, minska och sätta temperatur
+   * Uppdatera visningen när temperaturen ändras
+
+<details>
+<summary>Lösningsförslag för temperature-objektet</summary>
+
+```javascript
+const temperature = {
+  celsius: 20,
+
+  increase() {
+    this.celsius++;
+    console.log(`${this.celsius}°C`);
+  },
+
+  decrease() {
+    this.celsius--;
+    console.log(`${this.celsius}°C`);
+  },
+
+  setTemp(newTemp) {
+    this.celsius = newTemp;
+    console.log(`${this.celsius}°C`);
+  },
+
+  getFahrenheit() {
+    return (this.celsius * 9/5) + 32;
+  }
+};
+```
+</details>
+
+### 3 - Problemet med this
+Nu ska vi utforska ett klassiskt JavaScript-problem: `this` beter sig inte alltid som man förväntar sig.
+
+**Exempel på problemet:**
+```javascript
+const counter = {
+  value: 0,
+  increment() {
+    this.value++;
+    console.log(this.value);
+  }
+};
+
+// Detta fungerar som förväntat
+counter.increment(); // 1
+
+// Men detta fungerar INTE
+const myFunc = counter.increment;
+myFunc(); // NaN - varför?
+```
+
+#### Övning
+1. Använd ditt `temperature`-objekt från förra övningen.
+
+2. Prova att spara `increase`-metoden i en variabel och anropa den:
+```javascript
+const myIncrease = temperature.increase;
+myIncrease(); // Vad händer?
+```
+
+3. Titta i konsolen. Vad blir resultatet och varför?
+
+4. Prova samma sak med event-lyssnare. Skapa en knapp och lägg till:
+```javascript
+const button = document.querySelector("#myButton");
+button.addEventListener("click", temperature.increase);
+// Klicka på knappen - vad händer?
+```
+
+<details>
+<summary>Förklaring av problemet</summary>
+
+När du sparar metoden i en variabel och anropar den "tappar" den sin koppling till objektet. `this` refererar då inte längre till `temperature`-objektet, utan till `window` (i webbläsaren) eller `undefined` (i strict mode).
+
+```javascript
+const myIncrease = temperature.increase;
+myIncrease(); // this === window (eller undefined)
+// window.celsius++ → NaN (undefined + 1)
+```
+
+Samma problem uppstår med event-lyssnare - `this` blir knappen som klickades, inte temperature-objektet.
+</details>
+
+### 4 - Lösningar på this-problemet
+Det finns flera sätt att se till att `this` pekar på rätt objekt.
+
+**Tre vanliga lösningar:**
+
+#### Lösning A: Wrapper-funktion
+```javascript
+button.addEventListener("click", function() {
+  temperature.increase();
+});
+```
+
+#### Lösning B: Arrow function  
+```javascript
+button.addEventListener("click", () => {
+  temperature.increase();
+});
+```
+
+#### Lösning C: bind()
+```javascript
+button.addEventListener("click", temperature.increase.bind(temperature));
+```
+
+#### Övning
+1. Välj en av lösningarna ovan och fixa problemet med din temperature-knapp från förra övningen.
+
+2. Skapa tre olika knappar och testa alla tre lösningarna för att se att de fungerar.
+
+3. Vilken lösning tycker du är tydligast? Diskutera för- och nackdelar.
+
+<details>
+<summary>Vilken lösning ska jag välja?</summary>
+
+* **Arrow function** är oftast enklast och mest läsbar för enkla fall
+* **bind()** är bra när du behöver skicka runt en funktion men vill behålla rätt `this`
+* **Wrapper-funktion** är tydligast men lite mer verbose
+
+I modern JavaScript är arrow functions vanligast för event-lyssnare.
+</details>
+
+### 5 - Arrow functions som metoder (varning!)
+En vanlig fälla är att använda arrow functions för att definiera metoder.
+
+**Exempel på problemet:**
+```javascript
+const brokenPerson = {
+  name: "Test",
+
+  // ⚠️ Fungerar INTE som förväntat!
+  introduce: () => {
+    console.log(`Hej, jag heter ${this.name}`);
+  }
+};
+
+brokenPerson.introduce(); // "Hej, jag heter undefined"
+```
+
+#### Övning
+1. Prova exemplet ovan. Vad blir utskriften?
+
+2. Skapa ett objekt `calculator` med arrow functions som metoder:
+```javascript
+const calculator = {
+  result: 0,
+  
+  add: (num) => {
+    this.result += num;
+    return this.result;
+  }
+};
+```
+
+3. Testa `calculator.add(5)`. Fungerar det som förväntat?
+
+4. Skriv om `calculator` med vanliga metoder och testa igen.
+
+<details>
+<summary>Förklaring</summary>
+
+Arrow functions har inte eget `this` - de ärver `this` från den omgivande kontexten där de *definierades*. När objektet skapas är `this` inte objektet självt, utan det yttre scopet (oftast `window`).
+
+**Regel**: Använd aldrig arrow functions för objektmetoder som behöver `this`.
+
+```javascript
+// ❌ Fel
+const obj = {
+  method: () => { console.log(this.x) }  // this är inte obj!
+};
+
+// ✅ Rätt
+const obj = {
+  method() { console.log(this.x) }       // this är obj
+};
+```
+</details>
+
+### 6 - Utmaning: Interaktiv komponent
+Nu ska du använda allt du lärt dig för att skapa en komplett interaktiv komponent.
+
+#### Uppgift
+Skapa ett objekt som representerar en enkel toggle-switch (på/av) med följande specifikationer:
+
+**Objektet ska ha:**
+* En egenskap `isOn` (boolean, startar som `false`)
+* En metod `toggle()` som växlar tillståndet och loggar statusen
+* En metod `getStatus()` som returnerar "På" eller "Av"
+* En metod `updateDisplay()` som uppdaterar HTML-elementet
+
+**HTML ska ha:**
+* En knapp som togglar (text: "Växla")  
+* Ett element som visar aktuell status ("På" eller "Av")
+* CSS-klasser som ändrar utseendet baserat på tillstånd
+
+**Krav:**
+* Använd rätt teknik för att lösa `this`-problemet i event-lyssnaren
+* När switchen är "På": grön bakgrund och texten "På"
+* När switchen är "Av": röd bakgrund och texten "Av"
+
+**Extra utmaning:** Lägg till en `setValue(boolean)`-metod och knappar för "Sätt på" och "Sätt av".
+
+<details>
+<summary>Förslag på objektstruktur</summary>
+
+```javascript
+const toggle = {
+  isOn: false,
+
+  toggle() {
+    this.isOn = !this.isOn;
+    console.log(`Switched ${this.getStatus()}`);
+    this.updateDisplay();
+  },
+
+  getStatus() {
+    return this.isOn ? "På" : "Av";
+  },
+
+  setValue(value) {
+    this.isOn = value;
+    this.updateDisplay();
+  },
+
+  updateDisplay() {
+    const statusElement = document.querySelector('#status');
+    statusElement.textContent = this.getStatus();
+    statusElement.className = this.isOn ? 'on' : 'off';
+  }
+};
+
+// Event-lyssnare (välj en av lösningarna för this-problemet)
+document.querySelector('#toggleBtn').addEventListener('click', () => {
+  toggle.toggle();
+});
+```
+</details>
+
+<details>
+<summary>Förslag på CSS</summary>
+
+```css
+.status {
+  padding: 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.on {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.off {
+  background-color: #f44336;
+  color: white;
+}
+```
+</details>
+
+**Reflektion**:
+* Varför är `this` användbart i metoder?
+* Vilka problem kan uppstå med `this` och hur löser man dem?
+* När bör man använda vanliga funktioner vs arrow functions?
+
+</main>

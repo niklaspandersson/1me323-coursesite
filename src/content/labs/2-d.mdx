@@ -19,91 +19,194 @@ I förra laborationen såg vi att localStorage bara kan spara strängar. Men vad
 Skapa en ny mapp `2d` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
 
 ### 1 - Problemet med objekt i localStorage
-Låt oss först se varför vi behöver JSON.
+I förra laborationen såg vi att localStorage bara kan spara strängar. Vad händer när vi vill spara objekt eller arrayer?
 
-1. Prova att spara ett objekt direkt:
-
+**Demonstration av problemet:**
 ```javascript
 const user = {
   name: "Ada",
-  age: 36
+  age: 36,
+  hobbies: ["matematik", "programmering"]
 };
 
 localStorage.setItem("user", user);
-console.log(localStorage.getItem("user")); // "[object Object]" - inte bra!
+console.log(localStorage.getItem("user")); // "[object Object]" - trasigt!
+
+// Även arrayer blir fel
+const colors = ["röd", "grön", "blå"];
+localStorage.setItem("colors", colors);
+console.log(localStorage.getItem("colors")); // "röd,grön,blå" - nästan rätt, men inte en array längre
 ```
 
-2. All information är förlorad! JavaScript anropar automatiskt `.toString()` på objektet, vilket ger den oanvändbara strängen `[object Object]`.
+#### Övning
+1. Skapa ett objekt `student` med:
+   * `name`: ditt namn
+   * `courses`: en array med kursnamn (t.ex. ["Webbteknik 2", "Programmering"])
+   * `grades`: ett objekt med kurser som nycklar och betyg som värden
+
+2. Försök spara `student` i localStorage och läs upp det.
+
+3. Vad blir resultatet? Är det användbart?
+
+**Reflektion**: Varför fungerar inte objekt och arrayer direkt i localStorage?
+
+<details>
+<summary>Förklaring</summary>
+
+JavaScript anropar automatiskt `.toString()` på objektet när det konverteras till sträng. För objekt blir detta `"[object Object]"` och för arrayer blir det en kommaseparerad lista. All struktur och datatyper går förlorade.
+</details>
 
 ### 2 - JSON.stringify och JSON.parse
-JSON (JavaScript Object Notation) löser detta problem.
+JSON (JavaScript Object Notation) löser detta problem genom att konvertera objekt till välformatterade strängar.
 
-1. Konvertera objekt till JSON-sträng:
-
+**Exempel:**
 ```javascript
-const user = { name: "Ada", age: 36 };
+const user = { name: "Ada", age: 36, active: true };
+
+// Konvertera objekt till JSON-sträng
 const jsonString = JSON.stringify(user);
-console.log(jsonString);        // '{"name":"Ada","age":36}'
+console.log(jsonString);        // '{"name":"Ada","age":36,"active":true}'
 console.log(typeof jsonString); // "string"
-```
 
-2. Konvertera tillbaka till objekt:
-
-```javascript
+// Konvertera tillbaka till objekt
 const parsed = JSON.parse(jsonString);
-console.log(parsed);        // { name: "Ada", age: 36 }
+console.log(parsed);        // { name: "Ada", age: 36, active: true }
 console.log(typeof parsed); // "object"
 console.log(parsed.name);   // "Ada"
-```
 
-3. Nu kan vi spara objekt i localStorage:
-
-```javascript
-// Spara
+// Nu kan vi spara i localStorage
 localStorage.setItem("user", JSON.stringify(user));
-
-// Läsa
-const savedUser = JSON.parse(localStorage.getItem("user"));
-console.log(savedUser.name); // "Ada"
+const loadedUser = JSON.parse(localStorage.getItem("user"));
+console.log(loadedUser.name); // "Ada"
 ```
 
-### 3 - Hantera null och fel
-När vi läser från localStorage måste vi hantera två fall:
-* Nyckeln finns inte (returnerar `null`)
-* JSON är ogiltigt (kastar ett fel)
+#### Övning
+1. Använd ditt `student`-objekt från förra övningen.
 
-1. `JSON.parse(null)` returnerar faktiskt `null`, så det fungerar:
+2. Konvertera det till JSON med `JSON.stringify()` och logga resultatet.
+
+3. Konvertera JSON-strängen tillbaka till ett objekt med `JSON.parse()`.
+
+4. Kontrollera att du kan komma åt alla egenskaper (name, courses, grades).
+
+5. Skapa en funktion `saveStudent()` och `loadStudent()` som sparar/laddar student-objektet i localStorage:
+
+<details>
+<summary>Lösningsförslag</summary>
 
 ```javascript
-const result = JSON.parse(localStorage.getItem("doesNotExist"));
-console.log(result); // null
+const student = {
+  name: "Anna Andersson",
+  courses: ["Webbteknik 2", "Programmering", "Databaser"],
+  grades: {
+    "Webbteknik 2": "A",
+    "Programmering": "B",
+    "Databaser": "A"
+  }
+};
+
+function saveStudent(studentData) {
+  localStorage.setItem("student", JSON.stringify(studentData));
+}
+
+function loadStudent() {
+  const saved = localStorage.getItem("student");
+  return saved ? JSON.parse(saved) : null;
+}
+
+// Testa
+saveStudent(student);
+const loaded = loadStudent();
+console.log(loaded.name);
+console.log(loaded.courses[0]);
+console.log(loaded.grades["Programmering"]);
 ```
+</details>
 
-2. Men ogiltig JSON kastar ett fel:
+### 3 - Hantera fel och saknade data
+När vi arbetar med JSON och localStorage måste vi hantera två potentiella problem: saknade data och felaktig JSON.
 
-```javascript
-JSON.parse("detta är inte json"); // SyntaxError!
-```
-
-3. Säker läsning med try-catch:
-
+**Exempel på säker hantering:**
 ```javascript
 function loadFromStorage(key, defaultValue = null) {
   try {
     const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : defaultValue;
+    // Om nyckeln inte finns returnerar getItem() null
+    if (item === null) {
+      return defaultValue;
+    }
+    // Försök konvertera JSON
+    return JSON.parse(item);
   } catch (error) {
     console.error("Kunde inte läsa från localStorage:", error);
     return defaultValue;
   }
 }
 
-const user = loadFromStorage("user", { name: "Gäst" });
+// Användning
+const user = loadFromStorage("user", { name: "Gäst", preferences: {} });
+const settings = loadFromStorage("settings", { theme: "light", language: "sv" });
 ```
 
-### 4 - JSON-formatet
-JSON är ett textbaserat format som ser ut nästan exakt som JavaScript-objekt, men med några viktiga skillnader:
+#### Övning
+1. **Testa felhantering**: Manuellt spara felaktig JSON i localStorage:
+```javascript
+localStorage.setItem("trasig", '{"name": "Ada", "age": }'); // Ogiltig JSON
+```
 
+2. Försök läsa denna data med `JSON.parse()` - vad händer?
+
+3. Implementera din egen säkra `saveToStorage(key, data)` och `loadFromStorage(key, fallback)` funktioner.
+
+4. **Praktisk tillämpning**: Skapa ett "användar-profil" system som:
+   - Sparar användarens namn, ålder och intressen (array) 
+   - Laddar profilen vid sidstart (använd fallback-värden om ingen profil finns)
+   - Låter användaren uppdatera profilen via formulär
+
+<details>
+<summary>Lösningsförslag för säkra funktioner</summary>
+
+```javascript
+function saveToStorage(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+    return true; // Lyckades
+  } catch (error) {
+    console.error("Kunde inte spara till localStorage:", error);
+    return false; // Misslyckades
+  }
+}
+
+function loadFromStorage(key, fallback = null) {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch (error) {
+    console.error(`Fel vid läsning av ${key}:`, error);
+    return fallback;
+  }
+}
+
+// Exempel på användarprofil
+const defaultProfile = {
+  name: "",
+  age: 0,
+  interests: []
+};
+
+let userProfile = loadFromStorage("userProfile", defaultProfile);
+
+function updateProfile(name, age, interests) {
+  userProfile = { name, age, interests };
+  saveToStorage("userProfile", userProfile);
+}
+```
+</details>
+
+### 4 - JSON-formatet fördjupning
+JSON är ett textbaserat format som ser ut nästan exakt som JavaScript-objekt, men med viktiga skillnader.
+
+**Giltigt JSON:**
 ```json
 {
   "name": "Ada Lovelace",
@@ -117,156 +220,205 @@ JSON är ett textbaserat format som ser ut nästan exakt som JavaScript-objekt, 
 }
 ```
 
-**Regler för JSON:**
-* Nycklar måste vara strängar med dubbla citattecken
-* Strängar måste använda dubbla citattecken (inte enkla)
-* Inga trailing commas tillåtna
-* Inga kommentarer tillåtna
-* Inga funktioner (bara data)
-
-<details>
-<summary>Vanliga JSON-fel</summary>
+#### Övning
+1. **Validering**: Vilket av dessa JSON-exempel är korrekt? Testa med `JSON.parse()`:
 
 ```javascript
-// ❌ Enkla citattecken
-{ 'name': 'Ada' }
+// A
+const jsonA = '{"name": "Ada", "age": 36}';
 
-// ❌ Inga citattecken på nycklar
-{ name: "Ada" }
+// B 
+const jsonB = "{'name': 'Ada', 'age': 36}";
 
-// ❌ Trailing comma
-{ "name": "Ada", }
+// C
+const jsonC = '{"name": "Ada", "age": 36,}';
 
-// ✅ Korrekt JSON
-{ "name": "Ada" }
+// D
+const jsonD = '{"name": "Ada", "hobbies": ["math", "coding"], "active": true}';
+```
+
+2. **Konvertering**: Ta detta JavaScript-objekt och konvertera det till giltig JSON manuellt (skriv JSON-strängen för hand):
+```javascript
+const product = {
+  title: 'iPhone 15',
+  price: 12999,
+  inStock: true,
+  colors: ['svart', 'vit', 'blå'],
+  specs: {
+    storage: '128GB',
+    camera: '48MP'
+  }
+};
+```
+
+<details>
+<summary>JSON-regler sammanfattning</summary>
+
+**Obligatoriskt:**
+- Nycklar måste ha dubbla citattecken: `"name"`
+- Strängar måste ha dubbla citattecken: `"Ada"`
+- Inga trailing commas: ~~`{"a": 1,}`~~
+
+**Tillåtet:**
+- Strängar, tal, booleans, null
+- Objekt och arrayer (nästlade)
+
+**Ej tillåtet:**
+- Funktioner, undefined, kommentarer
+- Enkla citattecken, datum-objekt
+</details>
+
+<details>
+<summary>Svar på valideringsövningen</summary>
+
+- **A**: ✅ Korrekt
+- **B**: ❌ Enkla citattecken  
+- **C**: ❌ Trailing comma
+- **D**: ✅ Korrekt
+
+**Manuell JSON för product:**
+```json
+{
+  "title": "iPhone 15",
+  "price": 12999,
+  "inStock": true,
+  "colors": ["svart", "vit", "blå"],
+  "specs": {
+    "storage": "128GB", 
+    "camera": "48MP"
+  }
+}
 ```
 </details>
 
-### 5 - Bygg en todo-lista
-Nu ska vi använda allt vi lärt oss för att bygga en enkel todo-lista som sparas automatiskt.
+### 5 - Utmaning: Shopping lista med persistens
+Nu ska du bygga en komplett shopping lista som sparas automatiskt med JSON och localStorage.
 
-1. Skapa HTML med:
-   * Ett textfält för nya todos
-   * En knapp för att lägga till
-   * En lista där todos visas
+#### Uppgift
+Skapa en shopping lista-app med följande funktionalitet:
 
-2. Datastrukturen kan vara en array av objekt:
-
+**Datastruktur** (som exempel):
 ```javascript
-let todos = [
-  { id: 1, text: "Lär dig JSON", done: false },
-  { id: 2, text: "Bygg en todo-app", done: true }
+let shoppingList = [
+  { id: 1, item: "Mjölk", category: "Mejeri", bought: false, urgent: true },
+  { id: 2, item: "Bröd", category: "Bageri", bought: false, urgent: false },
+  { id: 3, item: "Äpplen", category: "Frukt", bought: true, urgent: false }
 ];
 ```
 
-3. Skapa funktioner för att:
-   * Rendera listan till DOM
-   * Lägga till en ny todo
-   * Markera en todo som klar
-   * Spara till localStorage (efter varje ändring)
-   * Ladda från localStorage (vid sidladdning)
+**Grundfunktioner:**
+1. **Lägg till vara** - formulär med fält för artikel, kategori, om det är brådskande
+2. **Visa lista** - alla varor med möjlighet att kryssa av som köpt
+3. **Ta bort vara** - knapp för att radera från listan  
+4. **Filtrera** - visa bara "Ej köpt", "Köpt" eller "Alla"
+5. **Automatisk sparning** - spara listan efter varje ändring
 
-4. Börja med att kunna lägga till och visa todos, sedan lägg till sparning.
+**Tekniska krav:**
+- Använd dina säkra `saveToStorage()` och `loadFromStorage()` funktioner
+- Generera unika ID:n för varje vara (t.ex. `Date.now()`)
+- Hantera tom lista elegant (visa meddelande)
+
+#### Starthjälp
+1. Börja med HTML-strukturen:
+   - Formulär för att lägga till vara
+   - Container för listan
+   - Knappar för filtrering
+
+2. Skapa grundfunktionerna:
+   - `addItem(item, category, urgent)`
+   - `removeItem(id)` 
+   - `toggleBought(id)`
+   - `renderList(filter)`
+   - `saveList()` och `loadList()`
+
+3. Bygg funktionaliteten steg för steg och testa varje del.
 
 <details>
-<summary>Tips för att komma igång</summary>
+<summary>Exempel på grundstruktur</summary>
 
 ```javascript
-// Ladda todos vid start
-let todos = loadFromStorage("todos", []);
-
-// Spara efter varje ändring
-function saveTodos() {
-  localStorage.setItem("todos", JSON.stringify(todos));
+// Säkra localStorage-funktioner (från tidigare övning)
+function saveToStorage(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+    return true;
+  } catch (error) {
+    console.error("Kunde inte spara:", error);
+    return false;
+  }
 }
 
-// Lägg till ny todo
-function addTodo(text) {
-  const newTodo = {
-    id: Date.now(), // Enkelt sätt att få unikt id
-    text: text,
-    done: false
+function loadFromStorage(key, fallback = null) {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch (error) {
+    console.error("Kunde inte ladda:", error);
+    return fallback;
+  }
+}
+
+// Shopping lista funktioner
+let shoppingList = loadFromStorage("shoppingList", []);
+
+function addItem(item, category, urgent = false) {
+  const newItem = {
+    id: Date.now(),
+    item: item.trim(),
+    category: category.trim(),
+    bought: false,
+    urgent: urgent
   };
-  todos.push(newTodo);
-  saveTodos();
-  renderTodos();
+  
+  shoppingList.push(newItem);
+  saveList();
+  renderList();
 }
 
-// Rendera till DOM
-function renderTodos() {
-  // Din kod för att visa todos i HTML
+function saveList() {
+  saveToStorage("shoppingList", shoppingList);
 }
+
+function renderList(filter = 'all') {
+  const container = document.getElementById('shopping-list');
+  let filteredList = shoppingList;
+  
+  if (filter === 'bought') {
+    filteredList = shoppingList.filter(item => item.bought);
+  } else if (filter === 'not-bought') {
+    filteredList = shoppingList.filter(item => !item.bought);
+  }
+  
+  if (filteredList.length === 0) {
+    container.innerHTML = '<p>Ingen vara att visa</p>';
+    return;
+  }
+  
+  container.innerHTML = filteredList.map(item => `
+    <div class="item ${item.bought ? 'bought' : ''} ${item.urgent ? 'urgent' : ''}">
+      <input type="checkbox" ${item.bought ? 'checked' : ''} 
+             onchange="toggleBought(${item.id})">
+      <span>${item.item} (${item.category})</span>
+      <button onclick="removeItem(${item.id})">Ta bort</button>
+    </div>
+  `).join('');
+}
+
+// Ladda lista vid start
+renderList();
 ```
 </details>
 
-### 6 - Utmaning: Komplett CRUD
-Utöka din todo-lista med full funktionalitet:
-
-1. **Create** - Lägg till nya todos (redan gjort)
-
-2. **Read** - Visa alla todos (redan gjort)
-
-3. **Update** - Markera som klar/inte klar
-   * Lägg till en checkbox eller klickbar ikon
-   * Uppdatera `done`-egenskapen
-   * Styla klara todos annorlunda (genomstruken text, annan färg)
-
-4. **Delete** - Ta bort todos
-   * Lägg till en ta-bort-knapp på varje todo
-   * Filtrera bort todon från arrayen
-   * Överväg bekräftelse innan borttagning
-
-<details>
-<summary>Tips för uppdatering och borttagning</summary>
-
-```javascript
-// Markera som klar
-function toggleTodo(id) {
-  const todo = todos.find(t => t.id === id);
-  if (todo) {
-    todo.done = !todo.done;
-    saveTodos();
-    renderTodos();
-  }
-}
-
-// Ta bort
-function deleteTodo(id) {
-  todos = todos.filter(t => t.id !== id);
-  saveTodos();
-  renderTodos();
-}
-```
-
-För att koppla knappar till rätt todo kan du använda data-attribut:
-```html
-<button data-id="123" class="delete-btn">Ta bort</button>
-```
-
-```javascript
-// Event delegation
-todoList.addEventListener("click", (e) => {
-  if (e.target.classList.contains("delete-btn")) {
-    const id = Number(e.target.dataset.id);
-    deleteTodo(id);
-  }
-});
-```
-</details>
-
-### 7 - Uppdatera din landing page
-Nu när du kan JSON och localStorage är det ett bra tillfälle att uppdatera din landing page från Lab 1-d.
-
-Fundera på:
-* Kan du spara information om vilka labs som är klara i localStorage?
-* Kan statusen ("Klar"/"Pågående") läsas från sparad data istället för att vara hårdkodad i HTML?
-
-Detta är ett första steg mot att göra sidan datadriven!
+**Extra utmaningar:**
+- Lägg till redigering av befintliga varor
+- Sortera efter kategori eller brådskande  
+- Export/import av lista (kopiera JSON till clipboard)
+- Räkna antal köpt vs ej köpt
 
 **Reflektion**:
 * Varför är JSON ett bra format för datautbyte?
 * Vilka datatyper stödjer JSON? Vilka stödjer det inte?
 * Hur skiljer sig JSON från JavaScript-objektliteraler?
-* När bör man spara data i localStorage vs skicka till en server?
+* När bör man spara komplexa data lokalt vs skicka till en server?
 
 </main>
