@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Kontorsstol Ergonomisk",
+    "description": "Justerbar kontorsstol med ländryggsstöd och nätrygg.",
+    "price": 2999,
+    "image": "product-01.jpg",
+    "category": "stolar"
+  },
+  {
+    "id": 2,
+    "name": "Skrivbord Höj- och Sänkbart",
+    "description": "Elektriskt höj- och sänkbart skrivbord. 160x80 cm.",
+    "price": 5999,
+    "image": "product-02.jpg",
+    "category": "bord"
+  },
+  {
+    "id": 3,
+    "name": "Soffa 3-sits",
+    "description": "Modern soffa i grått tyg. Avtagbar klädsel för enkel tvätt.",
+    "price": 7999,
+    "image": "product-03.jpg",
+    "category": "soffor"
+  },
+  {
+    "id": 4,
+    "name": "Golvlampa Båge",
+    "description": "Stilren bågformad golvlampa med justerbar arm. E27 sockel.",
+    "price": 1299,
+    "image": "product-04.jpg",
+    "category": "lampor"
+  },
+  {
+    "id": 5,
+    "name": "Bokhylla Trä",
+    "description": "Bokhylla i massiv ek med 5 hyllplan. 180cm hög.",
+    "price": 3499,
+    "image": "product-05.jpg",
+    "category": "förvaring"
+  },
+  {
+    "id": 6,
+    "name": "Matbord Runt",
+    "description": "Runt matbord för 4-6 personer. Vit skiva med träben.",
+    "price": 4499,
+    "image": "product-06.jpg",
+    "category": "bord"
+  },
+  {
+    "id": 7,
+    "name": "Fåtölj Läder",
+    "description": "Klassisk fåtölj i brunt läder med fotpall.",
+    "price": 6999,
+    "image": "product-07.jpg",
+    "category": "stolar"
+  },
+  {
+    "id": 8,
+    "name": "Sängbord med Låda",
+    "description": "Minimalistiskt sängbord i vit färg. En låda för förvaring.",
+    "price": 799,
+    "image": "product-08.jpg",
+    "category": "bord"
+  },
+  {
+    "id": 9,
+    "name": "Taklampa Pendel",
+    "description": "Modern pendellampa i mässing. 3 ljuskällor.",
+    "price": 1899,
+    "image": "product-09.jpg",
+    "category": "lampor"
+  },
+  {
+    "id": 10,
+    "name": "TV-bänk",
+    "description": "Låg TV-bänk med 2 lådor och öppna hyllor. 150cm bred.",
+    "price": 2499,
+    "image": "product-10.jpg",
+    "category": "förvaring"
+  }
+]

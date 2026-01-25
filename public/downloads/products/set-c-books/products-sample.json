@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "JavaScript: The Good Parts",
+    "description": "Douglas Crockfords klassiker om JavaScripts bästa delar.",
+    "price": 299,
+    "image": "product-01.jpg",
+    "category": "facklitteratur"
+  },
+  {
+    "id": 2,
+    "name": "Clean Code",
+    "description": "Robert C. Martins guide till att skriva läsbar och underhållbar kod.",
+    "price": 349,
+    "image": "product-02.jpg",
+    "category": "facklitteratur"
+  },
+  {
+    "id": 3,
+    "name": "Harry Potter och De Vises Sten",
+    "description": "Första boken i J.K. Rowlings magiska serie. Svensk översättning.",
+    "price": 199,
+    "image": "product-03.jpg",
+    "category": "romaner"
+  },
+  {
+    "id": 4,
+    "name": "Sapiens: En kort historik över mänskligheten",
+    "description": "Yuval Noah Hararis fascinerande resa genom mänsklighetens historia.",
+    "price": 249,
+    "image": "product-04.jpg",
+    "category": "facklitteratur"
+  },
+  {
+    "id": 5,
+    "name": "Kokboken: Svensk Husmanskost",
+    "description": "Klassiska svenska recept från köttbullar till prinsesstårta.",
+    "price": 349,
+    "image": "product-05.jpg",
+    "category": "kokböcker"
+  },
+  {
+    "id": 6,
+    "name": "Morden i Midsomer",
+    "description": "Kriminalroman baserad på den populära TV-serien.",
+    "price": 179,
+    "image": "product-06.jpg",
+    "category": "romaner"
+  },
+  {
+    "id": 7,
+    "name": "Veganmat för Alla",
+    "description": "Enkla och goda veganska recept för vardagen.",
+    "price": 279,
+    "image": "product-07.jpg",
+    "category": "kokböcker"
+  },
+  {
+    "id": 8,
+    "name": "Design Patterns",
+    "description": "Gang of Fours klassiska bok om designmönster i objektorienterad programmering.",
+    "price": 499,
+    "image": "product-08.jpg",
+    "category": "facklitteratur"
+  },
+  {
+    "id": 9,
+    "name": "Flickan med Draktatueringen",
+    "description": "Stieg Larssons internationella bestseller. Millennium-serien del 1.",
+    "price": 149,
+    "image": "product-09.jpg",
+    "category": "romaner"
+  },
+  {
+    "id": 10,
+    "name": "Bakning: Från Nybörjare till Mästare",
+    "description": "Komplett guide till bakning med steg-för-steg instruktioner.",
+    "price": 399,
+    "image": "product-10.jpg",
+    "category": "kokböcker"
+  }
+]

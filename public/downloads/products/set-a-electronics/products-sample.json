@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Smartphone Pro X",
+    "description": "Flaggskeppstelefon med 6.7\" AMOLED-skärm, 128GB lagring och 48MP kamera.",
+    "price": 12999,
+    "image": "product-01.jpg",
+    "category": "telefoner"
+  },
+  {
+    "id": 2,
+    "name": "Laptop UltraBook 15",
+    "description": "Tunn och lätt laptop med Intel i7, 16GB RAM och 512GB SSD.",
+    "price": 14999,
+    "image": "product-02.jpg",
+    "category": "datorer"
+  },
+  {
+    "id": 3,
+    "name": "Trådlösa Hörlurar Elite",
+    "description": "Premium hörlurar med aktiv brusreducering och 30 timmars batteritid.",
+    "price": 2999,
+    "image": "product-03.jpg",
+    "category": "ljud"
+  },
+  {
+    "id": 4,
+    "name": "Smartwatch Active",
+    "description": "Sportklocka med GPS, pulsmätare och 7 dagars batteritid.",
+    "price": 3499,
+    "image": "product-04.jpg",
+    "category": "wearables"
+  },
+  {
+    "id": 5,
+    "name": "Tablet Pro 11",
+    "description": "Kraftfull surfplatta med M2-chip, 11\" Liquid Retina-skärm.",
+    "price": 9999,
+    "image": "product-05.jpg",
+    "category": "datorer"
+  },
+  {
+    "id": 6,
+    "name": "Bluetooth Högtalare",
+    "description": "Portabel högtalare med 360° ljud och vattentålig design.",
+    "price": 1299,
+    "image": "product-06.jpg",
+    "category": "ljud"
+  },
+  {
+    "id": 7,
+    "name": "Gaming Headset RGB",
+    "description": "Surroundljud headset med mikrofon och anpassningsbar RGB-belysning.",
+    "price": 899,
+    "image": "product-07.jpg",
+    "category": "ljud"
+  },
+  {
+    "id": 8,
+    "name": "Smartphone Budget",
+    "description": "Prisvärd smartphone med 6.5\" skärm, 64GB lagring och dubbla kameror.",
+    "price": 2499,
+    "image": "product-08.jpg",
+    "category": "telefoner"
+  },
+  {
+    "id": 9,
+    "name": "Mekaniskt Tangentbord",
+    "description": "RGB tangentbord med Cherry MX-brytare och nordisk layout.",
+    "price": 1499,
+    "image": "product-09.jpg",
+    "category": "tillbehör"
+  },
+  {
+    "id": 10,
+    "name": "Trådlös Mus Ergonomisk",
+    "description": "Vertikal ergonomisk mus som minskar belastning på handled.",
+    "price": 599,
+    "image": "product-10.jpg",
+    "category": "tillbehör"
+  }
+]

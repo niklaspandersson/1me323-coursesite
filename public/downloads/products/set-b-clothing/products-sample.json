@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Basic T-shirt Vit",
+    "description": "Klassisk t-shirt i 100% ekologisk bomull. Rund halsringning.",
+    "price": 299,
+    "image": "product-01.jpg",
+    "category": "toppar"
+  },
+  {
+    "id": 2,
+    "name": "Hoodie Oversized",
+    "description": "Bekväm oversized hoodie med luva och ficka fram. Fleecefodrad.",
+    "price": 599,
+    "image": "product-02.jpg",
+    "category": "toppar"
+  },
+  {
+    "id": 3,
+    "name": "Slim Fit Jeans",
+    "description": "Klassiska jeans i mörkblå tvätt. Smal passform med stretch.",
+    "price": 799,
+    "image": "product-03.jpg",
+    "category": "byxor"
+  },
+  {
+    "id": 4,
+    "name": "Vinterjakka Parka",
+    "description": "Varm vinterjacka med avtagbar pälskrage. Vattentålig.",
+    "price": 1999,
+    "image": "product-04.jpg",
+    "category": "jackor"
+  },
+  {
+    "id": 5,
+    "name": "Sommarklänning Blommig",
+    "description": "Ledig sommarklänning med blommönster. Knälång med volangdetaljer.",
+    "price": 499,
+    "image": "product-05.jpg",
+    "category": "klänningar"
+  },
+  {
+    "id": 6,
+    "name": "Chinos Beige",
+    "description": "Snygga chinos i klassisk passform. Perfekta för kontoret.",
+    "price": 599,
+    "image": "product-06.jpg",
+    "category": "byxor"
+  },
+  {
+    "id": 7,
+    "name": "Skjorta Oxford",
+    "description": "Tidlös oxfordskjorta i ljusblå. Button-down-krage.",
+    "price": 699,
+    "image": "product-07.jpg",
+    "category": "toppar"
+  },
+  {
+    "id": 8,
+    "name": "Stickad Tröja",
+    "description": "Varm stickad tröja i merinoull. Rundhalsad.",
+    "price": 899,
+    "image": "product-08.jpg",
+    "category": "toppar"
+  },
+  {
+    "id": 9,
+    "name": "Regnjacka",
+    "description": "Lätt regnjacka med taped sömmar. Packbar i egen ficka.",
+    "price": 899,
+    "image": "product-09.jpg",
+    "category": "jackor"
+  },
+  {
+    "id": 10,
+    "name": "Shorts Cargo",
+    "description": "Avslappnade cargoshorts med flera fickor. Perfekt för sommaren.",
+    "price": 449,
+    "image": "product-10.jpg",
+    "category": "byxor"
+  }
+]

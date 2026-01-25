@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Fotboll Match",
+    "description": "FIFA-godkänd matchboll i syntetiskt läder. Storlek 5.",
+    "price": 499,
+    "image": "product-01.jpg",
+    "category": "bollar"
+  },
+  {
+    "id": 2,
+    "name": "Löparskor Pro",
+    "description": "Lätta löparskor med extra dämpning. Andningsbart material.",
+    "price": 1499,
+    "image": "product-02.jpg",
+    "category": "skor"
+  },
+  {
+    "id": 3,
+    "name": "Tennisracket Carbon",
+    "description": "Racket i kolfiberkomposit. Vikt: 285g. Inkl. fodral.",
+    "price": 1999,
+    "image": "product-03.jpg",
+    "category": "racketar"
+  },
+  {
+    "id": 4,
+    "name": "Yogamatta Premium",
+    "description": "Extra tjock yogamatta (6mm) i miljövänligt material. Halkfri.",
+    "price": 599,
+    "image": "product-04.jpg",
+    "category": "träning"
+  },
+  {
+    "id": 5,
+    "name": "Hantlar Set 2-10kg",
+    "description": "Set med hantlar: 2, 4, 6, 8 och 10 kg. Inkl. ställning.",
+    "price": 2499,
+    "image": "product-05.jpg",
+    "category": "träning"
+  },
+  {
+    "id": 6,
+    "name": "Basket Indoor/Outdoor",
+    "description": "Slitstark basket för både inne- och utomhusspel. Storlek 7.",
+    "price": 399,
+    "image": "product-06.jpg",
+    "category": "bollar"
+  },
+  {
+    "id": 7,
+    "name": "Badmintonset Komplett",
+    "description": "2 racketar, 6 fjäderbollar och nät. Perfekt för trädgården.",
+    "price": 699,
+    "image": "product-07.jpg",
+    "category": "racketar"
+  },
+  {
+    "id": 8,
+    "name": "Träningsskor Gym",
+    "description": "Stabila träningsskor för gym och crossfit. Platt sula.",
+    "price": 1299,
+    "image": "product-08.jpg",
+    "category": "skor"
+  },
+  {
+    "id": 9,
+    "name": "Resistance Bands Set",
+    "description": "5 motståndsband med olika styrka. Inkl. dörrankar och handtag.",
+    "price": 349,
+    "image": "product-09.jpg",
+    "category": "träning"
+  },
+  {
+    "id": 10,
+    "name": "Cykelhjälm Aero",
+    "description": "Aerodynamisk cykelhjälm med MIPS-skydd. Justerbar passform.",
+    "price": 899,
+    "image": "product-10.jpg",
+    "category": "utrustning"
+  }
+]
