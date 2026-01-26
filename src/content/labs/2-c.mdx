@@ -13,10 +13,10 @@ title: localStorage
 </aside>
 
 <main>
-Ibland vill vi att webbplatsen ska "komma ihåg" saker - användarens namn, inställningar, eller var de var i ett formulär. `localStorage` ger oss ett enkelt sätt att spara data i webbläsaren som överlever både sidladdningar och att webbläsaren stängs.
+Ibland vill vi att webbplatsen ska "komma ihåg" saker - användarens namn, inställningar, eller kanske vad det har lagt i en kundvagn. `localStorage` ger oss ett enkelt sätt att spara data i webbläsaren som överlever både sidladdningar och att webbläsaren stängs.
 
 ### 0 - Förberedelser
-* Skapa en ny mapp `2c` i din `labs`-mapp uppsättningar filer `index.html` + `index.js` och `page2.html` + `page2.js`. 
+* Skapa en ny mapp `2c` i din `labs`-mapp och två uppsättningar filer: `index.html` + `index.js` och `page2.html` + `page2.js`. 
 * Skapa grundstrukturer i båda html-filerna och läs in respektive JavaScript-fil som vanligt. 
 * Länka gärna in `global.css` på båda sidorna också. 
 * Lägg in en rubrik i HTML-filerna som talar om att detta är labb 2c, samt en instruktion om att öppna konsolen för att se resultatet av JavaScript-koden.
@@ -40,6 +40,11 @@ localStorage.removeItem("greeting");
 localStorage.clear();
 ```
 
+Öppna även DevTools och hitta var localStorage-data visas där:
+   * **Application**-fliken (Chrome) eller **Storage**-fliken (Firefox)
+   * Expandera **Local Storage**
+   * Ha gärna den fliken öppen när du kör koden för att se hur data läggs till och tas bort när du testa övningarna nedan.
+
 #### Övning
 1. Spara ditt favoritdjur i `localStorage` ifrån `index.js`, använd nycken `animal`.
 
@@ -47,10 +52,6 @@ localStorage.clear();
 
 3. Skapa en knapp i `page2.html` som när den klickas tar bort det sparade djuret från localStorage. Antingen genom att använda `localStorage.removeItem` eller `localStorage.clear`. 
    * Klicka på knappen och ladda om sidan för att verifiera att värdet är borta.
-
-4. Öppna DevTools och hitta var localStorage-data visas:
-   * **Application**-fliken (Chrome) eller **Storage**-fliken (Firefox)
-   * Expandera **Local Storage**
 
 <details>
 <summary>Lösningsförslag steg 1 - 2</summary>
