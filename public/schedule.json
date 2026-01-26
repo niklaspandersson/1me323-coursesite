@@ -86,17 +86,71 @@
           {
             "id": "js:object",
             "title": "Objekt",
-            "tasks": []
-          },
-          {
-            "id": "js:JSON",
-            "title": "JSON",
-            "tasks": []
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Objekt i javascript",
+                "link": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Object_basics"
+              },
+              {
+                "id": "js:object-basics",
+                "type": "exercise",
+                "title": "Grundläggande JS-objekt",
+                "link": "../laborationer/1a/"
+              },
+              {
+                "id": "js:methods",
+                "type": "exercise",
+                "title": "Metoder och 'this'",
+                "link": "../laborationer/1b/"
+              }
+            ]
           },
           {
             "id": "js:localStorage",
             "title": "localStorage",
-            "tasks": []
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "localStorage",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API"
+              },
+              {
+                "id": "js:localStorage",
+                "type": "exercise",
+                "title": "localStorage",
+                "link": "../laborationer/2c/"
+              }
+            ]
+          },
+          {
+            "id": "js:JSON",
+            "title": "JSON",
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "JSON",
+                "link": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON",
+                "note": ["Till och med 'JSON syntax restrictions'"]
+              },
+              {
+                "id": "js:JSON",
+                "type": "exercise",
+                "title": "JSON",
+                "link": "../laborationer/2d/"
+              }
+            ]
+          },
+          {
+            "title": "Övrigt",
+            "tasks": [
+              {
+                "id": "js:ternary",
+                "type": "exercise",
+                "title": "Ternary-operatorn (villkorsoperatorn)",
+                "link": "../laborationer/2e/"
+              }
+            ]
           }
         ]
       },

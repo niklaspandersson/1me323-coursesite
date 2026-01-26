@@ -1,0 +1,139 @@
+---
+title: Uppgift 2 - Produktsida med kundvagn
+downloads: u2.zip
+---
+
+<main>
+
+I denna uppgift ska du skapa en produktsida som dynamiskt renderar produkter från en datastruktur samt implementera en kundvagn som finnas kvar mellan sidladdningar via localStorage.
+
+### Bakgrund
+
+E-handel är en viktig del av webben idag och nästan alla webbplatser som säljer produkter eller tjänster använder liknande mönster: en lista med produkter som kan filtreras/sorteras, produktkort med bild och information, samt en kundvagn där användaren kan lägga till varor.
+
+I denna uppgift kommer du att bygga en produktsida från grunden. Du ska skapa en egen datastruktur för produkterna, dynamiskt rendera dem med JavaScript, och implementera en kundvagnsfunktion som sparar användarens val även när webbläsaren stängs.
+
+### Välj ett produktset
+
+Du ska välja **ett** av följande produktteman att arbeta med. Ladda ner arbetsmaterialet ovan för att få tillgång till exempeldata och instruktioner.
+
+| Set | Tema | Beskrivning |
+|-----|------|-------------|
+| **A** | Elektronik | Smartphones, laptops, hörlurar, kameror etc. |
+| **B** | Kläder | T-shirts, hoodies, jeans, jackor etc. |
+| **C** | Böcker | Romaner, facklitteratur, kokböcker etc. |
+| **D** | Möbler | Stolar, bord, soffor, lampor etc. |
+| **E** | Sport | Bollar, racketar, skor, träningsutrustning etc. |
+
+Arbetsmaterialet innehåller:
+* **Exempeldata (JSON):** Färdig produktdata för varje tema som du kan använda som utgångspunkt
+* **README:** Instruktioner för hur du kan använda placeholder-bilder från tjänster som [Picsum Photos](https://picsum.photos/) eller [Lorem Flickr](https://loremflickr.com/)
+
+<div class="note">
+Du får även använda egna produktbilder om du föredrar det. Se till att bilderna är av liknande storlek och kvalitet, och att du har rätt att använda dem. Du kan också använda AI-genererade bilder eller skärmdumpar från befintliga e-handelssidor (endast för utbildningssyfte).
+</div>
+
+### Krav
+
+#### Datastruktur för produkter
+
+* Skapa en JavaScript-fil (t.ex. `products.js`) som innehåller en array med produktobjekt.
+* Varje produktobjekt ska innehålla **minst** följande egenskaper:
+   * `id`: Unikt id för produkten (t.ex. 1, 2, 3 eller "prod-001")
+   * `name`: Produktens namn
+   * `description`: En kort beskrivning av produkten
+   * `price`: Pris i kronor (som nummer)
+   * `image`: Sökväg till produktbilden
+   * `category`: Produktens kategori (minst 2-3 olika kategorier)
+* Du ska ha **minst 8 produkter** i din datastruktur.
+* Det är tillåtet att lägga till fler egenskaper om du vill (t.ex. `stock`, `rating`, `discount` etc.)
+
+#### HTML-struktur
+
+* Skapa en `index.html` för produktsidan med följande innehåll:
+   * Header med sidans titel och navigation (återanvänd den globala navigationen från uppgift 1)
+   * En sektion för filtrering/kategorier
+   * En container där produktkorten ska renderas
+   * En kundvagnssektion (kan vara en sidebar, modal eller egen sida)
+   * Footer med relevant information
+* Använd semantiska HTML-element (`<main>`, `<section>`, `<article>`, `<aside>` etc.)
+* Sidan ska vara responsiv och fungera väl på både desktop och mobil
+
+#### CSS och design
+
+* Skapa en CSS-fil för produktsidans styling
+* Produktkorten ska visas i ett **grid** eller **flexbox**-baserat layoutsystem
+* Varje produktkort ska innehålla:
+   * Produktbild
+   * Produktnamn
+   * Pris
+   * En "Lägg i kundvagn"-knapp
+* Implementera hover-effekter på produktkorten
+* Kundvagnen ska ha tydlig visuell design som skiljer sig från produktlistan
+* Använd CSS-variabler för färger och återkommande värden
+
+#### JavaScript-funktionalitet
+
+Implementera följande funktionalitet med JavaScript:
+
+**Produktrendering:**
+* Produkterna ska renderas dynamiskt från din datastruktur - inga produkter får vara hårdkodade i HTML
+* Skapa en funktion som genererar HTML för ett produktkort
+* Skapa en funktion som renderar alla produkter till sidan
+
+**Filtrering:**
+* Användaren ska kunna filtrera produkter efter kategori
+* När en kategori väljs ska endast produkter i den kategorin visas
+* Det ska finnas ett alternativ att visa alla produkter
+
+**Kundvagn:**
+* Användaren ska kunna lägga till produkter i kundvagnen genom att klicka på en knapp
+* Kundvagnen ska visa:
+   * Lista på tillagda produkter med namn och pris
+   * Antal av varje produkt (om samma produkt läggs till flera gånger)
+   * Totalsumma för alla produkter
+* Användaren ska kunna:
+   * Öka/minska antal av en produkt
+   * Ta bort en produkt helt från kundvagnen
+   * Tömma hela kundvagnen
+
+**Persistens med localStorage:**
+* Kundvagnens innehåll ska sparas i `localStorage`
+* När sidan laddas om ska kundvagnens innehåll återställas från `localStorage`
+* Kundvagnen ska uppdateras i `localStorage` varje gång den ändras
+
+#### Kodkvalitet
+
+* Koden ska vara välstrukturerad och uppdelad i logiska funktioner
+* Använd beskrivande namn på variabler och funktioner
+* Kommentera koden där det behövs för att förklara komplex logik
+* Undvik upprepning av kod (DRY - Don't Repeat Yourself)
+* Hantera edge cases (t.ex. tom kundvagn, ogiltiga värden)
+
+### Frivilliga utökningar
+
+Om du vill utmana dig själv kan du implementera en eller flera av följande funktioner:
+
+* **Sökfunktion:** Låt användaren söka efter produkter baserat på namn eller beskrivning
+* **Sortering:** Möjlighet att sortera produkter efter pris (stigande/fallande) eller namn
+* **Produktdetaljer:** Klicka på en produkt för att se mer detaljerad information i en modal eller på en separat sida
+* **Lagerstatus:** Visa om produkten finns i lager och förhindra att utgångna produkter läggs i kundvagnen
+* **Rabatter:** Implementera rabattkoder eller mängdrabatt
+* **Animeringar:** Lägg till CSS-animeringar när produkter läggs till/tas bort från kundvagnen
+
+### Tips
+
+* Börja med att skapa datastrukturen och testa att du kan logga den i konsolen
+* Bygg HTML-strukturen utan JavaScript först, så du vet hur produktkorten ska se ut
+* Implementera en funktion i taget och testa noggrant innan du går vidare
+* Använd `JSON.stringify()` och `JSON.parse()` för att spara/hämta data från localStorage
+* Använd webbläsarens DevTools för att inspektera localStorage och debugga din kod
+
+### Inlämning
+
+* Skapa en katalog `assignment2/` i ditt assignments-repository
+* Uppdatera din `assignments.js` med information om uppgift 2
+* Pusha alla ändringar till GitHub
+* Lämna in URL:en till din publicerade produktsida i Moodle
+
+</main>
