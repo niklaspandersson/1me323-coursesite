@@ -41,8 +41,7 @@ console.log(localStorage.getItem("colors")); // "röd,grön,blå" - nästan rät
 #### Övning
 1. Skapa ett objekt `student` med:
    * `name`: ditt namn
-   * `courses`: en array med kursnamn (t.ex. ["Webbteknik 2", "Programmering"])
-   * `grades`: ett objekt med kurser som nycklar och betyg som värden
+   * `courses`: en array med kursnamn (t.ex. ["Webbteknik 3", "Digitala medier"])
 
 2. Försök spara `student` i localStorage och läs upp det.
 
@@ -57,7 +56,7 @@ JavaScript anropar automatiskt `.toString()` på objektet när det konverteras t
 </details>
 
 ### 2 - JSON.stringify och JSON.parse
-JSON (JavaScript Object Notation) löser detta problem genom att konvertera objekt till välformatterade strängar.
+JSON (JavaScript Object Notation) löser detta problem genom att konvertera objekt till välformatterade strängar. Javascript har inbyggda metoder för detta: `JSON.stringify()` och `JSON.parse()`.
 
 **Exempel:**
 ```javascript
@@ -97,113 +96,31 @@ console.log(loadedUser.name); // "Ada"
 ```javascript
 const student = {
   name: "Anna Andersson",
-  courses: ["Webbteknik 2", "Programmering", "Databaser"],
-  grades: {
-    "Webbteknik 2": "A",
-    "Programmering": "B",
-    "Databaser": "A"
-  }
+  courses: ["Webbteknik 3", "Digitala medier"]
 };
 
+// Testa
+const jsonStudent = JSON.stringify(student);
+console.log(jsonStudent);
+
+const parsedStudent = JSON.parse(jsonStudent);
+console.log(parsedStudent.name); // "Anna Andersson"
+console.log(parsedStudent.courses);
+
+
 function saveStudent(studentData) {
-  localStorage.setItem("student", JSON.stringify(studentData));
+  const json = JSON.stringify(studentData);
+  localStorage.setItem("student", json);
 }
 
 function loadStudent() {
   const saved = localStorage.getItem("student");
-  return saved ? JSON.parse(saved) : null;
-}
-
-// Testa
-saveStudent(student);
-const loaded = loadStudent();
-console.log(loaded.name);
-console.log(loaded.courses[0]);
-console.log(loaded.grades["Programmering"]);
-```
-</details>
-
-### 3 - Hantera fel och saknade data
-När vi arbetar med JSON och localStorage måste vi hantera två potentiella problem: saknade data och felaktig JSON.
-
-**Exempel på säker hantering:**
-```javascript
-function loadFromStorage(key, defaultValue = null) {
-  try {
-    const item = localStorage.getItem(key);
-    // Om nyckeln inte finns returnerar getItem() null
-    if (item === null) {
-      return defaultValue;
-    }
-    // Försök konvertera JSON
-    return JSON.parse(item);
-  } catch (error) {
-    console.error("Kunde inte läsa från localStorage:", error);
-    return defaultValue;
-  }
-}
-
-// Användning
-const user = loadFromStorage("user", { name: "Gäst", preferences: {} });
-const settings = loadFromStorage("settings", { theme: "light", language: "sv" });
-```
-
-#### Övning
-1. **Testa felhantering**: Manuellt spara felaktig JSON i localStorage:
-```javascript
-localStorage.setItem("trasig", '{"name": "Ada", "age": }'); // Ogiltig JSON
-```
-
-2. Försök läsa denna data med `JSON.parse()` - vad händer?
-
-3. Implementera din egen säkra `saveToStorage(key, data)` och `loadFromStorage(key, fallback)` funktioner.
-
-4. **Praktisk tillämpning**: Skapa ett "användar-profil" system som:
-   - Sparar användarens namn, ålder och intressen (array) 
-   - Laddar profilen vid sidstart (använd fallback-värden om ingen profil finns)
-   - Låter användaren uppdatera profilen via formulär
-
-<details>
-<summary>Lösningsförslag för säkra funktioner</summary>
-
-```javascript
-function saveToStorage(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-    return true; // Lyckades
-  } catch (error) {
-    console.error("Kunde inte spara till localStorage:", error);
-    return false; // Misslyckades
-  }
-}
-
-function loadFromStorage(key, fallback = null) {
-  try {
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : fallback;
-  } catch (error) {
-    console.error(`Fel vid läsning av ${key}:`, error);
-    return fallback;
-  }
-}
-
-// Exempel på användarprofil
-const defaultProfile = {
-  name: "",
-  age: 0,
-  interests: []
-};
-
-let userProfile = loadFromStorage("userProfile", defaultProfile);
-
-function updateProfile(name, age, interests) {
-  userProfile = { name, age, interests };
-  saveToStorage("userProfile", userProfile);
+  return JSON.parse(saved);
 }
 ```
 </details>
 
-### 4 - JSON-formatet fördjupning
+### 3 - JSON-formatet fördjupning
 JSON är ett textbaserat format som ser ut nästan exakt som JavaScript-objekt, men med viktiga skillnader.
 
 **Giltigt JSON:**
@@ -291,134 +208,9 @@ const product = {
 ```
 </details>
 
-### 5 - Utmaning: Shopping lista med persistens
-Nu ska du bygga en komplett shopping lista som sparas automatiskt med JSON och localStorage.
-
-#### Uppgift
-Skapa en shopping lista-app med följande funktionalitet:
-
-**Datastruktur** (som exempel):
-```javascript
-let shoppingList = [
-  { id: 1, item: "Mjölk", category: "Mejeri", bought: false, urgent: true },
-  { id: 2, item: "Bröd", category: "Bageri", bought: false, urgent: false },
-  { id: 3, item: "Äpplen", category: "Frukt", bought: true, urgent: false }
-];
-```
-
-**Grundfunktioner:**
-1. **Lägg till vara** - formulär med fält för artikel, kategori, om det är brådskande
-2. **Visa lista** - alla varor med möjlighet att kryssa av som köpt
-3. **Ta bort vara** - knapp för att radera från listan  
-4. **Filtrera** - visa bara "Ej köpt", "Köpt" eller "Alla"
-5. **Automatisk sparning** - spara listan efter varje ändring
-
-**Tekniska krav:**
-- Använd dina säkra `saveToStorage()` och `loadFromStorage()` funktioner
-- Generera unika ID:n för varje vara (t.ex. `Date.now()`)
-- Hantera tom lista elegant (visa meddelande)
-
-#### Starthjälp
-1. Börja med HTML-strukturen:
-   - Formulär för att lägga till vara
-   - Container för listan
-   - Knappar för filtrering
-
-2. Skapa grundfunktionerna:
-   - `addItem(item, category, urgent)`
-   - `removeItem(id)` 
-   - `toggleBought(id)`
-   - `renderList(filter)`
-   - `saveList()` och `loadList()`
-
-3. Bygg funktionaliteten steg för steg och testa varje del.
-
-<details>
-<summary>Exempel på grundstruktur</summary>
-
-```javascript
-// Säkra localStorage-funktioner (från tidigare övning)
-function saveToStorage(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-    return true;
-  } catch (error) {
-    console.error("Kunde inte spara:", error);
-    return false;
-  }
-}
-
-function loadFromStorage(key, fallback = null) {
-  try {
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : fallback;
-  } catch (error) {
-    console.error("Kunde inte ladda:", error);
-    return fallback;
-  }
-}
-
-// Shopping lista funktioner
-let shoppingList = loadFromStorage("shoppingList", []);
-
-function addItem(item, category, urgent = false) {
-  const newItem = {
-    id: Date.now(),
-    item: item.trim(),
-    category: category.trim(),
-    bought: false,
-    urgent: urgent
-  };
-  
-  shoppingList.push(newItem);
-  saveList();
-  renderList();
-}
-
-function saveList() {
-  saveToStorage("shoppingList", shoppingList);
-}
-
-function renderList(filter = 'all') {
-  const container = document.getElementById('shopping-list');
-  let filteredList = shoppingList;
-  
-  if (filter === 'bought') {
-    filteredList = shoppingList.filter(item => item.bought);
-  } else if (filter === 'not-bought') {
-    filteredList = shoppingList.filter(item => !item.bought);
-  }
-  
-  if (filteredList.length === 0) {
-    container.innerHTML = '<p>Ingen vara att visa</p>';
-    return;
-  }
-  
-  container.innerHTML = filteredList.map(item => `
-    <div class="item ${item.bought ? 'bought' : ''} ${item.urgent ? 'urgent' : ''}">
-      <input type="checkbox" ${item.bought ? 'checked' : ''} 
-             onchange="toggleBought(${item.id})">
-      <span>${item.item} (${item.category})</span>
-      <button onclick="removeItem(${item.id})">Ta bort</button>
-    </div>
-  `).join('');
-}
-
-// Ladda lista vid start
-renderList();
-```
-</details>
-
-**Extra utmaningar:**
-- Lägg till redigering av befintliga varor
-- Sortera efter kategori eller brådskande  
-- Export/import av lista (kopiera JSON till clipboard)
-- Räkna antal köpt vs ej köpt
-
 **Reflektion**:
 * Varför är JSON ett bra format för datautbyte?
 * Vilka datatyper stödjer JSON? Vilka stödjer det inte?
 * Hur skiljer sig JSON från JavaScript-objektliteraler?
-* När bör man spara komplexa data lokalt vs skicka till en server?
 
 </main>

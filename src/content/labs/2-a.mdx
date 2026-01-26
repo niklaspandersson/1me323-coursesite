@@ -219,8 +219,8 @@ Tänk på:
 <summary>Tips för att komma igång</summary>
 
 ```javascript
-const person = document.getElementById("person");
-person.innerHTML = `
+const personElement = document.getElementById("person");
+personElement.innerHTML = `
   <h2>${person.firstName} ${person.lastName}</h2>
   <p>Ålder: ${person.age}</p>
 `;
@@ -232,21 +232,32 @@ const genres = book.genres.join(", ");
 ```
 </details>
 
-### 5 - Utmaning: Iterera över ett objekt
-Ibland vill man loopa igenom alla egenskaper i ett objekt utan att veta namnen i förväg.
+### 5 - Iterera över ett objekt
+Ibland vill man loopa igenom alla egenskaper i ett objekt utan att veta namnen i förväg. För det finns det en speciell variant av `for`-loopen som heter `for ... in`. Den går igenom alla nycklar i ett objekt.
 
-1. Använd `Object.keys()` för att få en array med alla nyckelnamn:
+`for ... in` används på det här sättet:
 ```javascript
-const keys = Object.keys(person);
-console.log(keys); // ["firstName", "lastName", "age", ...]
-```
-
-3. Använd `Object.entries()` för att få par av nycklar och värden i form av arrayer med två element ([key, value]):
-```javascript
-for (const pair of Object.entries(person)) {
-  console.log(`${pair[0]}: ${pair[1]}`);
+for(const key in obj) {
+  console.log(key, obj[key]);
 }
 ```
+
+Om du vill ha en array med alla nycklar går det att få direkt med den inbyggda metoder `Object.keys()`:
+```javascript
+const keys = Object.keys(obj);
+console.log(keys); // Array med alla nycklar
+```
+
+1. Använd `for ... in` eller `Object.keys()` för gå igenom alla egenskaper i ditt objekt från tidigare övningar och logga ut namnet på egenskapen samt dess värde.
+
+<details>
+<summary>Lösningsförslag</summary>
+```javascript
+for (const key in person) {
+  console.log(key, person[key]);
+}
+```
+</details>
 
 **Reflektion**:
 * Vilka fördelar har objekt jämfört med att ha många separata variabler?

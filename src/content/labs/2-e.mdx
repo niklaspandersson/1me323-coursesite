@@ -6,7 +6,7 @@ title: Ternary-operatorn
 
 #### Syfte
 * Att förstå ternary-operatorn som ett kompakt alternativ till if/else.
-* Att kunna använda ternary i template literals och JSX-liknande uttryck.
+* Att kunna använda ternary i template literals.
 * Att veta när ternary passar och när if/else är bättre.
 
 </aside>
@@ -126,7 +126,7 @@ const button = document.querySelector('#toggle-btn');
 const content = document.querySelector('#hidden-content');
 let isVisible = false;
 
-button.addEventListener('click', () => {
+button.addEventListener('click', function() {
   isVisible = !isVisible;
   content.style.display = isVisible ? 'block' : 'none';
   button.textContent = isVisible ? 'Visa mindre' : 'Visa mer';
