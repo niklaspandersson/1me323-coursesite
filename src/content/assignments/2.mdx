@@ -1,0 +1,140 @@
+---
+title: Uppgift 2 - Produktsida med kundvagn
+---
+
+<aside class="first">
+### Redovisning
+Uppgiften redovisas tillsammans med uppgift 1 vid kursens första deadline.
+* **Deadline**: Feb 6, kl 23.59
+* **Inlämning**: [Deadline 1 i moodle](https://moodle.lnu.se/mod/assign/view.php?id=5083165)
+</aside>
+
+<main>
+
+I denna uppgift ska du skapa en produktsida som dynamiskt renderar produkter från en datastruktur. Du ska skapa en egen datastruktur för produkterna, dynamiskt rendera dem med JavaScript, och implementera en kundvagnsfunktion som sparar användarens val även när webbläsaren stängs.
+
+
+### Förberedelser
+I den här kursen jobbar du med alla uppgifter i samma repository. Skapa en ny mapp `assignment2` i din `assignments`-mapp för denna uppgift.
+
+```
+assignments/
+├── ...
+└── assignment2/
+```
+
+* Lägg in information om den här uppgiften i datastrukturen i `assignments.js` så att den visas och länkas på startsidan för uppgifter.
+
+### Välj ett produktset
+
+1. Du ska välja **en** produktkategori att arbeta med. Välj ett från listan nedan eller hitta på ett eget. 
+   * **Elektronik**: Smartphones, laptops, hörlurar, kameror etc.
+   * **Kläder**: T-shirts, hoodies, jeans, jackor etc.
+   * **Möbler**: Stolar, bord, soffor, lampor etc.
+   * **Idrott**: Bollar, racketar, skor, träningsutrustning etc.
+2. Skapa **minst 8 produkter** inom den valda kategorin med olika egenskaper (namn, beskrivning, pris, bild etc.)
+3. Hitta lämpliga bilder för produkterna. 
+   * Du kan använda bilder från gratis bildbanker som [Unsplash](https://unsplash.com/) eller [Pexels](https://www.pexels.com/). Se till att bilderna är av liknande storlek och kvalitet.
+   * Alternativt kan du låta AI generera bilder för dina produkter. Använd valfri-AI tjänst för att skapa bilderna.
+
+### Krav
+
+#### Datastruktur för produkter
+
+* Skapa en JavaScript-fil (t.ex. `products.js`) som innehåller en array med produktobjekt.
+* Varje produktobjekt ska innehålla **minst** följande egenskaper:
+   * `id`: Unikt id för produkten (t.ex. 1, 2, 3 eller "prod-001")
+   * `name`: Produktens namn
+   * `description`: En kort beskrivning av produkten
+   * `price`: Pris i kronor (som nummer)
+   * `image`: Sökväg till produktbilden
+   * `category`: Produktens kategori (minst 2-3 olika kategorier)
+* Det är tillåtet att lägga till fler egenskaper om du vill (t.ex. `rating`, `discount` etc.)
+* Du skall ett objekt per produkt i din datastruktur, alltså **minst 8 objekt**.
+
+#### HTML-struktur
+
+* Skapa en `index.html` för produktsidan med följande innehåll:
+   * Header med sidans titel och global navigation (använd samma globala navigation från uppgift 1)
+   * En container där produktkorten ska renderas
+   * En kundvagnssektion i en sidebar
+   * Footer med relevant information
+* Använd semantiska HTML-element
+* Bilderna skall vara anpassade för webben
+* Sidan behöver bara fungera bra på desktop (ingen mobilanpassning krävs för denna uppgift)
+
+#### CSS och design
+
+* Skapa en separat CSS-fil för den här uppgiften
+* Länka även in den globala CSS-filen från uppgift 1
+* Produktkorten ska visas i ett **grid** eller **flexbox**-baserat layoutsystem
+* Varje produktkort ska innehålla informationen från datastrukturen:
+   * Produktbild, Produktnamn, Pris, Kort beskrivning samt kategorier.
+   * En "Lägg i kundvagn"-knapp
+* Implementera hover-effekter på produktkorten
+* Kundvagnen ska ha tydlig visuell design som skiljer sig från produktlistan
+* Använd CSS-variabler för färger och återkommande värden
+
+#### JavaScript-funktionalitet
+
+Implementera följande funktionalitet med JavaScript:
+
+**Produktrendering:**
+* Produkterna ska renderas dynamiskt från din datastruktur - inga produkter får vara hårdkodade i HTML
+* Skapa en funktion som genererar HTML för ett produktkort
+
+**Kundvagn:**
+* Användaren ska kunna lägga till produkter i kundvagnen genom att klicka på en knapp
+* Kundvagnen ska visa:
+   * Lista på tillagda produkter med namn och pris
+   * Antal av varje produkt (om samma produkt läggs till flera gånger)
+   * Totalsumma för alla produkter
+* Användaren ska kunna:
+   * Tömma hela kundvagnen
+
+**Persistens med localStorage:**
+* Kundvagnens innehåll ska sparas i `localStorage`
+* När sidan laddas om ska kundvagnens innehåll återställas från `localStorage`
+* Kundvagnen ska uppdateras i `localStorage` varje gång den ändras
+
+#### Kodkvalitet
+
+* Koden ska vara välstrukturerad och uppdelad i logiska funktioner, använd gärna moduler för att separara koden i olika filer
+* Använd beskrivande namn på variabler och funktioner
+* Kommentera koden där det behövs för att förklara komplex logik
+* Tänk på att hantera specialfall (t.ex. tom kundvagn, ogiltiga värden)
+
+### Frivilliga utökningar
+
+Om du vill har uppslag på "verkliga" saker att träna dina javascriptfärdigheter på så kommer här förslag på rimliga utökningar av en sådan här produktsida.
+
+* **Sortering:** Möjlighet att sortera produkter efter pris (stigande/fallande) eller namn
+   * Använd `Array.sort()` för att sortera produkterna i din datastruktur innan rendering
+* **Lagerstatus:** Visa om produkten finns i lager och förhindra att utgångna produkter läggs i kundvagnen
+* **Filtrering:** Lägg till filter för att bara visa produkter baserat på vald kategori
+* **Antal**: Låt användaren välja antal av varje produkt innan den läggs i kundvagnen
+* **Rabatter:** Implementera rabattkoder eller mängdrabatt
+
+### Tips
+
+* Räkna med att behöva skriva om delar av koden när du bygger vidare och lägger till funktionalitet
+* Börja med att skapa datastrukturen och testa att du kan logga den i konsolen
+* Bygg HTML-strukturen utan JavaScript först, så du vet hur produktkorten ska se ut
+* Implementera en funktion i taget och testa noggrant innan du går vidare
+* Använd `JSON.stringify()` och `JSON.parse()` för att spara/hämta data från localStorage
+* Använd webbläsarens DevTools för att inspektera localStorage och debugga din kod
+* Fråga om hjälp ifall du kör fast och inte vet hur du ska lösa ett visst problem
+
+### Versionshantering
+
+* Commita ofta, eftersom du gör framsteg
+* Pusha din kod till GitHub regelbundet
+
+### Inlämning
+* Commita och pusha till GitHub när allt är klart
+* Verifiera att den kompletta, fungerande versionen är publicerad på GitHub Pages
+* Lämna in URL:en till din publicerade produktsida i Moodle
+
+### Lycka till!
+
+</main>
