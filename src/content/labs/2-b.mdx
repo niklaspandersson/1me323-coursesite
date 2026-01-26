@@ -164,86 +164,7 @@ Utan `new`-nyckelordet:
 **Därför**: Använd alltid `new` med constructor functions!
 </details>
 
-### 4 - Metoder i constructor functions
-Du kan även lägga till metoder (funktioner) i constructor functions.
-
-**Exempel:**
-```javascript
-function Person(firstName, lastName) {
-  this.firstName = firstName;
-  this.lastName = lastName;
-  
-  // Metod som använder objektets egenskaper
-  this.getFullName = function() {
-    return this.firstName + " " + this.lastName;
-  };
-  
-  this.introduce = function() {
-    return `Hej, jag heter ${this.getFullName()}!`;
-  };
-}
-
-const person = new Person("Ada", "Lovelace");
-console.log(person.getFullName()); // "Ada Lovelace"
-console.log(person.introduce());   // "Hej, jag heter Ada Lovelace!"
-```
-
-#### Övning
-1. Utöka din `Car`-constructor med en metod `getDescription()` som returnerar en beskrivning som: "2018 Volvo V40 i blå färg".
-
-2. Lägg till en metod `honk()` som loggar "Tut tut!" och bilens märke.
-
-3. Skapa en `BankAccount`-constructor med:
-   * Egenskaper: `owner` (kontoinnehavare), `balance` (saldo, startar med 0)
-   * Metoder:
-     - `deposit(amount)` - sätt in pengar
-     - `withdraw(amount)` - ta ut pengar (bara om det finns tillräckligt saldo)
-     - `getBalance()` - visa aktuellt saldo
-     - `getInfo()` - visa kontoinformation
-
-4. Skapa två bankkonton och testa alla metoder.
-
-<details>
-<summary>Lösningsförslag för BankAccount</summary>
-
-```javascript
-function BankAccount(owner) {
-  this.owner = owner;
-  this.balance = 0;
-  
-  this.deposit = function(amount) {
-    if (amount > 0) {
-      this.balance += amount;
-      console.log(`Satte in ${amount} kr. Nytt saldo: ${this.balance} kr`);
-    }
-  };
-  
-  this.withdraw = function(amount) {
-    if (amount > 0 && amount <= this.balance) {
-      this.balance -= amount;
-      console.log(`Tog ut ${amount} kr. Nytt saldo: ${this.balance} kr`);
-    } else {
-      console.log("Otillräckligt saldo eller ogiltigt belopp");
-    }
-  };
-  
-  this.getBalance = function() {
-    return this.balance;
-  };
-  
-  this.getInfo = function() {
-    return `Konto för ${this.owner}, saldo: ${this.balance} kr`;
-  };
-}
-
-const account1 = new BankAccount("Anna Andersson");
-account1.deposit(1000);
-account1.withdraw(300);
-console.log(account1.getInfo());
-```
-</details>
-
-### 5 - Constructor vs vanlig funktion
+### 4 - Constructor vs vanlig funktion
 Viktiga skillnader att komma ihåg:
 
 | Constructor Function | Vanlig Funktion |
@@ -301,66 +222,58 @@ function Counter() {
 ```
 </details>
 
-### 6 - Utmaning: Kontaktlista
-Skapa en komplett kontaktlista-applikation.
+### 5 - Utmaning: Produktkatalog
+Skapa en produktkatalog där du använder constructor functions för att hantera produkter.
 
 #### Uppgift
-1. **Constructor**: Skapa en `Contact`-constructor med:
-   - `name`, `email`, `phone`, `company`
-   - Metod `getDisplayInfo()` som returnerar formaterad information
-   - Metod `updatePhone(newPhone)` för att uppdatera telefonnummer
+1. **Constructor**: Skapa en `Product`-constructor med:
+   - `name`, `price`, `category`, `inStock` (boolean)
 
-2. **Data**: Skapa en array med minst 5 kontakter
+2. **Data**: Skapa en array med minst 5 produkter från olika kategorier
 
-3. **HTML**: Bygg en sida som visar alla kontakter
+3. **HTML**: Bygg en sida som visar alla produkter i ett snyggt grid
 
-4. **Funktionalitet**: 
-   - Visa alla kontakter i en snygg lista
-   - Lägg till formulär för att skapa nya kontakter
-   - Lägg till knapp för att uppdatera telefonnummer
-
-**Extra utmaning**: Lägg till sök-funktionalitet för att filtrera kontakter.
+4. **Funktionalitet**:
+   - Visa alla produkter med namn, pris och lagerstatus
+   - Produkter som inte finns i lager ska markeras visuellt (t.ex. grå bakgrund)
 
 <details>
 <summary>Grund-struktur</summary>
 
 ```javascript
-function Contact(name, email, phone, company) {
+function Product(name, price, category, inStock) {
   this.name = name;
-  this.email = email;
-  this.phone = phone;
-  this.company = company;
-  
-  this.getDisplayInfo = function() {
-    return `
-      <div class="contact">
-        <h3>${this.name}</h3>
-        <p>Email: ${this.email}</p>
-        <p>Phone: ${this.phone}</p>
-        <p>Company: ${this.company}</p>
-      </div>
-    `;
-  };
-  
-  this.updatePhone = function(newPhone) {
-    this.phone = newPhone;
-  };
+  this.price = price;
+  this.category = category;
+  this.inStock = inStock;
 }
 
-// Skapa kontakter
-const contacts = [
-  new Contact("Anna Andersson", "anna@example.com", "070-123-4567", "Tech AB"),
-  new Contact("Erik Eriksson", "erik@example.com", "070-987-6543", "Design Studio"),
-  // ... fler kontakter
+// Skapa produkter
+const products = [
+  new Product("Laptop", 12999, "Elektronik", true),
+  new Product("Bok", 199, "Böcker", true),
+  new Product("Hörlurar", 899, "Elektronik", false),
+  // ... fler produkter
 ];
 
-// Visa kontakter
-function displayContacts() {
-  const container = document.getElementById('contacts');
-  container.innerHTML = contacts.map(contact => 
-    contact.getDisplayInfo()
-  ).join('');
+// Visa produkter
+function displayProducts() {
+  const container = document.getElementById('products');
+
+  for (const product of products) {
+    const html = `
+      <div class="product ${product.inStock ? '' : 'out-of-stock'}">
+        <h3>${product.name}</h3>
+        <p class="price">${product.price} kr</p>
+        <p class="category">${product.category}</p>
+        <span class="stock">${product.inStock ? 'I lager' : 'Slut'}</span>
+      </div>
+    `;
+    container.innerHTML += html;
+  }
 }
+
+displayProducts();
 ```
 </details>
 

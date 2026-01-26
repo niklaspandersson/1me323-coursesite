@@ -1,0 +1,329 @@
+---
+title: Destructuring
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå destructuring som ett sätt att extrahera värden från objekt och arrayer.
+* Att kunna använda destructuring i variabeldeklarationer och funktionsparametrar.
+* Att känna till rest-operatorn (`...`) för att samla återstående värden.
+* Att skriva renare, mer läsbar kod.
+
+</aside>
+
+<main>
+Destructuring låter dig "packa upp" värden från arrayer eller objekt till separata variabler. Det gör koden kortare och mer läsbar.
+
+### 0 - Förberedelser
+Skapa en ny mapp `5e` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Objekt-destructuring
+Extrahera egenskaper från ett objekt till variabler.
+
+```javascript
+const person = {
+  name: "Anna",
+  age: 25,
+  city: "Stockholm"
+};
+
+// Utan destructuring
+const name = person.name;
+const age = person.age;
+
+// Med destructuring - samma resultat
+const { name, age, city } = person;
+
+console.log(name); // "Anna"
+console.log(age);  // 25
+```
+
+**Variabelnamnet måste matcha egenskapsnamnet** (om du inte byter namn, se nedan).
+
+#### Övning
+Givet objektet:
+```javascript
+const product = {
+  title: "Laptop",
+  price: 12999,
+  brand: "Dell",
+  inStock: true
+};
+```
+
+1. Använd destructuring för att extrahera `title` och `price`
+2. Logga ut: "Laptop kostar 12999 kr"
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const { title, price } = product;
+console.log(`${title} kostar ${price} kr`);
+```
+</details>
+
+### 2 - Byta namn vid destructuring
+Du kan ge variablerna andra namn med `:`.
+
+```javascript
+const person = { name: "Anna", age: 25 };
+
+// Byt namn: "name" blir "personName"
+const { name: personName, age: personAge } = person;
+
+console.log(personName); // "Anna"
+console.log(personAge);  // 25
+```
+
+#### Övning
+Givet två objekt som har samma egenskapsnamn:
+```javascript
+const user = { id: 1, name: "Anna" };
+const product = { id: 101, name: "Laptop" };
+```
+
+Destructurera båda så att du får: `userId`, `userName`, `productId`, `productName`.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const { id: userId, name: userName } = user;
+const { id: productId, name: productName } = product;
+
+console.log(userId, userName);       // 1, "Anna"
+console.log(productId, productName); // 101, "Laptop"
+```
+</details>
+
+### 3 - Default-värden
+Du kan ge default-värden om egenskapen saknas.
+
+```javascript
+const person = { name: "Anna" };
+
+// age finns inte, så default-värdet används
+const { name, age = 18 } = person;
+
+console.log(age); // 18
+```
+
+### 4 - Array-destructuring
+Fungerar likadant för arrayer, men baserat på position.
+
+```javascript
+const colors = ["röd", "grön", "blå"];
+
+// Utan destructuring
+const first = colors[0];
+const second = colors[1];
+
+// Med destructuring
+const [first, second, third] = colors;
+
+console.log(first);  // "röd"
+console.log(second); // "grön"
+```
+
+**Hoppa över element** med tomma komman:
+```javascript
+const [first, , third] = colors;
+console.log(third); // "blå"
+```
+
+#### Övning
+Givet koordinater:
+```javascript
+const point = [10, 20, 30];
+```
+
+1. Destructurera till `x`, `y`, `z`
+2. Logga ut positionen
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const [x, y, z] = point;
+console.log(`Position: x=${x}, y=${y}, z=${z}`);
+```
+</details>
+
+### 5 - Byta variabler med destructuring
+Ett klassiskt trick: byt värden på två variabler utan temp-variabel.
+
+```javascript
+let a = 1;
+let b = 2;
+
+// Klassiskt sätt
+// let temp = a;
+// a = b;
+// b = temp;
+
+// Med destructuring
+[a, b] = [b, a];
+
+console.log(a); // 2
+console.log(b); // 1
+```
+
+### 6 - Rest-operatorn (`...`)
+Samla "resten" av elementen i en array eller objekt.
+
+```javascript
+// Array
+const [first, ...rest] = [1, 2, 3, 4, 5];
+console.log(first); // 1
+console.log(rest);  // [2, 3, 4, 5]
+
+// Objekt
+const { name, ...otherProps } = { name: "Anna", age: 25, city: "Stockholm" };
+console.log(name);       // "Anna"
+console.log(otherProps); // { age: 25, city: "Stockholm" }
+```
+
+### 7 - Destructuring i funktionsparametrar
+Mycket användbart för funktioner som tar objekt som argument.
+
+```javascript
+// Utan destructuring
+function greet(person) {
+  return `Hej ${person.name}, du är ${person.age} år!`;
+}
+
+// Med destructuring i parametern
+function greet({ name, age }) {
+  return `Hej ${name}, du är ${age} år!`;
+}
+
+const anna = { name: "Anna", age: 25, city: "Stockholm" };
+console.log(greet(anna)); // "Hej Anna, du är 25 år!"
+```
+
+#### Övning
+Skriv om denna funktion med destructuring i parametern:
+
+```javascript
+function createProductCard(product) {
+  return `
+    <div class="product">
+      <h3>${product.name}</h3>
+      <p>${product.price} kr</p>
+      <span>${product.inStock ? 'I lager' : 'Slut'}</span>
+    </div>
+  `;
+}
+```
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+function createProductCard({ name, price, inStock }) {
+  return `
+    <div class="product">
+      <h3>${name}</h3>
+      <p>${price} kr</p>
+      <span>${inStock ? 'I lager' : 'Slut'}</span>
+    </div>
+  `;
+}
+```
+</details>
+
+### 8 - Praktisk övning: API-svar
+API-svar har ofta djupt nästlade strukturer. Destructuring gör dem lättare att hantera.
+
+```javascript
+const apiResponse = {
+  status: "success",
+  data: {
+    user: {
+      id: 1,
+      name: "Anna",
+      email: "anna@example.com"
+    },
+    posts: [
+      { id: 1, title: "Första inlägget" },
+      { id: 2, title: "Andra inlägget" }
+    ]
+  }
+};
+```
+
+#### Uppgift
+1. Destructurera för att få ut: `status`, `user` (hela objektet), `posts` (hela arrayen)
+2. Destructurera vidare för att få ut användarens `name` och `email`
+3. Destructurera för att få ut titeln på första posten
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+// Steg 1
+const { status, data: { user, posts } } = apiResponse;
+
+// Steg 2
+const { name, email } = user;
+
+// Steg 3
+const [firstPost] = posts;
+const { title } = firstPost;
+
+// Eller allt på en gång (avancerat)
+const {
+  status,
+  data: {
+    user: { name, email },
+    posts: [{ title: firstTitle }]
+  }
+} = apiResponse;
+```
+</details>
+
+### 9 - Utmaning: Rendera användarlista
+Använd destructuring för att göra koden renare.
+
+```javascript
+const users = [
+  { id: 1, name: "Anna", email: "anna@example.com", role: "admin" },
+  { id: 2, name: "Erik", email: "erik@example.com", role: "user" },
+  { id: 3, name: "Maria", email: "maria@example.com", role: "user" }
+];
+```
+
+1. Skapa en funktion `renderUserCard({ name, email, role })` som returnerar HTML
+2. Använd `map()` med destructuring för att rendera alla användare
+3. Visa resultatet på sidan
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+function renderUserCard({ name, email, role }) {
+  return `
+    <div class="user-card">
+      <h3>${name}</h3>
+      <p>${email}</p>
+      <span class="role ${role}">${role}</span>
+    </div>
+  `;
+}
+
+const html = users
+  .map(user => renderUserCard(user))
+  .join('');
+
+document.getElementById('users').innerHTML = html;
+```
+</details>
+
+**Reflektion**:
+* Hur gör destructuring koden mer läsbar?
+* När är det overkill att använda destructuring?
+* Hur kombinerar du destructuring med `map()` och `filter()`?
+
+</main>

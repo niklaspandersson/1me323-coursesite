@@ -1,0 +1,582 @@
+---
+title: Labs Landing Page 2.0
+---
+
+<aside class="first">
+
+#### Syfte
+* Att applicera kunskaper om objekt och arrayer i ett riktigt scenario.
+* Att ersätta hårdkodad HTML med datadriven DOM-manipulation.
+* Att skapa en skalbar struktur för din portfolio.
+</aside>
+
+<main>
+Nu är det dags att damma av din "Labs Landing Page" (som du skapade i labb 1-e) och göra den smartare. Förra veckan hårdkodade du information om varje labb i filen. Det fungerar för några få laborationer, men det blir snabbt mycket repetition och risken att något blir fel någonstans är stor. Nu när du behärskar objekt och arrayer ska vi bygga om sidan så att den genereras utifrån data istället.
+
+### 0 - Förberedelser
+Öppna din `labs`-mapp i VS Code. Du ska arbeta i roten av denna mapp (där din `index.html` ligger).
+
+Om du inte redan har en `main.js` i roten av `labs`-mappen, skapa en och länka in den i din `index.html` (glöm inte `type="module"`).
+
+### 1 - Problemet med hårdkodad HTML
+Förra veckan skapade du en landing page med hårdkodad HTML för varje labb. Detta fungerar för få laborationer, men blir snabbt problem.
+
+**Exempel på problemet:**
+```html
+<!-- Hårdkodad HTML - svår att underhålla -->
+<ul>
+  <li class="lab-card">
+    <h3>Labb 1a - Moduler</h3>
+    <p>Lär dig om import och export i JavaScript</p>
+    <span class="status completed">Klar</span>
+  </li>
+  <li class="lab-card">
+    <h3>Labb 1b - Git grunder</h3>
+    <p>Versionshantering med Git och GitHub</p>
+    <span class="status in-progress">Pågående</span>
+  </li>
+  <!-- ... 20+ laborationer mer? 😰 -->
+</ul>
+```
+
+**Problem med detta:**
+- Mycket repetition (varje labb kräver samma HTML-struktur)
+- Risk för slarvfel och inkonsistens
+- Svårt att ändra utseende på alla labbar samtidigt
+- Svårt att lägga till ny funktionalitet (t.ex. filtrering)
+
+#### Övning
+1. Reflektera över din nuvarande landing page:
+   - Hur många laborationer har du hittills?
+   - Hur många rader HTML är det per labb?
+   - Vad skulle hända om du ville lägga till en "favorit"-stjärna på varje labb?
+
+**Den datadrivna lösningen**: Istället för att hårdkoda HTML beskriver vi laborationerna som data och genererar HTML med JavaScript.
+
+<details>
+<summary>Fördelar med datadriven approach</summary>
+
+- **Skalbarhet**: Lätt att lägga till nya labbar
+- **Konsistens**: Alla labbar ser identiska ut
+- **Flexibilitet**: Enkelt att ändra layout för alla labbar
+- **Funktionalitet**: Enkelt att lägga till sortering, filtrering osv.
+- **Underhåll**: Ändringar på ett ställe påverkar alla labbar
+</details>
+
+### 2 - Designa din datastruktur
+Nu ska vi planera hur vi ska representera laborationerna som data.
+
+**Exempel på en lab-datastruktur:**
+```javascript
+const labExample = {
+  id: '1a',                    // Unik identifierare
+  title: 'Moduler',            // Titel som visas
+  description: 'Lär dig om import och export i JavaScript',
+  week: 1,                     // Vilken vecka 
+  status: 'completed',         // 'completed', 'in-progress', 'not-started'
+  hasLink: true,               // Finns det en länk till labb-mappen?
+  difficulty: 'easy',          // 'easy', 'medium', 'hard'
+  technologies: ['JavaScript', 'ES6 Modules']
+};
+```
+
+#### Övning
+1. **Planera din struktur**: Vilka egenskaper behöver du för dina laborationer? Fundera på:
+   - Vilken information vill du visa?
+   - Vill du kunna filtrera eller sortera?
+   - Finns det extra funktionalitet du vill ha senare?
+
+2. **Skapa din lab-array**: I `main.js`, skapa en array med minst 5 av dina laborationer. Börja enkelt:
+```javascript
+const labs = [
+  {
+    id: '1a',
+    title: 'Moduler', 
+    description: 'Import och export i JavaScript',
+    status: 'completed',
+    hasLink: true
+  },
+  // Lägg till minst 4 fler...
+];
+```
+
+3. **Testa datat**: Logga ut din array och kontrollera att strukturen ser korrekt ut.
+
+<details>
+<summary>Förslag på utökad struktur</summary>
+
+```javascript
+const labs = [
+  {
+    id: '1a',
+    title: 'Hello Modules',
+    description: 'Lär dig använda import och export för att strukturera JavaScript-kod',
+    week: 1,
+    status: 'completed',
+    hasLink: true,
+    difficulty: 'easy',
+    topics: ['Moduler', 'Import/Export', 'ES6']
+  },
+  {
+    id: '1b', 
+    title: 'Git Grunderna',
+    description: 'Versionshantering och GitHub för utvecklare',
+    week: 1,
+    status: 'completed', 
+    hasLink: true,
+    difficulty: 'medium',
+    topics: ['Git', 'GitHub', 'Versionshantering']
+  },
+  {
+    id: '2a',
+    title: 'Grundläggande JS-objekt',
+    description: 'Skapa och manipulera objekt i JavaScript',
+    week: 2,
+    status: 'in-progress',
+    hasLink: true,
+    difficulty: 'medium', 
+    topics: ['Objekt', 'Egenskaper', 'Metoder']
+  }
+  // ... fortsätt med resten
+];
+```
+</details>
+
+### 3 - Förbered HTML-containerstrukturen
+Nu ska vi förbereda HTML-strukturen för att ta emot den genererade datan.
+
+**Exempel på ny HTML-struktur:**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mina Laborationer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Programmering - Laborationer</h1>
+    <nav>
+      <button id="filter-all" class="active">Alla</button>
+      <button id="filter-completed">Klara</button>
+      <button id="filter-in-progress">Pågående</button>
+    </nav>
+  </header>
+  
+  <main>
+    <!-- Tom container - fylls av JavaScript -->
+    <section id="labs-container" class="labs-grid">
+      <!-- Laborationer kommer här -->
+    </section>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
+```
+
+#### Övning
+1. **Uppdatera din HTML**: 
+   - Ta bort all hårdkodad HTML för laborationer
+   - Lägg till en tom container med ID (t.ex. `labs-container`)
+   - Se till att `main.js` är länkad som modul
+
+2. **Spara en HTML-mall**: Innan du tar bort allt, kopiera HTML-strukturen för EN labb. Du kommer använda den som mall. Exempel:
+```html
+<!-- Spara denna struktur som kommentar eller i separat fil -->
+<div class="lab-card">
+  <h3>Labb 1a - Moduler</h3>  
+  <p>Beskrivning av laborationen...</p>
+  <div class="lab-meta">
+    <span class="status completed">Klar</span>
+    <span class="week">Vecka 1</span>
+  </div>
+  <a href="./1a/" class="lab-link">Öppna labb</a>
+</div>
+```
+
+**Testa**: Öppna sidan - den ska vara nästan tom nu (bara header/navigation), eftersom vi inte genererat innehåll än.
+
+<details>
+<summary>Förslag på CSS för grid-layout</summary>
+
+```css
+.labs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.lab-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.lab-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.status.completed { 
+  background: #4CAF50; 
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+
+.status.in-progress { 
+  background: #FF9800; 
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+```
+</details>
+
+### 4 - Generera HTML från data
+Nu kommer kärnan: vi ska skriva JavaScript som omvandlar vår data till HTML.
+
+**Exempel på renderingsfunktion:**
+```javascript
+function renderLabs(labsToShow = labs) {
+  const container = document.getElementById('labs-container');
+  
+  // Rensa befintligt innehåll
+  container.innerHTML = '';
+  
+  // Loopa genom labbarna och skapa HTML
+  for (const lab of labsToShow) {
+    const html = `
+      <div class="lab-card">
+        <h3>Labb ${lab.id} - ${lab.title}</h3>
+        <p>${lab.description}</p>
+        <div class="lab-meta">
+          <span class="status ${lab.status}">${getStatusText(lab.status)}</span>
+          <span class="week">Vecka ${lab.week}</span>
+        </div>
+        ${lab.hasLink ? `<a href="./${lab.id}/" class="lab-link">Öppna labb</a>` : ''}
+      </div>
+    `;
+    
+    container.innerHTML += html;
+  }
+}
+
+function getStatusText(status) {
+  const statusMap = {
+    'completed': 'Klar',
+    'in-progress': 'Pågående', 
+    'not-started': 'Ej startad'
+  };
+  return statusMap[status] || status;
+}
+
+// Rendera vid sidladdning
+renderLabs();
+```
+
+#### Övning
+1. **Implementera grundfunktionen**: 
+   - Skapa en `renderLabs()` funktion som loopar genom din `labs`-array
+   - Använd template literals (`` ` ``) för att skapa HTML-strängar
+   - Ersätt hårdkodade värden med `${lab.property}`
+
+2. **Anpassa efter din HTML-mall**: Använd den HTML-struktur du sparade från step 3.
+
+3. **Testa**: Kalla `renderLabs()` vid slutet av din JS-fil. Sidan ska nu visa dina labbar!
+
+4. **Hantera villkorlig rendering**: 
+   - Visa länk bara om `hasLink` är true
+   - Använd olika CSS-klasser baserat på `status`
+
+<details>
+<summary>Alternativ implementation med map()</summary>
+
+```javascript
+function renderLabs(labsToShow = labs) {
+  const container = document.getElementById('labs-container');
+  
+  const html = labsToShow.map(lab => `
+    <div class="lab-card ${lab.status}">
+      <h3>Labb ${lab.id.toUpperCase()} - ${lab.title}</h3>
+      <p>${lab.description}</p>
+      
+      <div class="lab-tags">
+        ${lab.topics ? lab.topics.map(topic => 
+          `<span class="tag">${topic}</span>`
+        ).join('') : ''}
+      </div>
+      
+      <div class="lab-meta">
+        <span class="status ${lab.status}">
+          ${getStatusText(lab.status)}
+        </span>
+        <span class="difficulty ${lab.difficulty}">
+          ${lab.difficulty || 'medium'}
+        </span>
+      </div>
+      
+      ${lab.hasLink ? 
+        `<a href="./${lab.id}/" class="lab-link">Öppna labb →</a>` : 
+        '<span class="no-link">Kommer snart</span>'
+      }
+    </div>
+  `).join('');
+  
+  container.innerHTML = html;
+}
+```
+
+Detta är mer funktionell programmering - `map()` transformerar varje labb till HTML, sedan `join()` slår samman allt.
+</details>
+
+### 5 - Lägg till interaktivitet
+Nu när grundstrukturen fungerar ska vi lägga till funktionalitet för filtrering och sortering.
+
+**Exempel på filtreringsfunktion:**
+```javascript
+// Filtrera labbar baserat på status
+function filterLabs(statusFilter) {
+  let filteredLabs;
+  
+  if (statusFilter === 'all') {
+    filteredLabs = labs;
+  } else {
+    filteredLabs = labs.filter(lab => lab.status === statusFilter);
+  }
+  
+  renderLabs(filteredLabs);
+  updateActiveFilter(statusFilter);
+}
+
+function updateActiveFilter(activeFilter) {
+  // Ta bort 'active' klass från alla knappar
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Lägg till 'active' klass på rätt knapp
+  document.getElementById(`filter-${activeFilter}`).classList.add('active');
+}
+
+// Lägg till event listeners för filter-knappar
+document.getElementById('filter-all').addEventListener('click', () => filterLabs('all'));
+document.getElementById('filter-completed').addEventListener('click', () => filterLabs('completed'));
+document.getElementById('filter-in-progress').addEventListener('click', () => filterLabs('in-progress'));
+```
+
+#### Övning
+1. **Implementera filtrering**:
+   - Skapa filter-funktioner för olika statusar
+   - Lägg till event listeners på dina filter-knappar
+   - Uppdatera vilket filter som är aktivt visuellt
+
+2. **Lägg till sortering**: Skapa en dropdown eller knappar för att sortera efter:
+   - Vecka (kronologisk ordning)  
+   - Titel (alfabetisk ordning)
+   - Status (klara först, eller tvärtom)
+
+3. **Extra funktionalitet**: 
+   - Lägg till en sökfunktion som filtrerar på titel/beskrivning
+   - Räkna och visa antal labbar per kategori
+
+<details>
+<summary>Exempel på sorteringsfunktion</summary>
+
+```javascript
+function sortLabs(sortBy) {
+  let sortedLabs = [...labs]; // Skapa en kopia
+  
+  switch(sortBy) {
+    case 'week':
+      sortedLabs.sort((a, b) => a.week - b.week);
+      break;
+    case 'title':
+      sortedLabs.sort((a, b) => a.title.localeCompare(b.title));
+      break;
+    case 'status':
+      const statusOrder = { 'completed': 0, 'in-progress': 1, 'not-started': 2 };
+      sortedLabs.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+      break;
+  }
+  
+  renderLabs(sortedLabs);
+}
+
+// Sökfunktion
+function searchLabs(searchTerm) {
+  const filtered = labs.filter(lab => 
+    lab.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lab.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  renderLabs(filtered);
+}
+
+// Event listener för sökfält
+document.getElementById('search').addEventListener('input', (e) => {
+  searchLabs(e.target.value);
+});
+```
+</details>
+
+### 6 - Utmaning: Komplett portfolio med localStorage
+Nu ska du kombinera allt du lärt dig för att skapa en riktigt smart portfolio.
+
+#### Uppgift
+Integrera localStorage för att spara och ladda statusen på dina laborationer:
+
+**Funktionalitet att implementera:**
+1. **Spara status**: När användaren klickar på en labb, växla status och spara till localStorage
+2. **Ladda status**: Vid sidladdning, läs sparad status och uppdatera labs-arrayen  
+3. **Progress tracking**: Visa progression (t.ex. "7 av 15 laborationer klara")
+4. **Senaste aktivitet**: Spara datum för när labbar markeras som klara
+
+**Tekniska krav:**
+- Använd säkra localStorage-funktioner (från lab 2-d)
+- Hantera fallet när ingen data finns sparad
+- Uppdatera visningen direkt när status ändras
+
+#### Starthjälp
+```javascript
+// Spara lab-status till localStorage  
+function saveLabStatus() {
+  const statusData = labs.map(lab => ({
+    id: lab.id,
+    status: lab.status,
+    lastModified: new Date().toISOString()
+  }));
+  
+  saveToStorage('labStatus', statusData);
+}
+
+// Ladda och applicera sparad status
+function loadLabStatus() {
+  const savedStatus = loadFromStorage('labStatus', []);
+  
+  // Uppdatera labs-arrayen med sparad status
+  savedStatus.forEach(saved => {
+    const lab = labs.find(l => l.id === saved.id);
+    if (lab) {
+      lab.status = saved.status;
+      lab.lastModified = saved.lastModified;
+    }
+  });
+}
+
+// Växla status för en labb
+function toggleLabStatus(labId) {
+  const lab = labs.find(l => l.id === labId);
+  if (!lab) return;
+  
+  // Cykel genom statusar
+  const statusCycle = ['not-started', 'in-progress', 'completed'];
+  const currentIndex = statusCycle.indexOf(lab.status);
+  const nextIndex = (currentIndex + 1) % statusCycle.length;
+  
+  lab.status = statusCycle[nextIndex];
+  lab.lastModified = new Date().toISOString();
+  
+  saveLabStatus();
+  renderLabs();
+  updateProgress();
+}
+
+// Visa progression
+function updateProgress() {
+  const completed = labs.filter(lab => lab.status === 'completed').length;
+  const total = labs.length;
+  const percentage = Math.round((completed / total) * 100);
+  
+  document.getElementById('progress').innerHTML = `
+    <p>Progression: ${completed} av ${total} laborationer klara (${percentage}%)</p>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: ${percentage}%"></div>
+    </div>
+  `;
+}
+```
+
+**Extra utmaningar:**
+- **Statistik**: Visa genomsnittlig tid per labb, labbar per vecka osv.
+- **Export**: Låt användaren exportera sin progress som JSON
+- **Backup**: Implementera backup/restore funktionalitet  
+- **Achievements**: Lås upp "achievements" för milstolpar (5 klara, all vecka 1 klar osv.)
+
+**CSS för progression:**
+```css
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  transition: width 0.3s ease;
+}
+```
+
+<details>
+<summary>Komplett klickhantering</summary>
+
+```javascript
+// Lägg till klick-hantering på lab-cards
+function addClickHandlers() {
+  document.addEventListener('click', (e) => {
+    // Hitta närmaste lab-card
+    const labCard = e.target.closest('.lab-card');
+    if (!labCard) return;
+    
+    // Hitta lab-id (kan vara data-attribut eller parsas från innehåll)
+    const labId = labCard.dataset.labId;
+    if (labId) {
+      toggleLabStatus(labId);
+    }
+  });
+}
+
+// Uppdatera renderLabs för att inkludera data-attribut
+function renderLabs(labsToShow = labs) {
+  const container = document.getElementById('labs-container');
+  
+  const html = labsToShow.map(lab => `
+    <div class="lab-card ${lab.status}" data-lab-id="${lab.id}">
+      <h3>Labb ${lab.id.toUpperCase()} - ${lab.title}</h3>
+      <p>${lab.description}</p>
+      <div class="status-indicator">
+        <span class="status ${lab.status}">${getStatusText(lab.status)}</span>
+        <small>Klicka för att ändra status</small>
+      </div>
+    </div>
+  `).join('');
+  
+  container.innerHTML = html;
+}
+
+// Initiera vid sidladdning
+document.addEventListener('DOMContentLoaded', () => {
+  loadLabStatus();
+  renderLabs();
+  updateProgress();
+  addClickHandlers();
+});
+```
+</details>
+
+**Reflektion**:
+* Vilka fördelar ger datadriven utveckling jämfört med hårdkodad HTML?
+* Hur gör localStorage din portfolio mer personlig och användbar?
+* Vad händer med skalbarhet när du har 50+ laborationer?
+* Vilka andra typer av applikationer skulle gynnas av liknande arkitektur?
+
+</main>

@@ -1,0 +1,395 @@
+---
+title: Metoder
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå vad metoder är och hur de skiljer sig från vanliga funktioner.
+* Att kunna lägga till metoder på objekt och klasser.
+* Att förstå hur `this` fungerar i metoder.
+* Att använda metoder för att kapsla in beteende tillsammans med data.
+
+</aside>
+
+<main>
+En metod är en funktion som tillhör ett objekt. Metoder låter objekt "göra saker" - inte bara lagra data. Detta är grunden för objektorienterad programmering.
+
+### 0 - Förberedelser
+Skapa en ny mapp `4e` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Metoder på objekt-literaler
+Det enklaste sättet att skapa en metod är direkt på ett objekt.
+
+```javascript
+const person = {
+  firstName: "Anna",
+  lastName: "Andersson",
+
+  // Metod - funktion som tillhör objektet
+  getFullName: function() {
+    return this.firstName + " " + this.lastName;
+  }
+};
+
+console.log(person.getFullName()); // "Anna Andersson"
+```
+
+**Kortare syntax (ES6):**
+```javascript
+const person = {
+  firstName: "Anna",
+  lastName: "Andersson",
+
+  // Samma sak, kortare syntax
+  getFullName() {
+    return this.firstName + " " + this.lastName;
+  }
+};
+```
+
+#### Övning
+Skapa ett `calculator`-objekt med:
+- Egenskap: `value` (startar på 0)
+- Metoder: `add(num)`, `subtract(num)`, `multiply(num)`, `reset()`
+- Varje metod ska modifiera `value` och logga resultatet
+
+Testa genom att kedja operationer:
+```javascript
+calculator.add(10);      // 10
+calculator.multiply(2);  // 20
+calculator.subtract(5);  // 15
+```
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const calculator = {
+  value: 0,
+
+  add(num) {
+    this.value += num;
+    console.log(this.value);
+  },
+
+  subtract(num) {
+    this.value -= num;
+    console.log(this.value);
+  },
+
+  multiply(num) {
+    this.value *= num;
+    console.log(this.value);
+  },
+
+  reset() {
+    this.value = 0;
+    console.log("Reset:", this.value);
+  }
+};
+```
+</details>
+
+### 2 - `this` i metoder
+I en metod refererar `this` till objektet som metoden anropas på.
+
+```javascript
+const car = {
+  brand: "Volvo",
+  model: "V40",
+
+  getDescription() {
+    // this refererar till car-objektet
+    return `${this.brand} ${this.model}`;
+  }
+};
+
+console.log(car.getDescription()); // "Volvo V40"
+```
+
+#### Övning
+Skapa ett `counter`-objekt som håller koll på ett antal.
+
+1. Egenskap: `count` (startar på 0)
+2. Metoder:
+   - `increment()` - ökar med 1
+   - `decrement()` - minskar med 1 (men aldrig under 0)
+   - `getCount()` - returnerar aktuellt värde
+3. Visa räknaren i DOM och uppdatera vid varje ändring
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const counter = {
+  count: 0,
+
+  increment() {
+    this.count++;
+    this.updateDisplay();
+  },
+
+  decrement() {
+    if (this.count > 0) {
+      this.count--;
+    }
+    this.updateDisplay();
+  },
+
+  getCount() {
+    return this.count;
+  },
+
+  updateDisplay() {
+    document.getElementById('count').textContent = this.count;
+  }
+};
+
+// Koppla till knappar
+document.getElementById('increment').addEventListener('click', () => {
+  counter.increment();
+});
+
+document.getElementById('decrement').addEventListener('click', () => {
+  counter.decrement();
+});
+```
+</details>
+
+### 3 - Metoder i klasser
+Klasser gör det enklare att skapa flera objekt med samma metoder.
+
+```javascript
+class BankAccount {
+  constructor(owner) {
+    this.owner = owner;
+    this.balance = 0;
+  }
+
+  deposit(amount) {
+    if (amount > 0) {
+      this.balance += amount;
+    }
+  }
+
+  withdraw(amount) {
+    if (amount > 0 && amount <= this.balance) {
+      this.balance -= amount;
+      return true;
+    }
+    return false;
+  }
+
+  getInfo() {
+    return `${this.owner}: ${this.balance} kr`;
+  }
+}
+
+const account = new BankAccount("Anna");
+account.deposit(1000);
+account.withdraw(300);
+console.log(account.getInfo()); // "Anna: 700 kr"
+```
+
+#### Övning
+Skapa en `TodoItem`-klass med:
+- Egenskaper: `text`, `completed` (boolean)
+- Metoder:
+  - `toggle()` - växla completed-status
+  - `render()` - returnera HTML för att-göra-posten
+
+Skapa sedan flera TodoItems och visa dem på sidan.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class TodoItem {
+  constructor(text) {
+    this.text = text;
+    this.completed = false;
+  }
+
+  toggle() {
+    this.completed = !this.completed;
+  }
+
+  render() {
+    return `
+      <li class="${this.completed ? 'completed' : ''}">
+        ${this.text}
+      </li>
+    `;
+  }
+}
+
+const todos = [
+  new TodoItem("Handla mat"),
+  new TodoItem("Städa"),
+  new TodoItem("Träna")
+];
+
+todos[0].toggle(); // Markera första som klar
+
+const html = todos.map(todo => todo.render()).join('');
+document.getElementById('todos').innerHTML = html;
+```
+</details>
+
+### 4 - Metoder som returnerar `this`
+För att kunna kedja metodanrop kan metoden returnera `this`.
+
+```javascript
+class StringBuilder {
+  constructor() {
+    this.value = "";
+  }
+
+  append(text) {
+    this.value += text;
+    return this;  // Returnera objektet självt
+  }
+
+  toString() {
+    return this.value;
+  }
+}
+
+const result = new StringBuilder()
+  .append("Hej ")
+  .append("på ")
+  .append("dig!")
+  .toString();
+
+console.log(result); // "Hej på dig!"
+```
+
+#### Övning
+Utöka din `calculator` från övning 1 så att metoderna returnerar `this`, vilket möjliggör kedjning:
+
+```javascript
+calculator
+  .add(10)
+  .multiply(2)
+  .subtract(5);
+```
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const calculator = {
+  value: 0,
+
+  add(num) {
+    this.value += num;
+    return this;
+  },
+
+  subtract(num) {
+    this.value -= num;
+    return this;
+  },
+
+  multiply(num) {
+    this.value *= num;
+    return this;
+  },
+
+  getResult() {
+    return this.value;
+  },
+
+  reset() {
+    this.value = 0;
+    return this;
+  }
+};
+
+const result = calculator
+  .add(10)
+  .multiply(2)
+  .subtract(5)
+  .getResult();
+
+console.log(result); // 15
+```
+</details>
+
+### 5 - Utmaning: Interaktiv att-göra-lista
+Bygg en komplett att-göra-lista med en `TodoList`-klass.
+
+#### Uppgift
+Skapa en `TodoList`-klass med:
+- Egenskap: `items` (array av TodoItem)
+- Metoder:
+  - `add(text)` - lägg till ny todo
+  - `remove(index)` - ta bort todo
+  - `toggleItem(index)` - växla status
+  - `render()` - visa alla todos i DOM
+
+Lägg till:
+- Formulär för att lägga till nya todos
+- Knappar för att markera som klar/ta bort
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class TodoList {
+  constructor(containerId) {
+    this.items = [];
+    this.container = document.getElementById(containerId);
+  }
+
+  add(text) {
+    this.items.push(new TodoItem(text));
+    this.render();
+  }
+
+  remove(index) {
+    this.items.splice(index, 1);
+    this.render();
+  }
+
+  toggleItem(index) {
+    this.items[index].toggle();
+    this.render();
+  }
+
+  render() {
+    const html = this.items.map((item, index) => `
+      <li class="${item.completed ? 'completed' : ''}">
+        <span>${item.text}</span>
+        <button onclick="todoList.toggleItem(${index})">
+          ${item.completed ? 'Ångra' : 'Klar'}
+        </button>
+        <button onclick="todoList.remove(${index})">Ta bort</button>
+      </li>
+    `).join('');
+
+    this.container.innerHTML = `<ul>${html}</ul>`;
+  }
+}
+
+const todoList = new TodoList('todo-container');
+
+// Koppla formulär
+document.getElementById('todo-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('todo-input');
+  if (input.value.trim()) {
+    todoList.add(input.value);
+    input.value = '';
+  }
+});
+```
+</details>
+
+**Reflektion**:
+* Vad är fördelen med att ha beteende (metoder) tillsammans med data (egenskaper)?
+* Varför är `this` viktigt i metoder?
+* När är det användbart att returnera `this` från en metod?
+
+</main>

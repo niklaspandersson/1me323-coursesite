@@ -1,0 +1,210 @@
+---
+title: Nullish coalescing och default-värden
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå skillnaden mellan `??` (nullish coalescing) och `||` (or).
+* Att kunna ge default-värden till variabler på ett säkert sätt.
+* Att hantera saknade eller odefinierade värden i API-svar och objekt.
+
+</aside>
+
+<main>
+När du arbetar med data från API:er eller användarinput finns det ofta värden som kan vara `null`, `undefined`, eller saknas helt. Nullish coalescing-operatorn (`??`) hjälper dig hantera dessa fall på ett elegant sätt.
+
+### 0 - Förberedelser
+Skapa en ny mapp `3d` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+
+### 1 - Problemet med `||`
+Den logiska ELLER-operatorn (`||`) har länge använts för default-värden, men har ett problem:
+
+```javascript
+const userInput = 0;
+const value = userInput || 100;  // 100, inte 0!
+
+const emptyString = "";
+const text = emptyString || "Default";  // "Default", inte ""!
+```
+
+`||` behandlar `0`, `""`, `false`, `null`, och `undefined` som "falsy" och ger default-värdet.
+
+#### Övning
+Testa vad som händer med dessa värden:
+
+```javascript
+const testValues = [0, "", false, null, undefined, "hej", 42];
+
+for (const val of testValues) {
+  console.log(`${val} || "default" = ${val || "default"}`);
+}
+```
+
+### 2 - Nullish coalescing (`??`)
+`??` ger endast default-värdet om vänstra sidan är `null` eller `undefined`.
+
+```javascript
+const userInput = 0;
+const value = userInput ?? 100;  // 0! Behåller nollan
+
+const emptyString = "";
+const text = emptyString ?? "Default";  // ""! Behåller tom sträng
+
+const missing = null;
+const result = missing ?? "Default";  // "Default"
+```
+
+#### Övning
+Jämför `||` och `??` med samma testvärden:
+
+```javascript
+const testValues = [0, "", false, null, undefined, "hej", 42];
+
+for (const val of testValues) {
+  console.log(`${val} ?? "default" = ${val ?? "default"}`);
+}
+```
+
+**Vilken skillnad ser du?**
+
+### 3 - Praktisk användning: API-svar
+När du hämtar data från ett API kan vissa fält saknas eller vara null.
+
+```javascript
+// Simulerat API-svar
+const apiResponse = {
+  user: {
+    name: "Anna",
+    age: null,           // Okänd ålder
+    score: 0,            // Giltig poäng (noll)
+    bio: "",             // Tom bio (medvetet vald)
+    // email saknas helt
+  }
+};
+
+const user = apiResponse.user;
+
+// Med ??
+const age = user.age ?? "Okänd";        // "Okänd" (age är null)
+const score = user.score ?? 0;          // 0 (behåller nollan)
+const bio = user.bio ?? "Ingen bio";    // "" (behåller tom sträng)
+const email = user.email ?? "Ej angiven"; // "Ej angiven" (email är undefined)
+```
+
+#### Övning
+Skapa en funktion `displayUserInfo(user)` som visar användarinformation på sidan.
+
+1. Använd `??` för att ge default-värden till saknade fält
+2. Visa informationen i HTML
+
+```javascript
+const users = [
+  { name: "Anna", email: "anna@example.com", phone: null },
+  { name: "Erik", email: null, phone: "070-123456" },
+  { name: "Maria" }  // Saknar både email och phone
+];
+```
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+function displayUserInfo(user) {
+  const name = user.name ?? "Okänt namn";
+  const email = user.email ?? "Ej angiven";
+  const phone = user.phone ?? "Ej angiven";
+
+  return `
+    <div class="user-card">
+      <h3>${name}</h3>
+      <p>Email: ${email}</p>
+      <p>Telefon: ${phone}</p>
+    </div>
+  `;
+}
+
+const container = document.getElementById('users');
+container.innerHTML = users.map(displayUserInfo).join('');
+```
+</details>
+
+### 4 - Kombinera med optional chaining (`?.`)
+`??` fungerar perfekt tillsammans med optional chaining för djupt nästlade objekt.
+
+```javascript
+const response = {
+  data: {
+    user: {
+      settings: null  // settings finns men är null
+    }
+  }
+};
+
+// Utan optional chaining + ??
+// response.data.user.settings.theme  // Error!
+
+// Med optional chaining + ??
+const theme = response.data?.user?.settings?.theme ?? "light";
+// "light" (säker åtkomst + default-värde)
+```
+
+### 5 - Utmaning: Inställningshanterare
+Bygg en enkel inställningshanterare som använder `??` för att kombinera användarinställningar med default-värden.
+
+#### Uppgift
+1. Skapa ett objekt med default-inställningar
+2. Simulera att användaren har ändrat några (men inte alla) inställningar
+3. Kombinera dem så att användarens val prioriteras, men saknade värden får defaults
+
+```javascript
+const defaultSettings = {
+  theme: "light",
+  fontSize: 16,
+  showNotifications: true,
+  language: "sv"
+};
+
+// Användaren har bara ändrat några inställningar
+const userSettings = {
+  theme: "dark",
+  fontSize: 0,  // Medvetet valt 0 (bör behållas!)
+  // showNotifications saknas
+  // language saknas
+};
+
+// Din uppgift: kombinera till finalSettings
+```
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const finalSettings = {
+  theme: userSettings.theme ?? defaultSettings.theme,
+  fontSize: userSettings.fontSize ?? defaultSettings.fontSize,
+  showNotifications: userSettings.showNotifications ?? defaultSettings.showNotifications,
+  language: userSettings.language ?? defaultSettings.language
+};
+
+console.log(finalSettings);
+// { theme: "dark", fontSize: 0, showNotifications: true, language: "sv" }
+
+// Visa på sidan
+document.body.innerHTML = `
+  <div class="settings">
+    <p>Tema: ${finalSettings.theme}</p>
+    <p>Teckenstorlek: ${finalSettings.fontSize}px</p>
+    <p>Notifikationer: ${finalSettings.showNotifications ? 'På' : 'Av'}</p>
+    <p>Språk: ${finalSettings.language}</p>
+  </div>
+`;
+```
+</details>
+
+**Reflektion**:
+* När ska du använda `??` istället för `||`?
+* Varför är det viktigt att `0` och `""` inte behandlas som "saknade" värden?
+* Hur hjälper `??` vid arbete med API-data?
+
+</main>
