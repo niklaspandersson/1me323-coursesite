@@ -96,13 +96,13 @@
                 "id": "js:object-basics",
                 "type": "exercise",
                 "title": "Grundläggande JS-objekt",
-                "link": "../laborationer/1a/"
+                "link": "../laborationer/2a/"
               },
               {
                 "id": "js:methods",
                 "type": "exercise",
                 "title": "Metoder och 'this'",
-                "link": "../laborationer/1b/"
+                "link": "../laborationer/2b/"
               }
             ]
           },
@@ -125,13 +125,18 @@
           },
           {
             "id": "js:JSON",
-            "title": "JSON",
+            "title": "JSON och data",
             "tasks": [
               {
                 "type": "reading",
                 "title": "JSON",
                 "link": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON",
                 "note": ["Till och med 'JSON syntax restrictions'"]
+              },
+              {
+                "type": "reading",
+                "title": "Översikt om XML",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/XML/Guides/XML_introduction"
               },
               {
                 "id": "js:JSON",
