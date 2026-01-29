@@ -15,7 +15,7 @@ title: Nullish coalescing och default-värden
 När du arbetar med data från API:er eller användarinput finns det ofta värden som kan vara `null`, `undefined`, eller saknas helt. Nullish coalescing-operatorn (`??`) hjälper dig hantera dessa fall på ett elegant sätt.
 
 ### 0 - Förberedelser
-Skapa en ny mapp `3d` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+Skapa en ny mapp `3e` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
 
 ### 1 - Problemet med `||`
 Den logiska ELLER-operatorn (`||`) har länge använts för default-värden, men har ett problem:
@@ -110,22 +110,31 @@ const users = [
 <summary>Lösningsförslag</summary>
 
 ```javascript
-function displayUserInfo(user) {
+function createUserCard(user) {
   const name = user.name ?? "Okänt namn";
   const email = user.email ?? "Ej angiven";
   const phone = user.phone ?? "Ej angiven";
 
-  return `
-    <div class="user-card">
-      <h3>${name}</h3>
-      <p>Email: ${email}</p>
-      <p>Telefon: ${phone}</p>
-    </div>
-  `;
+  const card = document.createElement('div');
+  card.classList.add('user-card');
+
+  const heading = document.createElement('h3');
+  heading.textContent = name;
+
+  const emailP = document.createElement('p');
+  emailP.textContent = `Email: ${email}`;
+
+  const phoneP = document.createElement('p');
+  phoneP.textContent = `Telefon: ${phone}`;
+
+  card.append(heading, emailP, phoneP);
+  return card;
 }
 
 const container = document.getElementById('users');
-container.innerHTML = users.map(displayUserInfo).join('');
+for (const user of users) {
+  container.append(createUserCard(user));
+}
 ```
 </details>
 
@@ -190,15 +199,28 @@ const finalSettings = {
 console.log(finalSettings);
 // { theme: "dark", fontSize: 0, showNotifications: true, language: "sv" }
 
-// Visa på sidan
-document.body.innerHTML = `
-  <div class="settings">
-    <p>Tema: ${finalSettings.theme}</p>
-    <p>Teckenstorlek: ${finalSettings.fontSize}px</p>
-    <p>Notifikationer: ${finalSettings.showNotifications ? 'På' : 'Av'}</p>
-    <p>Språk: ${finalSettings.language}</p>
-  </div>
-`;
+// Visa på sidan med createElement
+function displaySettings(settings) {
+  const container = document.createElement('div');
+  container.classList.add('settings');
+
+  const items = [
+    `Tema: ${settings.theme}`,
+    `Teckenstorlek: ${settings.fontSize}px`,
+    `Notifikationer: ${settings.showNotifications ? 'På' : 'Av'}`,
+    `Språk: ${settings.language}`
+  ];
+
+  for (const item of items) {
+    const p = document.createElement('p');
+    p.textContent = item;
+    container.append(p);
+  }
+
+  return container;
+}
+
+document.body.append(displaySettings(finalSettings));
 ```
 </details>
 

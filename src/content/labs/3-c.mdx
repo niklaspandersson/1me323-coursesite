@@ -1,0 +1,288 @@
+---
+title: Skapa element dynamiskt
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå skillnaden mellan `innerHTML` och `document.createElement()`.
+* Att kunna skapa och lägga till DOM-element med JavaScript.
+* Att förstå när man bör använda vilken metod.
+
+</aside>
+
+<main>
+Hittills har vi ofta skapat HTML genom att konkatenera strängar och sätta `innerHTML`. Det fungerar, men det finns ett mer robust sätt: att skapa riktiga DOM-element med `document.createElement()` och lägga till dem med `append()`.
+
+### 0 - Förberedelser
+Skapa en ny mapp `3c` i din `labs`-mapp med `index.html` och `main.js`. Förbered HTML:en med en tom `<main>`-tagg.
+
+### 1 - Problemet med innerHTML
+
+Att bygga HTML som strängar har flera nackdelar:
+
+```javascript
+// Med innerHTML (sträng-konkatenering)
+const container = document.querySelector('main');
+
+const name = "Anna";
+const items = ["Äpple", "Banan", "Citron"];
+
+let html = `<h2>Hej ${name}!</h2>`;
+html += '<ul>';
+for (const item of items) {
+  html += `<li>${item}</li>`;
+}
+html += '</ul>';
+
+container.innerHTML = html;
+```
+
+**Problem:**
+- Lätt att göra syntaxfel (glömma stängande taggar)
+- Svårt att felsöka (allt är en lång sträng)
+- Kan vara en säkerhetsrisk om `name` kommer från användaren (XSS)
+- Varje gång du sätter `innerHTML` förstörs alla befintliga element (inklusive event listeners)
+
+### 2 - Skapa element med createElement()
+
+`document.createElement()` skapar ett nytt DOM-element:
+
+```javascript
+// Skapa ett nytt p-element
+const paragraph = document.createElement('p');
+
+// Sätt textinnehåll
+paragraph.textContent = 'Hej från JavaScript!';
+
+// Lägg till CSS-klass
+paragraph.classList.add('highlight');
+
+// Sätt attribut
+paragraph.id = 'greeting';
+```
+
+Elementet existerar nu i minnet, men syns inte på sidan ännu.
+
+#### Övning
+Skapa tre olika element med `createElement()`:
+1. En `<h1>` med texten "Min första createElement"
+2. En `<p>` med en CSS-klass
+3. En `<button>` med texten "Klicka mig"
+
+Logga ut elementen i konsolen för att se vad de innehåller.
+
+### 3 - Lägg till element med append()
+
+För att visa element på sidan använder vi `append()`:
+
+```javascript
+const container = document.querySelector('main');
+
+// Skapa element
+const heading = document.createElement('h2');
+heading.textContent = 'Välkommen!';
+
+const paragraph = document.createElement('p');
+paragraph.textContent = 'Detta skapades med JavaScript.';
+
+// Lägg till i container
+container.append(heading);
+container.append(paragraph);
+
+// Eller lägg till flera samtidigt
+container.append(heading, paragraph);
+```
+
+**Fördel med append():**
+- Lägger till i slutet av containern
+- Kan ta flera argument
+- Befintliga element och event listeners bevaras
+
+#### Övning
+1. Lägg till dina tre element från förra övningen i `<main>`
+2. Lägg till en `click`-eventlyssnare på knappen
+3. Skapa och lägg till ett nytt element när knappen klickas
+
+### 4 - Bygga strukturer
+
+När du behöver nästlade element, bygg inifrån och ut:
+
+```javascript
+// Bygg en lista med createElement
+function createList(items) {
+  const ul = document.createElement('ul');
+
+  for (const item of items) {
+    const li = document.createElement('li');
+    li.textContent = item;
+    ul.append(li);
+  }
+
+  return ul;
+}
+
+const fruits = ['Äpple', 'Banan', 'Citron'];
+const fruitList = createList(fruits);
+document.querySelector('main').append(fruitList);
+```
+
+#### Övning
+Skapa en funktion `createCard(title, description)` som returnerar ett komplett kort-element:
+
+```html
+<!-- Så här ska strukturen se ut -->
+<article class="card">
+  <h3>Titel här</h3>
+  <p>Beskrivning här</p>
+</article>
+```
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+function createCard(title, description) {
+  const article = document.createElement('article');
+  article.classList.add('card');
+
+  const h3 = document.createElement('h3');
+  h3.textContent = title;
+
+  const p = document.createElement('p');
+  p.textContent = description;
+
+  article.append(h3, p);
+
+  return article;
+}
+
+// Användning
+const card = createCard('Min rubrik', 'En beskrivande text.');
+document.querySelector('main').append(card);
+```
+</details>
+
+### 5 - Jämförelse: innerHTML vs createElement
+
+| Aspekt | innerHTML | createElement |
+|--------|-----------|---------------|
+| Läsbarhet | Enkelt för simpla fall | Tydligare struktur |
+| Säkerhet | Risk för XSS | Säkrare (textContent escapar) |
+| Prestanda | Parsning varje gång | Snabbare för enstaka element |
+| Event listeners | Förstörs vid uppdatering | Bevaras |
+| Felsökning | Svårare | Lättare |
+
+**Tumregel:**
+- Använd `innerHTML` för statiskt innehåll som inte ändras
+- Använd `createElement` när du bygger dynamiskt eller behöver event listeners
+
+### 6 - Praktisk tillämpning: Rendera data
+
+Låt oss tillämpa detta på att visa data:
+
+```javascript
+const users = [
+  { name: 'Anna', role: 'Admin' },
+  { name: 'Erik', role: 'User' },
+  { name: 'Maria', role: 'User' }
+];
+
+function renderUsers(users) {
+  const container = document.querySelector('#user-list');
+
+  // Rensa befintligt innehåll
+  container.innerHTML = '';
+
+  for (const user of users) {
+    const div = document.createElement('div');
+    div.classList.add('user-card');
+
+    const name = document.createElement('h3');
+    name.textContent = user.name;
+
+    const role = document.createElement('span');
+    role.textContent = user.role;
+    role.classList.add('role', user.role.toLowerCase());
+
+    div.append(name, role);
+    container.append(div);
+  }
+}
+
+renderUsers(users);
+```
+
+#### Övning
+Modifiera `renderUsers` så att varje kort har en "Ta bort"-knapp som tar bort just det kortet när man klickar.
+
+<details>
+<summary>Tips</summary>
+
+Skapa knappen inuti loopen och lägg till en click-eventlyssnare:
+
+```javascript
+const deleteBtn = document.createElement('button');
+deleteBtn.textContent = 'Ta bort';
+deleteBtn.addEventListener('click', () => {
+  div.remove(); // Tar bort elementet från DOM
+});
+div.append(name, role, deleteBtn);
+```
+</details>
+
+### 7 - Utmaning: Interaktiv lista
+
+Bygg en enkel att-göra-lista med `createElement`:
+
+1. Ett inputfält där användaren skriver en uppgift
+2. En knapp för att lägga till uppgiften
+3. Varje uppgift ska ha en ta bort-knapp
+4. Bonus: Lägg till en checkbox för att markera som klar
+
+**Krav:**
+- Använd ENDAST `createElement` och `append` (ingen `innerHTML`)
+- Event listeners ska fungera korrekt
+
+<details>
+<summary>Startstruktur</summary>
+
+```javascript
+function createTodoItem(text) {
+  const li = document.createElement('li');
+
+  const span = document.createElement('span');
+  span.textContent = text;
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'X';
+  deleteBtn.addEventListener('click', () => {
+    li.remove();
+  });
+
+  li.append(span, deleteBtn);
+  return li;
+}
+
+function addTodo() {
+  const input = document.querySelector('#todo-input');
+  const text = input.value.trim();
+
+  if (text) {
+    const todoItem = createTodoItem(text);
+    document.querySelector('#todo-list').append(todoItem);
+    input.value = ''; // Rensa inputfältet
+  }
+}
+
+// Event listener för knappen
+document.querySelector('#add-btn').addEventListener('click', addTodo);
+```
+</details>
+
+**Reflektion**:
+* Vilka fördelar ser du med `createElement` jämfört med `innerHTML`?
+* När skulle du fortfarande välja `innerHTML`?
+* Hur påverkar detta din förmåga att hantera event listeners?
+
+</main>

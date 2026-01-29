@@ -47,7 +47,54 @@ fetch("message.txt")
 Ett Promise är ett "löfte" om ett framtida värde. Koden fortsätter köra medan vi väntar på svaret.
 </details>
 
-### 2 - Hämta JSON
+### 2 - Förstå Promise och Response
+När du använder `fetch` arbetar du med två viktiga typer av objekt: **Promise** och **Response**. Låt oss utforska dessa.
+
+1. Logga vad `fetch` returnerar *direkt* (utan `.then()`):
+
+```javascript
+const result = fetch("message.txt");
+console.log(result);
+console.log(typeof result);
+```
+
+2. Du bör se att `result` är ett Promise-objekt. Ett Promise representerar ett värde som inte finns ännu men kommer att finnas i framtiden. När nätverksförfrågan är klar "uppfylls" (resolves) detta Promise med ett Response-objekt.
+
+3. Nu ska vi titta på Response-objektet. Ändra koden:
+
+```javascript
+fetch("message.txt")
+  .then(response => {
+    console.log(response);
+    console.log("Status:", response.status);
+    console.log("OK?", response.ok);
+    console.log("URL:", response.url);
+    return response.text();
+  })
+  .then(text => {
+    console.log("Innehåll:", text);
+  });
+```
+
+4. Response-objektet innehåller information om svaret från servern:
+   * `status` - HTTP-statuskoden (200 = OK, 404 = inte hittat, etc.)
+   * `ok` - `true` om status är 200-299
+   * `url` - vilken URL som hämtades
+
+5. Notera att `response.text()` också returnerar ett Promise - det är därför vi behöver en till `.then()` för att få det faktiska innehållet.
+
+> **OBS**: Ibland går saker fel - filen kanske inte finns, eller servern svarar inte. Vi kommer att titta på hur man hanterar sådana fel senare i kursen. Just nu fokuserar vi på när allt fungerar som det ska.
+
+<details>
+<summary>Sammanfattning</summary>
+
+* `fetch()` returnerar ett **Promise** som "löser sig" till ett **Response**-objekt
+* Response-objektet innehåller information om svaret (status, headers, etc.)
+* För att få själva innehållet anropar du `.text()` eller `.json()` på Response-objektet
+* Dessa metoder returnerar också Promises, så du behöver ytterligare `.then()` eller `await`
+</details>
+
+### 3 - Hämta JSON
 JSON-filer är vanligare eftersom de kan innehålla strukturerad data.
 
 1. Skapa en fil `data.json` med följande innehåll:
@@ -76,7 +123,7 @@ fetch("data.json")
 
 **Testa själv**: Vad händer om du använder `.text()` på en JSON-fil? Vad händer om du använder `.json()` på en textfil som inte är giltig JSON?
 
-### 3 - Async/await
+### 4 - Async/await
 `.then()` fungerar men kan bli svårläst med många steg. `async/await` ger en mer läsbar syntax.
 
 1. Skriv om din fetch med async/await:
@@ -110,43 +157,6 @@ console.log(data);
 I denna kurs rekommenderar vi async/await för de flesta fall.
 </details>
 
-### 4 - Felhantering
-Vad händer om filen inte finns? Vi behöver hantera fel.
-
-1. Prova att hämta en fil som inte existerar:
-
-```javascript
-const response = await fetch("finns-inte.json");
-console.log(response.status); // 404
-console.log(response.ok);     // false
-```
-
-2. `fetch` kastar inte fel vid 404 - den returnerar ett response med `ok: false`. Du måste kontrollera detta själv:
-
-```javascript
-async function loadData() {
-  const response = await fetch("data.json");
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data;
-}
-```
-
-3. Använd try-catch för att hantera fel:
-
-```javascript
-try {
-  const data = await loadData();
-  console.log(data);
-} catch (error) {
-  console.error("Kunde inte ladda data:", error.message);
-}
-```
-
 ### 5 - Visa data i DOM
 Nu ska vi kombinera fetch med DOM-manipulation.
 
@@ -156,18 +166,11 @@ Nu ska vi kombinera fetch med DOM-manipulation.
 
 ```javascript
 async function displayData() {
-  try {
-    const response = await fetch("data.json");
-    if (!response.ok) throw new Error("Kunde inte hämta data");
+  const response = await fetch("data.json");
+  const data = await response.json();
 
-    const data = await response.json();
-
-    // Uppdatera DOM med datan
-    // Din kod här...
-
-  } catch (error) {
-    // Visa ett felmeddelande för användaren
-  }
+  // Uppdatera DOM med datan
+  // Din kod här...
 }
 
 displayData();
