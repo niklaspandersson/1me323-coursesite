@@ -1,232 +1,603 @@
 ---
-title: Nullish coalescing och default-värden
+title: Labs Landing Page 2.0
 ---
 
 <aside class="first">
 
 #### Syfte
-* Att förstå skillnaden mellan `??` (nullish coalescing) och `||` (or).
-* Att kunna ge default-värden till variabler på ett säkert sätt.
-* Att hantera saknade eller odefinierade värden i API-svar och objekt.
-
+* Att applicera kunskaper om objekt och arrayer i ett riktigt scenario.
+* Att ersätta hårdkodad HTML med datadriven DOM-manipulation.
+* Att skapa en skalbar struktur för din portfolio.
 </aside>
 
 <main>
-När du arbetar med data från API:er eller användarinput finns det ofta värden som kan vara `null`, `undefined`, eller saknas helt. Nullish coalescing-operatorn (`??`) hjälper dig hantera dessa fall på ett elegant sätt.
+Nu är det dags att damma av din "Labs Landing Page" (som du skapade i labb 1-e) och göra den smartare. Förra veckan hårdkodade du information om varje labb i filen. Det fungerar för några få laborationer, men det blir snabbt mycket repetition och risken att något blir fel någonstans är stor. Nu när du behärskar objekt och arrayer ska vi bygga om sidan så att den genereras utifrån data istället.
 
 ### 0 - Förberedelser
-Skapa en ny mapp `3e` i din `labs`-mapp med `index.html` och `main.js`. Länka gärna in `global.css`.
+Öppna din `labs`-mapp i VS Code. Du ska arbeta i roten av denna mapp (där din `index.html` ligger).
 
-### 1 - Problemet med `||`
-Den logiska ELLER-operatorn (`||`) har länge använts för default-värden, men har ett problem:
+Om du inte redan har en `main.js` i roten av `labs`-mappen, skapa en och länka in den i din `index.html` (glöm inte `type="module"`).
 
-```javascript
-const userInput = 0;
-const value = userInput || 100;  // 100, inte 0!
+### 1 - Problemet med hårdkodad HTML
+Förra veckan skapade du en landing page med hårdkodad HTML för varje labb. Detta fungerar för få laborationer, men blir snabbt problem.
 
-const emptyString = "";
-const text = emptyString || "Default";  // "Default", inte ""!
+**Exempel på problemet:**
+```html
+<!-- Hårdkodad HTML - svår att underhålla -->
+<ul>
+  <li class="lab-card">
+    <h3>Labb 1a - Moduler</h3>
+    <p>Lär dig om import och export i JavaScript</p>
+    <span class="status completed">Klar</span>
+  </li>
+  <li class="lab-card">
+    <h3>Labb 1b - Git grunder</h3>
+    <p>Versionshantering med Git och GitHub</p>
+    <span class="status in-progress">Pågående</span>
+  </li>
+  <!-- ... 20+ laborationer mer? -->
+</ul>
 ```
 
-`||` behandlar `0`, `""`, `false`, `null`, och `undefined` som "falsy" och ger default-värdet.
+**Problem med detta:**
+- Mycket repetition (varje labb kräver samma HTML-struktur)
+- Risk för slarvfel och inkonsistens
+- Svårt att ändra utseende på alla labbar samtidigt
+- Svårt att lägga till ny funktionalitet (t.ex. filtrering)
 
 #### Övning
-Testa vad som händer med dessa värden:
+1. Reflektera över din nuvarande landing page:
+   - Hur många laborationer har du hittills?
+   - Hur många rader HTML är det per labb?
+   - Vad skulle hända om du ville lägga till en "favorit"-stjärna på varje labb?
 
+**Den datadrivna lösningen**: Istället för att hårdkoda HTML beskriver vi laborationerna som data och genererar HTML med JavaScript.
+
+<details>
+<summary>Fördelar med datadriven approach</summary>
+
+- **Skalbarhet**: Lätt att lägga till nya labbar
+- **Konsistens**: Alla labbar ser identiska ut
+- **Flexibilitet**: Enkelt att ändra layout för alla labbar
+- **Funktionalitet**: Enkelt att lägga till sortering, filtrering osv.
+- **Underhåll**: Ändringar på ett ställe påverkar alla labbar
+</details>
+
+### 2 - Designa din datastruktur
+Nu ska vi planera hur vi ska representera laborationerna som data.
+
+**Exempel på en lab-datastruktur:**
 ```javascript
-const testValues = [0, "", false, null, undefined, "hej", 42];
-
-for (const val of testValues) {
-  console.log(`${val} || "default" = ${val || "default"}`);
-}
-```
-
-### 2 - Nullish coalescing (`??`)
-`??` ger endast default-värdet om vänstra sidan är `null` eller `undefined`.
-
-```javascript
-const userInput = 0;
-const value = userInput ?? 100;  // 0! Behåller nollan
-
-const emptyString = "";
-const text = emptyString ?? "Default";  // ""! Behåller tom sträng
-
-const missing = null;
-const result = missing ?? "Default";  // "Default"
-```
-
-#### Övning
-Jämför `||` och `??` med samma testvärden:
-
-```javascript
-const testValues = [0, "", false, null, undefined, "hej", 42];
-
-for (const val of testValues) {
-  console.log(`${val} ?? "default" = ${val ?? "default"}`);
-}
-```
-
-**Vilken skillnad ser du?**
-
-### 3 - Praktisk användning: API-svar
-När du hämtar data från ett API kan vissa fält saknas eller vara null.
-
-```javascript
-// Simulerat API-svar
-const apiResponse = {
-  user: {
-    name: "Anna",
-    age: null,           // Okänd ålder
-    score: 0,            // Giltig poäng (noll)
-    bio: "",             // Tom bio (medvetet vald)
-    // email saknas helt
-  }
+const labExample = {
+  id: '1a',                    // Unik identifierare
+  title: 'Moduler',            // Titel som visas
+  description: 'Lär dig om import och export i JavaScript',
+  week: 1,                     // Vilken vecka
+  status: 'completed',         // 'completed', 'in-progress', 'not-started'
+  hasLink: true,               // Finns det en länk till labb-mappen?
+  difficulty: 'easy',          // 'easy', 'medium', 'hard'
+  technologies: ['JavaScript', 'ES6 Modules']
 };
-
-const user = apiResponse.user;
-
-// Med ??
-const age = user.age ?? "Okänd";        // "Okänd" (age är null)
-const score = user.score ?? 0;          // 0 (behåller nollan)
-const bio = user.bio ?? "Ingen bio";    // "" (behåller tom sträng)
-const email = user.email ?? "Ej angiven"; // "Ej angiven" (email är undefined)
 ```
 
 #### Övning
-Skapa en funktion `displayUserInfo(user)` som visar användarinformation på sidan.
+1. **Planera din struktur**: Vilka egenskaper behöver du för dina laborationer? Fundera på:
+   - Vilken information vill du visa?
+   - Vill du kunna filtrera eller sortera?
+   - Finns det extra funktionalitet du vill ha senare?
 
-1. Använd `??` för att ge default-värden till saknade fält
-2. Visa informationen i HTML
-
+2. **Skapa din lab-array**: I `main.js`, skapa en array med minst 5 av dina laborationer. Börja enkelt:
 ```javascript
-const users = [
-  { name: "Anna", email: "anna@example.com", phone: null },
-  { name: "Erik", email: null, phone: "070-123456" },
-  { name: "Maria" }  // Saknar både email och phone
+const labs = [
+  {
+    id: '1a',
+    title: 'Moduler',
+    description: 'Import och export i JavaScript',
+    status: 'completed',
+    hasLink: true
+  },
+  // Lägg till minst 4 fler...
 ];
 ```
 
+3. **Testa datat**: Logga ut din array och kontrollera att strukturen ser korrekt ut.
+
 <details>
-<summary>Lösningsförslag</summary>
+<summary>Förslag på utökad struktur</summary>
 
 ```javascript
-function createUserCard(user) {
-  const name = user.name ?? "Okänt namn";
-  const email = user.email ?? "Ej angiven";
-  const phone = user.phone ?? "Ej angiven";
+const labs = [
+  {
+    id: '1a',
+    title: 'Hello Modules',
+    description: 'Lär dig använda import och export för att strukturera JavaScript-kod',
+    week: 1,
+    status: 'completed',
+    hasLink: true,
+    difficulty: 'easy',
+    topics: ['Moduler', 'Import/Export', 'ES6']
+  },
+  {
+    id: '1b',
+    title: 'Git Grunderna',
+    description: 'Versionshantering och GitHub för utvecklare',
+    week: 1,
+    status: 'completed',
+    hasLink: true,
+    difficulty: 'medium',
+    topics: ['Git', 'GitHub', 'Versionshantering']
+  },
+  {
+    id: '2a',
+    title: 'Grundläggande JS-objekt',
+    description: 'Skapa och manipulera objekt i JavaScript',
+    week: 2,
+    status: 'in-progress',
+    hasLink: true,
+    difficulty: 'medium',
+    topics: ['Objekt', 'Egenskaper', 'Metoder']
+  }
+  // ... fortsätt med resten
+];
+```
+</details>
 
-  const card = document.createElement('div');
-  card.classList.add('user-card');
+### 3 - Förbered HTML-containerstrukturen
+Nu ska vi förbereda HTML-strukturen för att ta emot den genererade datan.
 
-  const heading = document.createElement('h3');
-  heading.textContent = name;
+**Exempel på ny HTML-struktur:**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mina Laborationer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Programmering - Laborationer</h1>
+    <nav>
+      <button id="filter-all" class="active">Alla</button>
+      <button id="filter-completed">Klara</button>
+      <button id="filter-in-progress">Pågående</button>
+    </nav>
+  </header>
 
-  const emailP = document.createElement('p');
-  emailP.textContent = `Email: ${email}`;
+  <main>
+    <!-- Tom container - fylls av JavaScript -->
+    <section id="labs-container" class="labs-grid">
+      <!-- Laborationer kommer här -->
+    </section>
+  </main>
 
-  const phoneP = document.createElement('p');
-  phoneP.textContent = `Telefon: ${phone}`;
+  <script type="module" src="main.js"></script>
+</body>
+</html>
+```
 
-  card.append(heading, emailP, phoneP);
-  return card;
+#### Övning
+1. **Uppdatera din HTML**:
+   - Ta bort all hårdkodad HTML för laborationer
+   - Lägg till en tom container med ID (t.ex. `labs-container`)
+   - Se till att `main.js` är länkad som modul
+
+2. **Spara en HTML-mall**: Innan du tar bort allt, kopiera HTML-strukturen för EN labb. Du kommer använda den som mall. Exempel:
+```html
+<!-- Spara denna struktur som kommentar eller i separat fil -->
+<div class="lab-card">
+  <h3>Labb 1a - Moduler</h3>
+  <p>Beskrivning av laborationen...</p>
+  <div class="lab-meta">
+    <span class="status completed">Klar</span>
+    <span class="week">Vecka 1</span>
+  </div>
+  <a href="./1a/" class="lab-link">Öppna labb</a>
+</div>
+```
+
+**Testa**: Öppna sidan - den ska vara nästan tom nu (bara header/navigation), eftersom vi inte genererat innehåll än.
+
+<details>
+<summary>Förslag på CSS för grid-layout</summary>
+
+```css
+.labs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
 }
 
-const container = document.getElementById('users');
-for (const user of users) {
-  container.append(createUserCard(user));
+.lab-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.lab-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.status.completed {
+  background: #4CAF50;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+
+.status.in-progress {
+  background: #FF9800;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
 }
 ```
 </details>
 
-### 4 - Kombinera med optional chaining (`?.`)
-`??` fungerar perfekt tillsammans med optional chaining för djupt nästlade objekt.
+### 4 - Generera HTML från data med createElement
+Nu kommer kärnan: vi ska skriva JavaScript som omvandlar vår data till HTML. Vi använder `document.createElement()` och `append()` som du lärde dig i förra laborationen.
 
+**Exempel på renderingsfunktion med createElement:**
 ```javascript
-const response = {
-  data: {
-    user: {
-      settings: null  // settings finns men är null
-    }
+function getStatusText(status) {
+  const statusMap = {
+    'completed': 'Klar',
+    'in-progress': 'Pågående',
+    'not-started': 'Ej startad'
+  };
+  return statusMap[status] || status;
+}
+
+function createLabCard(lab) {
+  // Skapa huvudcontainern
+  const card = document.createElement('div');
+  card.classList.add('lab-card');
+
+  // Skapa rubrik
+  const heading = document.createElement('h3');
+  heading.textContent = `Labb ${lab.id} - ${lab.title}`;
+
+  // Skapa beskrivning
+  const description = document.createElement('p');
+  description.textContent = lab.description;
+
+  // Skapa meta-container
+  const meta = document.createElement('div');
+  meta.classList.add('lab-meta');
+
+  // Skapa status-span
+  const statusSpan = document.createElement('span');
+  statusSpan.classList.add('status', lab.status);
+  statusSpan.textContent = getStatusText(lab.status);
+
+  // Skapa vecka-span
+  const weekSpan = document.createElement('span');
+  weekSpan.classList.add('week');
+  weekSpan.textContent = `Vecka ${lab.week}`;
+
+  meta.append(statusSpan, weekSpan);
+
+  // Lägg till länk om den finns
+  if (lab.hasLink) {
+    const link = document.createElement('a');
+    link.href = `./${lab.id}/`;
+    link.classList.add('lab-link');
+    link.textContent = 'Öppna labb';
+    card.append(heading, description, meta, link);
+  } else {
+    card.append(heading, description, meta);
   }
-};
 
-// Utan optional chaining + ??
-// response.data.user.settings.theme  // Error!
+  return card;
+}
 
-// Med optional chaining + ??
-const theme = response.data?.user?.settings?.theme ?? "light";
-// "light" (säker åtkomst + default-värde)
+function renderLabs(labsToShow = labs) {
+  const container = document.getElementById('labs-container');
+
+  // Rensa befintligt innehåll
+  container.innerHTML = '';
+
+  // Skapa och lägg till kort för varje labb
+  for (const lab of labsToShow) {
+    const card = createLabCard(lab);
+    container.append(card);
+  }
+}
+
+// Rendera vid sidladdning
+renderLabs();
 ```
 
-### 5 - Utmaning: Inställningshanterare
-Bygg en enkel inställningshanterare som använder `??` för att kombinera användarinställningar med default-värden.
+#### Övning
+1. **Implementera funktionerna**:
+   - Skapa `createLabCard()` som returnerar ett komplett lab-kort
+   - Skapa `renderLabs()` som loopar genom arrayen och lägger till korten
 
-#### Uppgift
-1. Skapa ett objekt med default-inställningar
-2. Simulera att användaren har ändrat några (men inte alla) inställningar
-3. Kombinera dem så att användarens val prioriteras, men saknade värden får defaults
+2. **Anpassa efter din HTML-mall**: Använd den HTML-struktur du sparade från step 3.
+
+3. **Testa**: Kalla `renderLabs()` vid slutet av din JS-fil. Sidan ska nu visa dina labbar!
+
+4. **Hantera villkorlig rendering**:
+   - Visa länk bara om `hasLink` är true
+   - Använd olika CSS-klasser baserat på `status`
+
+<details>
+<summary>Tips för topics/tags</summary>
+
+Om du har en `topics`-array kan du skapa taggar så här:
 
 ```javascript
-const defaultSettings = {
-  theme: "light",
-  fontSize: 16,
-  showNotifications: true,
-  language: "sv"
-};
+// Inuti createLabCard, efter meta
+if (lab.topics && lab.topics.length > 0) {
+  const tagsContainer = document.createElement('div');
+  tagsContainer.classList.add('lab-tags');
 
-// Användaren har bara ändrat några inställningar
-const userSettings = {
-  theme: "dark",
-  fontSize: 0,  // Medvetet valt 0 (bör behållas!)
-  // showNotifications saknas
-  // language saknas
-};
+  for (const topic of lab.topics) {
+    const tag = document.createElement('span');
+    tag.classList.add('tag');
+    tag.textContent = topic;
+    tagsContainer.append(tag);
+  }
 
-// Din uppgift: kombinera till finalSettings
+  card.append(tagsContainer);
+}
+```
+</details>
+
+### 5 - Lägg till interaktivitet
+Nu när grundstrukturen fungerar ska vi lägga till funktionalitet för filtrering och sortering.
+
+**Exempel på filtreringsfunktion:**
+```javascript
+// Filtrera labbar baserat på status
+function filterLabs(statusFilter) {
+  let filteredLabs;
+
+  if (statusFilter === 'all') {
+    filteredLabs = labs;
+  } else {
+    filteredLabs = labs.filter(lab => lab.status === statusFilter);
+  }
+
+  renderLabs(filteredLabs);
+  updateActiveFilter(statusFilter);
+}
+
+function updateActiveFilter(activeFilter) {
+  // Ta bort 'active' klass från alla knappar
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Lägg till 'active' klass på rätt knapp
+  document.getElementById(`filter-${activeFilter}`).classList.add('active');
+}
+
+// Lägg till event listeners för filter-knappar
+document.getElementById('filter-all').addEventListener('click', () => filterLabs('all'));
+document.getElementById('filter-completed').addEventListener('click', () => filterLabs('completed'));
+document.getElementById('filter-in-progress').addEventListener('click', () => filterLabs('in-progress'));
+```
+
+#### Övning
+1. **Implementera filtrering**:
+   - Skapa filter-funktioner för olika statusar
+   - Lägg till event listeners på dina filter-knappar
+   - Uppdatera vilket filter som är aktivt visuellt
+
+2. **Lägg till sortering**: Skapa en dropdown eller knappar för att sortera efter:
+   - Vecka (kronologisk ordning)
+   - Titel (alfabetisk ordning)
+   - Status (klara först, eller tvärtom)
+
+3. **Extra funktionalitet**:
+   - Lägg till en sökfunktion som filtrerar på titel/beskrivning
+   - Räkna och visa antal labbar per kategori
+
+<details>
+<summary>Exempel på sorteringsfunktion</summary>
+
+```javascript
+function sortLabs(sortBy) {
+  let sortedLabs = [...labs]; // Skapa en kopia
+
+  switch(sortBy) {
+    case 'week':
+      sortedLabs.sort((a, b) => a.week - b.week);
+      break;
+    case 'title':
+      sortedLabs.sort((a, b) => a.title.localeCompare(b.title));
+      break;
+    case 'status':
+      const statusOrder = { 'completed': 0, 'in-progress': 1, 'not-started': 2 };
+      sortedLabs.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+      break;
+  }
+
+  renderLabs(sortedLabs);
+}
+
+// Sökfunktion
+function searchLabs(searchTerm) {
+  const filtered = labs.filter(lab =>
+    lab.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    lab.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  renderLabs(filtered);
+}
+
+// Event listener för sökfält
+document.getElementById('search').addEventListener('input', (e) => {
+  searchLabs(e.target.value);
+});
+```
+</details>
+
+### 6 - Utmaning: Komplett portfolio med localStorage
+Nu ska du kombinera allt du lärt dig för att skapa en riktigt smart portfolio.
+
+#### Uppgift
+Integrera localStorage för att spara och ladda statusen på dina laborationer:
+
+**Funktionalitet att implementera:**
+1. **Spara status**: När användaren klickar på en labb, växla status och spara till localStorage
+2. **Ladda status**: Vid sidladdning, läs sparad status och uppdatera labs-arrayen
+3. **Progress tracking**: Visa progression (t.ex. "7 av 15 laborationer klara")
+4. **Senaste aktivitet**: Spara datum för när labbar markeras som klara
+
+**Tekniska krav:**
+- Använd säkra localStorage-funktioner (från lab 2-d)
+- Hantera fallet när ingen data finns sparad
+- Uppdatera visningen direkt när status ändras
+
+#### Starthjälp
+```javascript
+// Spara lab-status till localStorage
+function saveLabStatus() {
+  const statusData = labs.map(lab => ({
+    id: lab.id,
+    status: lab.status,
+    lastModified: new Date().toISOString()
+  }));
+
+  saveToStorage('labStatus', statusData);
+}
+
+// Ladda och applicera sparad status
+function loadLabStatus() {
+  const savedStatus = loadFromStorage('labStatus', []);
+
+  // Uppdatera labs-arrayen med sparad status
+  savedStatus.forEach(saved => {
+    const lab = labs.find(l => l.id === saved.id);
+    if (lab) {
+      lab.status = saved.status;
+      lab.lastModified = saved.lastModified;
+    }
+  });
+}
+
+// Växla status för en labb
+function toggleLabStatus(labId) {
+  const lab = labs.find(l => l.id === labId);
+  if (!lab) return;
+
+  // Cykel genom statusar
+  const statusCycle = ['not-started', 'in-progress', 'completed'];
+  const currentIndex = statusCycle.indexOf(lab.status);
+  const nextIndex = (currentIndex + 1) % statusCycle.length;
+
+  lab.status = statusCycle[nextIndex];
+  lab.lastModified = new Date().toISOString();
+
+  saveLabStatus();
+  renderLabs();
+  updateProgress();
+}
+
+// Visa progression med createElement
+function updateProgress() {
+  const completed = labs.filter(lab => lab.status === 'completed').length;
+  const total = labs.length;
+  const percentage = Math.round((completed / total) * 100);
+
+  const progressContainer = document.getElementById('progress');
+  progressContainer.innerHTML = ''; // Rensa först
+
+  const text = document.createElement('p');
+  text.textContent = `Progression: ${completed} av ${total} laborationer klara (${percentage}%)`;
+
+  const progressBar = document.createElement('div');
+  progressBar.classList.add('progress-bar');
+
+  const progressFill = document.createElement('div');
+  progressFill.classList.add('progress-fill');
+  progressFill.style.width = `${percentage}%`;
+
+  progressBar.append(progressFill);
+  progressContainer.append(text, progressBar);
+}
+```
+
+**Extra utmaningar:**
+- **Statistik**: Visa genomsnittlig tid per labb, labbar per vecka osv.
+- **Export**: Låt användaren exportera sin progress som JSON
+- **Backup**: Implementera backup/restore funktionalitet
+- **Achievements**: Lås upp "achievements" för milstolpar (5 klara, all vecka 1 klar osv.)
+
+**CSS för progression:**
+```css
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+  transition: width 0.3s ease;
+}
 ```
 
 <details>
-<summary>Lösningsförslag</summary>
+<summary>Komplett klickhantering med createElement</summary>
 
 ```javascript
-const finalSettings = {
-  theme: userSettings.theme ?? defaultSettings.theme,
-  fontSize: userSettings.fontSize ?? defaultSettings.fontSize,
-  showNotifications: userSettings.showNotifications ?? defaultSettings.showNotifications,
-  language: userSettings.language ?? defaultSettings.language
-};
+// Uppdatera createLabCard för att inkludera data-attribut och klickhantering
+function createLabCard(lab) {
+  const card = document.createElement('div');
+  card.classList.add('lab-card', lab.status);
+  card.dataset.labId = lab.id;
 
-console.log(finalSettings);
-// { theme: "dark", fontSize: 0, showNotifications: true, language: "sv" }
+  const heading = document.createElement('h3');
+  heading.textContent = `Labb ${lab.id.toUpperCase()} - ${lab.title}`;
 
-// Visa på sidan med createElement
-function displaySettings(settings) {
-  const container = document.createElement('div');
-  container.classList.add('settings');
+  const description = document.createElement('p');
+  description.textContent = lab.description;
 
-  const items = [
-    `Tema: ${settings.theme}`,
-    `Teckenstorlek: ${settings.fontSize}px`,
-    `Notifikationer: ${settings.showNotifications ? 'På' : 'Av'}`,
-    `Språk: ${settings.language}`
-  ];
+  const statusIndicator = document.createElement('div');
+  statusIndicator.classList.add('status-indicator');
 
-  for (const item of items) {
-    const p = document.createElement('p');
-    p.textContent = item;
-    container.append(p);
-  }
+  const statusSpan = document.createElement('span');
+  statusSpan.classList.add('status', lab.status);
+  statusSpan.textContent = getStatusText(lab.status);
 
-  return container;
+  const hint = document.createElement('small');
+  hint.textContent = 'Klicka för att ändra status';
+
+  statusIndicator.append(statusSpan, hint);
+  card.append(heading, description, statusIndicator);
+
+  // Lägg till klickhantering direkt på kortet
+  card.addEventListener('click', () => {
+    toggleLabStatus(lab.id);
+  });
+
+  return card;
 }
 
-document.body.append(displaySettings(finalSettings));
+// Initiera vid sidladdning
+document.addEventListener('DOMContentLoaded', () => {
+  loadLabStatus();
+  renderLabs();
+  updateProgress();
+});
 ```
 </details>
 
 **Reflektion**:
-* När ska du använda `??` istället för `||`?
-* Varför är det viktigt att `0` och `""` inte behandlas som "saknade" värden?
-* Hur hjälper `??` vid arbete med API-data?
+* Vilka fördelar ger datadriven utveckling jämfört med hårdkodad HTML?
+* Hur gör localStorage din portfolio mer personlig och användbar?
+* Vad händer med skalbarhet när du har 50+ laborationer?
+* Vilka andra typer av applikationer skulle gynnas av liknande arkitektur?
 
 </main>

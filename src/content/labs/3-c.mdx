@@ -1,288 +1,207 @@
 ---
-title: Skapa element dynamiskt
+title: Strukturera data
 ---
 
 <aside class="first">
 
 #### Syfte
-* Att förstå skillnaden mellan `innerHTML` och `document.createElement()`.
-* Att kunna skapa och lägga till DOM-element med JavaScript.
-* Att förstå när man bör använda vilken metod.
+* Att kunna designa genomtänkta JSON-strukturer.
+* Att förstå hur datastruktur påverkar kodens komplexitet.
+* Att kunna validera JSON.
+* Att tänka som en "data-arkitekt".
 
 </aside>
 
 <main>
-Hittills har vi ofta skapat HTML genom att konkatenera strängar och sätta `innerHTML`. Det fungerar, men det finns ett mer robust sätt: att skapa riktiga DOM-element med `document.createElement()` och lägga till dem med `append()`.
+Innan du börjar koda är det viktigt att tänka igenom hur din data ska struktureras. En väldesignad datastruktur gör koden enklare att skriva och underhålla. I denna laboration fokuserar vi på design och struktur snarare än programmering.
 
 ### 0 - Förberedelser
-Skapa en ny mapp `3c` i din `labs`-mapp med `index.html` och `main.js`. Förbered HTML:en med en tom `<main>`-tagg.
+Skapa en ny mapp `3b` i din `labs`-mapp med `index.html` och `main.js`. Du kommer främst arbeta med JSON-filer i denna laboration.
 
-### 1 - Problemet med innerHTML
+### 1 - Designa en menystruktur
+Din uppgift är att designa en JSON-struktur för en restaurangmeny.
 
-Att bygga HTML som strängar har flera nackdelar:
+Tänk igenom vilken information som behövs:
+* Restaurangens namn och beskrivning
+* Kategorier (förrätter, huvudrätter, desserter, drycker)
+* Rätter med namn, beskrivning och pris
+* Allergi-information
+* Om rätten är vegetarisk/vegansk
 
-```javascript
-// Med innerHTML (sträng-konkatenering)
-const container = document.querySelector('main');
+1. Skapa en fil `menu.json` och bygg upp strukturen steg för steg.
 
-const name = "Anna";
-const items = ["Äpple", "Banan", "Citron"];
+2. Börja enkelt - en restaurang med några kategorier och rätter.
 
-let html = `<h2>Hej ${name}!</h2>`;
-html += '<ul>';
-for (const item of items) {
-  html += `<li>${item}</li>`;
-}
-html += '</ul>';
-
-container.innerHTML = html;
-```
-
-**Problem:**
-- Lätt att göra syntaxfel (glömma stängande taggar)
-- Svårt att felsöka (allt är en lång sträng)
-- Kan vara en säkerhetsrisk om `name` kommer från användaren (XSS)
-- Varje gång du sätter `innerHTML` förstörs alla befintliga element (inklusive event listeners)
-
-### 2 - Skapa element med createElement()
-
-`document.createElement()` skapar ett nytt DOM-element:
-
-```javascript
-// Skapa ett nytt p-element
-const paragraph = document.createElement('p');
-
-// Sätt textinnehåll
-paragraph.textContent = 'Hej från JavaScript!';
-
-// Lägg till CSS-klass
-paragraph.classList.add('highlight');
-
-// Sätt attribut
-paragraph.id = 'greeting';
-```
-
-Elementet existerar nu i minnet, men syns inte på sidan ännu.
-
-#### Övning
-Skapa tre olika element med `createElement()`:
-1. En `<h1>` med texten "Min första createElement"
-2. En `<p>` med en CSS-klass
-3. En `<button>` med texten "Klicka mig"
-
-Logga ut elementen i konsolen för att se vad de innehåller.
-
-### 3 - Lägg till element med append()
-
-För att visa element på sidan använder vi `append()`:
-
-```javascript
-const container = document.querySelector('main');
-
-// Skapa element
-const heading = document.createElement('h2');
-heading.textContent = 'Välkommen!';
-
-const paragraph = document.createElement('p');
-paragraph.textContent = 'Detta skapades med JavaScript.';
-
-// Lägg till i container
-container.append(heading);
-container.append(paragraph);
-
-// Eller lägg till flera samtidigt
-container.append(heading, paragraph);
-```
-
-**Fördel med append():**
-- Lägger till i slutet av containern
-- Kan ta flera argument
-- Befintliga element och event listeners bevaras
-
-#### Övning
-1. Lägg till dina tre element från förra övningen i `<main>`
-2. Lägg till en `click`-eventlyssnare på knappen
-3. Skapa och lägg till ett nytt element när knappen klickas
-
-### 4 - Bygga strukturer
-
-När du behöver nästlade element, bygg inifrån och ut:
-
-```javascript
-// Bygg en lista med createElement
-function createList(items) {
-  const ul = document.createElement('ul');
-
-  for (const item of items) {
-    const li = document.createElement('li');
-    li.textContent = item;
-    ul.append(li);
-  }
-
-  return ul;
-}
-
-const fruits = ['Äpple', 'Banan', 'Citron'];
-const fruitList = createList(fruits);
-document.querySelector('main').append(fruitList);
-```
-
-#### Övning
-Skapa en funktion `createCard(title, description)` som returnerar ett komplett kort-element:
-
-```html
-<!-- Så här ska strukturen se ut -->
-<article class="card">
-  <h3>Titel här</h3>
-  <p>Beskrivning här</p>
-</article>
-```
+3. Fundera på:
+   * Ska allergi-info vara en array eller separata booleans?
+   * Hur representerar du pris? (tal eller sträng med valuta?)
+   * Behöver varje rätt ett unikt ID?
 
 <details>
-<summary>Lösningsförslag</summary>
+<summary>Tips för att komma igång</summary>
 
-```javascript
-function createCard(title, description) {
-  const article = document.createElement('article');
-  article.classList.add('card');
-
-  const h3 = document.createElement('h3');
-  h3.textContent = title;
-
-  const p = document.createElement('p');
-  p.textContent = description;
-
-  article.append(h3, p);
-
-  return article;
+Börja med grundstrukturen:
+```json
+{
+  "restaurant": {
+    "name": "...",
+    "description": "..."
+  },
+  "categories": [
+    {
+      "name": "Förrätter",
+      "items": [
+        {
+          "name": "...",
+          "price": 0
+        }
+      ]
+    }
+  ]
 }
-
-// Användning
-const card = createCard('Min rubrik', 'En beskrivande text.');
-document.querySelector('main').append(card);
 ```
+
+Bygg sedan ut varje del med mer information.
 </details>
 
-### 5 - Jämförelse: innerHTML vs createElement
+### 2 - Validera din JSON
+JSON måste följa strikta regler. Ett enda fel gör hela filen ogiltig.
 
-| Aspekt | innerHTML | createElement |
-|--------|-----------|---------------|
-| Läsbarhet | Enkelt för simpla fall | Tydligare struktur |
-| Säkerhet | Risk för XSS | Säkrare (textContent escapar) |
-| Prestanda | Parsning varje gång | Snabbare för enstaka element |
-| Event listeners | Förstörs vid uppdatering | Bevaras |
-| Felsökning | Svårare | Lättare |
+1. Använd ett online-verktyg för att validera din JSON:
+   * [JSONLint](https://jsonlint.com/)
+   * [JSON Formatter](https://jsonformatter.curiousconcept.com/)
 
-**Tumregel:**
-- Använd `innerHTML` för statiskt innehåll som inte ändras
-- Använd `createElement` när du bygger dynamiskt eller behöver event listeners
+2. Vanliga fel att leta efter:
+   * Trailing commas (komma efter sista elementet)
+   * Enkla citattecken istället för dubbla
+   * Saknade citattecken runt nycklar
+   * Kommentarer (ej tillåtna i JSON)
 
-### 6 - Praktisk tillämpning: Rendera data
+3. VS Code kan också hjälpa - spara filen som `.json` så får du syntaxmarkering och felindikering.
 
-Låt oss tillämpa detta på att visa data:
+### 3 - Testa din struktur
+Skriv ett litet script som läser in din meny och gör enkla operationer.
+
+1. Läs in JSON-filen med fetch.
+
+2. Logga ut grundläggande information:
+   * Restaurangens namn
+   * Antal kategorier
+   * Totalt antal rätter
 
 ```javascript
-const users = [
-  { name: 'Anna', role: 'Admin' },
-  { name: 'Erik', role: 'User' },
-  { name: 'Maria', role: 'User' }
-];
+async function analyzeMenu() {
+  const response = await fetch("menu.json");
+  const menu = await response.json();
 
-function renderUsers(users) {
-  const container = document.querySelector('#user-list');
+  console.log("Restaurang:", menu.restaurant.name);
+  console.log("Antal kategorier:", menu.categories.length);
 
-  // Rensa befintligt innehåll
-  container.innerHTML = '';
-
-  for (const user of users) {
-    const div = document.createElement('div');
-    div.classList.add('user-card');
-
-    const name = document.createElement('h3');
-    name.textContent = user.name;
-
-    const role = document.createElement('span');
-    role.textContent = user.role;
-    role.classList.add('role', user.role.toLowerCase());
-
-    div.append(name, role);
-    container.append(div);
-  }
+  // Räkna totalt antal rätter
+  // Din kod här...
 }
-
-renderUsers(users);
 ```
 
-#### Övning
-Modifiera `renderUsers` så att varje kort har en "Ta bort"-knapp som tar bort just det kortet när man klickar.
+3. Om koden blir komplicerad, fundera på om din datastruktur kan förbättras.
 
-<details>
-<summary>Tips</summary>
+### 4 - Utöka med olika datatyper
+En bra JSON-struktur använder rätt datatyp för rätt information.
 
-Skapa knappen inuti loopen och lägg till en click-eventlyssnare:
+Utöka din meny med:
+* **Booleans**: `isVegetarian`, `isSpicy`, `isAvailable`
+* **Numbers**: `price`, `calories`, `preparationTime`
+* **Arrays**: `allergens`, `ingredients`, `tags`
+* **Nested objects**: `nutritionInfo`, `portionSizes`
 
-```javascript
-const deleteBtn = document.createElement('button');
-deleteBtn.textContent = 'Ta bort';
-deleteBtn.addEventListener('click', () => {
-  div.remove(); // Tar bort elementet från DOM
-});
-div.append(name, role, deleteBtn);
+Exempel på en komplett rätt:
+
+```json
+{
+  "id": "main-001",
+  "name": "Pasta Carbonara",
+  "description": "Klassisk italiensk pastarätt",
+  "price": 159,
+  "currency": "SEK",
+  "isVegetarian": false,
+  "isSpicy": false,
+  "allergens": ["gluten", "ägg", "laktos"],
+  "ingredients": ["pasta", "pancetta", "ägg", "parmesan", "svartpeppar"],
+  "nutritionInfo": {
+    "calories": 650,
+    "protein": 25,
+    "carbs": 70,
+    "fat": 28
+  },
+  "tags": ["populär", "klassiker"]
+}
 ```
-</details>
 
-### 7 - Utmaning: Interaktiv lista
+### 5 - Rendera menyn
+Nu ska du visa menyn på en webbsida.
 
-Bygg en enkel att-göra-lista med `createElement`:
+1. Skapa en HTML-struktur för att visa menyn.
 
-1. Ett inputfält där användaren skriver en uppgift
-2. En knapp för att lägga till uppgiften
-3. Varje uppgift ska ha en ta bort-knapp
-4. Bonus: Lägg till en checkbox för att markera som klar
+2. Skriv JavaScript som:
+   * Hämtar JSON-datan
+   * Loopar genom kategorier och rätter
+   * Skapar HTML-element för varje del
+   * Visar allergi-information tydligt
 
-**Krav:**
-- Använd ENDAST `createElement` och `append` (ingen `innerHTML`)
-- Event listeners ska fungera korrekt
+3. Tänk på användarvänlighet:
+   * Gruppera rätter under sina kategorier
+   * Visa priser tydligt
+   * Markera vegetariska alternativ
+   * Gör allergi-info lätt att hitta
 
-<details>
-<summary>Startstruktur</summary>
+Skriv din egen HTML och CSS - använd gärna `global.css` som bas men lägg till specifik styling för menyn.
+
+### 6 - Utmaning: Filtrera menyn
+Lägg till interaktivitet:
+
+1. Skapa knappar eller checkboxar för att filtrera menyn:
+   * Visa endast vegetariskt
+   * Visa endast rätter utan en viss allergen
+   * Sortera efter pris
+
+2. Implementera filtreringen i JavaScript:
 
 ```javascript
-function createTodoItem(text) {
-  const li = document.createElement('li');
+function filterVegetarian(items) {
+  return items.filter(item => item.isVegetarian);
+}
+```
 
-  const span = document.createElement('span');
-  span.textContent = text;
+3. Uppdatera visningen när användaren ändrar filter.
 
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = 'X';
-  deleteBtn.addEventListener('click', () => {
-    li.remove();
+<details>
+<summary>Tips för filterlogik</summary>
+
+```javascript
+let currentFilters = {
+  vegetarian: false,
+  maxPrice: null,
+  excludeAllergens: []
+};
+
+function applyFilters(items) {
+  return items.filter(item => {
+    if (currentFilters.vegetarian && !item.isVegetarian) {
+      return false;
+    }
+    if (currentFilters.maxPrice && item.price > currentFilters.maxPrice) {
+      return false;
+    }
+    // Fler filter...
+    return true;
   });
-
-  li.append(span, deleteBtn);
-  return li;
 }
-
-function addTodo() {
-  const input = document.querySelector('#todo-input');
-  const text = input.value.trim();
-
-  if (text) {
-    const todoItem = createTodoItem(text);
-    document.querySelector('#todo-list').append(todoItem);
-    input.value = ''; // Rensa inputfältet
-  }
-}
-
-// Event listener för knappen
-document.querySelector('#add-btn').addEventListener('click', addTodo);
 ```
 </details>
 
 **Reflektion**:
-* Vilka fördelar ser du med `createElement` jämfört med `innerHTML`?
-* När skulle du fortfarande välja `innerHTML`?
-* Hur påverkar detta din förmåga att hantera event listeners?
+* Hur påverkade din datastruktur kodens komplexitet?
+* Vad hade du gjort annorlunda om du fick börja om?
+* Vilka fler användningsfall skulle din struktur behöva stödja i verkligheten?
+* Hur skulle du hantera flerspråkighet i menyn?
 
 </main>

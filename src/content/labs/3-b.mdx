@@ -1,207 +1,280 @@
 ---
-title: Strukturera data
+title: Fetch
 ---
 
 <aside class="first">
 
 #### Syfte
-* Att kunna designa genomtänkta JSON-strukturer.
-* Att förstå hur datastruktur påverkar kodens komplexitet.
-* Att kunna validera JSON.
-* Att tänka som en "data-arkitekt".
+* Att förstå grunderna i `fetch` för att hämta data.
+* Att kunna läsa både textfiler och JSON-filer.
+* Att förstå skillnaden mellan `.then()` och `async/await`.
+* Att hantera asynkrona operationer korrekt.
+
+</aside>
+<aside>
+
+#### Vad betyder asynkront?
+Att en operation är **asynkron** innebär att programmet inte väntar på att uppgiften ska bli färdig innan det går vidare till nästa rad kod. Istället startas uppgiften (t.ex. en nätverksförfrågan) i bakgrunden, vilket gör att webbsidan förblir responsiv under tiden data hämtas.
 
 </aside>
 
+
 <main>
-Innan du börjar koda är det viktigt att tänka igenom hur din data ska struktureras. En väldesignad datastruktur gör koden enklare att skriva och underhålla. I denna laboration fokuserar vi på design och struktur snarare än programmering.
+Hittills har all data vi arbetat med varit hårdkodad i JavaScript-filer. I verkligheten kommer data ofta från externa källor - filer, databaser eller API:er. `fetch` är webbläsarens inbyggda sätt att hämta data asynkront.
 
 ### 0 - Förberedelser
-Skapa en ny mapp `3b` i din `labs`-mapp med `index.html` och `main.js`. Du kommer främst arbeta med JSON-filer i denna laboration.
+* Skapa en ny mapp `3a` i din `labs`-mapp med `index.html` och `index.js`. Länka gärna in `global.css`.
+* Lägg till en rubrik och ett main-element i `index.html`. Main-elementet skall du komma åt från javascript.
 
-### 1 - Designa en menystruktur
-Din uppgift är att designa en JSON-struktur för en restaurangmeny.
+**Viktigt**: Precis som med moduler måste du köra sidan via en lokal webbserver (t.ex. Live Server) för att `fetch` ska fungera med lokala filer.
 
-Tänk igenom vilken information som behövs:
-* Restaurangens namn och beskrivning
-* Kategorier (förrätter, huvudrätter, desserter, drycker)
-* Rätter med namn, beskrivning och pris
-* Allergi-information
-* Om rätten är vegetarisk/vegansk
+### 1 - Hämta en textfil
+Vi börjar med att hämta en enkel textfil.
 
-1. Skapa en fil `menu.json` och bygg upp strukturen steg för steg.
+#### Så fungerar fetch-API:et
+Webbläsaren har en inbyggd funktion `fetch()` för att hämta data. Processen fungerar så här:
 
-2. Börja enkelt - en restaurang med några kategorier och rätter.
+1. Du anropar `fetch("url")` med adressen till det du vill hämta
+2. Webbläsaren skickar en **HTTP-förfrågan** (request) till servern
+3. Servern skickar tillbaka ett **svar** (response) med den begärda datan
+4. Eftersom detta tar tid (nätverkskommunikation är långsamt jämfört med kodexekvering) returnerar `fetch` ett **Promise** - ett "löfte" om att du kommer få ett svar *någon gång*
+5. Med `.then()` kan du köa upp kod som ska köras *när* svaret kommer
 
-3. Fundera på:
-   * Ska allergi-info vara en array eller separata booleans?
-   * Hur representerar du pris? (tal eller sträng med valuta?)
-   * Behöver varje rätt ett unikt ID?
+---
+#### Testa
 
-<details>
-<summary>Tips för att komma igång</summary>
+1. Skapa en fil `message.txt` i din `3a`-mapp med valfritt innehåll (några meningar).
 
-Börja med grundstrukturen:
-```json
-{
-  "restaurant": {
-    "name": "...",
-    "description": "..."
-  },
-  "categories": [
-    {
-      "name": "Förrätter",
-      "items": [
-        {
-          "name": "...",
-          "price": 0
-        }
-      ]
-    }
-  ]
-}
+
+
+2. Använd `fetch` för att göra en http-förfrågan som hämta filen:
+    ```javascript
+    const responsePromise = fetch("message.txt");
+    console.log(responsePromise);
+    ```
+    I konsolen ser du ett **Promise**-objekt - inte filinnehållet! Det är för att http-förfrågan inte är klar än.
+
+3. För att komma åt resultatet *när det är klart* använder vi `.then()`. Lägg till:
+    ```javascript
+    responsePromise.then(response => {
+      console.log(response);
+    });
+    ```
+    Nu ser du ett **Response**-objekt i konsolen. Detta innehåller information om http-svaret, men fortfarande inte själva innehållet i textfilen.
+
+4. Response-objektet har en metod `.text()` som ger oss innehållet tolkat som text. Vi kan returnera det från `then`-hanteraren, då får vi ett nytt löfte vi måste vänta på, detta löftet kommer att ge oss den faktiska texten. 
+
+   Uppdatera `then`-hanteraren att returnera `response.text()` och spara sedan resultatet i en ny variabel:
+
+    ```javascript
+    const textPromise = responsePromise.then(response => {
+      console.log(response);
+      return response.text();
+    });
+    ```
+    Lägg sedan till föjande för att även vänta på detta löfte:
+    ```javascript
+    textPromise.then(text => {
+      document.querySelector('main').textContent = text;
+    });
+    ```
+
+
+    Nu kan vi äntligen se texten från textfilen i vår webbläsare!
+
+#### Kedjad syntax
+Eftersom `.then()` alltid returnerar ett Promise kan vi kedja anropen istället för att spara varje Promise i en variabel. Samma sak kan skrivas så här:
+    ```javascript
+    fetch("message.txt")
+      .then(response => response.text())
+      .then(text => {
+        document.querySelector('main').textContent = text;
+      });
+    ```
+    Detta är den vanliga syntaxen du kommer se. Varje `.then()` tar emot resultatet från föregående steg.
+
+### 2 - Förstå Promise och Response
+När du använder `fetch` arbetar du med två viktiga typer av objekt: **Promise** och **Response**. Låt oss utforska dessa.
+
+1. Logga vad `fetch` returnerar *direkt* (utan `.then()`):
+
+```javascript
+const result = fetch("message.txt");
+console.log(result);
+console.log(typeof result);
 ```
 
-Bygg sedan ut varje del med mer information.
+2. Du bör se att `result` är ett Promise-objekt. Ett Promise representerar ett värde som inte finns ännu men kommer att finnas i framtiden. När nätverksförfrågan är klar "uppfylls" (resolves) detta Promise med ett Response-objekt.
+
+3. Nu ska vi titta på Response-objektet. Ändra koden:
+
+```javascript
+fetch("message.txt")
+  .then(response => {
+    console.log(response);
+    console.log("Status:", response.status);
+    console.log("OK?", response.ok);
+    console.log("URL:", response.url);
+    return response.text();
+  })
+  .then(text => {
+    console.log("Innehåll:", text);
+  });
+```
+
+4. Response-objektet innehåller information om svaret från servern:
+   * `status` - HTTP-statuskoden (200 = OK, 404 = inte hittat, etc.)
+   * `ok` - `true` om status är 200-299
+   * `url` - vilken URL som hämtades
+
+5. Notera att `response.text()` också returnerar ett Promise - det är därför vi behöver en till `.then()` för att få det faktiska innehållet.
+
+> **OBS**: Ibland går saker fel - filen kanske inte finns, eller servern svarar inte. Vi kommer att titta på hur man hanterar sådana fel senare i kursen. Just nu fokuserar vi på när allt fungerar som det ska.
+
+<details>
+<summary>Sammanfattning</summary>
+
+* `fetch()` returnerar ett **Promise** som "löser sig" till ett **Response**-objekt
+* Response-objektet innehåller information om svaret (status, headers, etc.)
+* För att få själva innehållet anropar du `.text()` eller `.json()` på Response-objektet
+* Dessa metoder returnerar också Promises, så du behöver ytterligare `.then()` eller `await`
 </details>
 
-### 2 - Validera din JSON
-JSON måste följa strikta regler. Ett enda fel gör hela filen ogiltig.
+### 3 - Hämta JSON
+JSON-filer är vanligare eftersom de kan innehålla strukturerad data.
 
-1. Använd ett online-verktyg för att validera din JSON:
-   * [JSONLint](https://jsonlint.com/)
-   * [JSON Formatter](https://jsonformatter.curiousconcept.com/)
-
-2. Vanliga fel att leta efter:
-   * Trailing commas (komma efter sista elementet)
-   * Enkla citattecken istället för dubbla
-   * Saknade citattecken runt nycklar
-   * Kommentarer (ej tillåtna i JSON)
-
-3. VS Code kan också hjälpa - spara filen som `.json` så får du syntaxmarkering och felindikering.
-
-### 3 - Testa din struktur
-Skriv ett litet script som läser in din meny och gör enkla operationer.
-
-1. Läs in JSON-filen med fetch.
-
-2. Logga ut grundläggande information:
-   * Restaurangens namn
-   * Antal kategorier
-   * Totalt antal rätter
-
-```javascript
-async function analyzeMenu() {
-  const response = await fetch("menu.json");
-  const menu = await response.json();
-
-  console.log("Restaurang:", menu.restaurant.name);
-  console.log("Antal kategorier:", menu.categories.length);
-
-  // Räkna totalt antal rätter
-  // Din kod här...
-}
-```
-
-3. Om koden blir komplicerad, fundera på om din datastruktur kan förbättras.
-
-### 4 - Utöka med olika datatyper
-En bra JSON-struktur använder rätt datatyp för rätt information.
-
-Utöka din meny med:
-* **Booleans**: `isVegetarian`, `isSpicy`, `isAvailable`
-* **Numbers**: `price`, `calories`, `preparationTime`
-* **Arrays**: `allergens`, `ingredients`, `tags`
-* **Nested objects**: `nutritionInfo`, `portionSizes`
-
-Exempel på en komplett rätt:
+1. Skapa en fil `data.json` med följande innehåll:
 
 ```json
 {
-  "id": "main-001",
-  "name": "Pasta Carbonara",
-  "description": "Klassisk italiensk pastarätt",
-  "price": 159,
-  "currency": "SEK",
-  "isVegetarian": false,
-  "isSpicy": false,
-  "allergens": ["gluten", "ägg", "laktos"],
-  "ingredients": ["pasta", "pancetta", "ägg", "parmesan", "svartpeppar"],
-  "nutritionInfo": {
-    "calories": 650,
-    "protein": 25,
-    "carbs": 70,
-    "fat": 28
-  },
-  "tags": ["populär", "klassiker"]
+  "title": "Min första JSON-fil",
+  "author": "Ditt namn",
+  "items": ["äpple", "banan", "citron"]
 }
 ```
 
-### 5 - Rendera menyn
-Nu ska du visa menyn på en webbsida.
-
-1. Skapa en HTML-struktur för att visa menyn.
-
-2. Skriv JavaScript som:
-   * Hämtar JSON-datan
-   * Loopar genom kategorier och rätter
-   * Skapar HTML-element för varje del
-   * Visar allergi-information tydligt
-
-3. Tänk på användarvänlighet:
-   * Gruppera rätter under sina kategorier
-   * Visa priser tydligt
-   * Markera vegetariska alternativ
-   * Gör allergi-info lätt att hitta
-
-Skriv din egen HTML och CSS - använd gärna `global.css` som bas men lägg till specifik styling för menyn.
-
-### 6 - Utmaning: Filtrera menyn
-Lägg till interaktivitet:
-
-1. Skapa knappar eller checkboxar för att filtrera menyn:
-   * Visa endast vegetariskt
-   * Visa endast rätter utan en viss allergen
-   * Sortera efter pris
-
-2. Implementera filtreringen i JavaScript:
+2. Hämta och parsa JSON:en:
 
 ```javascript
-function filterVegetarian(items) {
-  return items.filter(item => item.isVegetarian);
-}
+fetch("data.json")
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    console.log(data.title);
+    console.log(data.items[0]);
+  });
 ```
 
-3. Uppdatera visningen när användaren ändrar filter.
+3. Notera skillnaden: `.text()` för text, `.json()` för JSON.
+
+**Testa själv**: Vad händer om du använder `.text()` på en JSON-fil? Vad händer om du använder `.json()` på en textfil som inte är giltig JSON?
+
+### 4 - Async/await
+`.then()` fungerar men kan bli svårläst med många steg. `async/await` ger en mer läsbar syntax.
+
+1. Skriv om din fetch med async/await:
+
+```javascript
+async function loadData() {
+  const response = await fetch("data.json");
+  const data = await response.json();
+  console.log(data);
+}
+
+loadData();
+```
+
+2. `await` pausar funktionen tills Promise:t är klart. Funktionen måste vara markerad med `async`.
+
+3. Du kan också använda async/await på toppnivå i en modul (vilket din fil är om du använder `type="module"`):
+
+```javascript
+const response = await fetch("data.json");
+const data = await response.json();
+console.log(data);
+```
 
 <details>
-<summary>Tips för filterlogik</summary>
+<summary>När använda vad?</summary>
+
+* **async/await** - Mer läsbart, speciellt för sekventiella operationer
+* **.then()** - Bra för enkla fall eller när du vill kedja promises
+
+I denna kurs rekommenderar vi async/await för de flesta fall.
+</details>
+
+### 5 - Visa data i DOM
+Nu ska vi kombinera fetch med DOM-manipulation.
+
+1. Skapa HTML-element där du kan visa datan (en rubrik, en lista, etc.).
+
+2. Hämta JSON-datan och rendera den till sidan:
 
 ```javascript
-let currentFilters = {
-  vegetarian: false,
-  maxPrice: null,
-  excludeAllergens: []
-};
+async function displayData() {
+  const response = await fetch("data.json");
+  const data = await response.json();
 
-function applyFilters(items) {
-  return items.filter(item => {
-    if (currentFilters.vegetarian && !item.isVegetarian) {
-      return false;
-    }
-    if (currentFilters.maxPrice && item.price > currentFilters.maxPrice) {
-      return false;
-    }
-    // Fler filter...
-    return true;
-  });
+  // Uppdatera DOM med datan
+  // Din kod här...
 }
+
+displayData();
 ```
+
+Tänk på:
+* Vad ska användaren se medan datan laddas?
+* Vad ska användaren se om något går fel?
+
+### 6 - Utmaning: Ladda flera filer
+Ibland behöver du hämta flera filer.
+
+#### Sekventiellt (en i taget)
+```javascript
+const response1 = await fetch("file1.json");
+const data1 = await response1.json();
+
+const response2 = await fetch("file2.json");
+const data2 = await response2.json();
+```
+
+#### Parallellt (samtidigt)
+```javascript
+const [response1, response2] = await Promise.all([
+  fetch("file1.json"),
+  fetch("file2.json")
+]);
+
+const data1 = await response1.json();
+const data2 = await response2.json();
+```
+
+1. Skapa två JSON-filer med olika data.
+
+2. Hämta båda och kombinera informationen på sidan.
+
+3. Mät tidsskillnaden mellan sekventiell och parallell hämtning med `console.time()`:
+
+```javascript
+console.time("fetch");
+// ... din kod
+console.timeEnd("fetch");
+```
+
+<details>
+<summary>Förklaring</summary>
+
+`Promise.all()` startar alla förfrågningar samtidigt och väntar tills alla är klara. Detta är snabbare än att vänta på varje fil i tur och ordning.
+
+Om en fil är 100ms bort och du hämtar 3 filer:
+* Sekventiellt: ~300ms
+* Parallellt: ~100ms
 </details>
 
 **Reflektion**:
-* Hur påverkade din datastruktur kodens komplexitet?
-* Vad hade du gjort annorlunda om du fick börja om?
-* Vilka fler användningsfall skulle din struktur behöva stödja i verkligheten?
-* Hur skulle du hantera flerspråkighet i menyn?
+* Varför returnerar `fetch` ett Promise istället för datan direkt?
+* Vad är skillnaden mellan `response.text()` och `response.json()`?
+* Varför måste vi kontrollera `response.ok` manuellt?
+* När är parallell hämtning bättre än sekventiell?
 
 </main>
