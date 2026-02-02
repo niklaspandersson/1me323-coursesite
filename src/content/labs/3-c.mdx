@@ -16,12 +16,14 @@ title: Strukturera data
 Innan du börjar koda är det viktigt att tänka igenom hur din data ska struktureras. En väldesignad datastruktur gör koden enklare att skriva och underhålla. I denna laboration fokuserar vi på design och struktur snarare än programmering.
 
 ### 0 - Förberedelser
-Skapa en ny mapp `3b` i din `labs`-mapp med `index.html` och `main.js`. Du kommer främst arbeta med JSON-filer i denna laboration.
+Skapa en ny mapp `3c` i din `labs`-mapp med `index.html` och `index.js`, samt länka in din globala CSS-fil om du har en sådan.
+
+Skapa en rubrik och ett textstycke som informerar om att utvecklarkonsolen behöver användas för att se resultatet i den här laborationen.
 
 ### 1 - Designa en menystruktur
 Din uppgift är att designa en JSON-struktur för en restaurangmeny.
 
-Tänk igenom vilken information som behövs:
+Tänk igenom vilken information som behövs, följande är några förslag för att komma igång:
 * Restaurangens namn och beskrivning
 * Kategorier (förrätter, huvudrätter, desserter, drycker)
 * Rätter med namn, beskrivning och pris
@@ -37,6 +39,8 @@ Tänk igenom vilken information som behövs:
    * Hur representerar du pris? (tal eller sträng med valuta?)
    * Behöver varje rätt ett unikt ID?
 
+   Här finns inte nödvändigtvis något "rätt" eller "fel" - det viktiga är att du kan motivera dina val och att strukturen är logisk och lätt att använda i kod.
+
 <details>
 <summary>Tips för att komma igång</summary>
 
@@ -50,7 +54,7 @@ Börja med grundstrukturen:
   "categories": [
     {
       "name": "Förrätter",
-      "items": [
+      "dishes": [
         {
           "name": "...",
           "price": 0
@@ -67,28 +71,33 @@ Bygg sedan ut varje del med mer information.
 ### 2 - Validera din JSON
 JSON måste följa strikta regler. Ett enda fel gör hela filen ogiltig.
 
-1. Använd ett online-verktyg för att validera din JSON:
+1. VS Code hjälper till mycket - spara filen som `.json` så får du automatiskt syntaxmarkering och felindikering.
+
+2. Du kan också prova att använda ett online-verktyg för att validera din JSON:
    * [JSONLint](https://jsonlint.com/)
    * [JSON Formatter](https://jsonformatter.curiousconcept.com/)
 
-2. Vanliga fel att leta efter:
+3. Vanliga fel att leta efter:
    * Trailing commas (komma efter sista elementet)
    * Enkla citattecken istället för dubbla
    * Saknade citattecken runt nycklar
    * Kommentarer (ej tillåtna i JSON)
 
-3. VS Code kan också hjälpa - spara filen som `.json` så får du syntaxmarkering och felindikering.
 
 ### 3 - Testa din struktur
-Skriv ett litet script som läser in din meny och gör enkla operationer.
+Lägg in lite kod i din `index.js` som läser in din meny och gör enkla operationer.
 
 1. Läs in JSON-filen med fetch.
 
 2. Logga ut grundläggande information:
    * Restaurangens namn
    * Antal kategorier
-   * Totalt antal rätter
+   * Annan intressant statistik (t.ex. totalt antal rätter)
 
+3. Om koden blir komplicerad, fundera på om din datastruktur kan förbättras.
+
+<details>
+<summary>Förslag på lösning</summary>
 ```javascript
 async function analyzeMenu() {
   const response = await fetch("menu.json");
@@ -100,108 +109,31 @@ async function analyzeMenu() {
   // Räkna totalt antal rätter
   // Din kod här...
 }
-```
 
-3. Om koden blir komplicerad, fundera på om din datastruktur kan förbättras.
-
-### 4 - Utöka med olika datatyper
-En bra JSON-struktur använder rätt datatyp för rätt information.
-
-Utöka din meny med:
-* **Booleans**: `isVegetarian`, `isSpicy`, `isAvailable`
-* **Numbers**: `price`, `calories`, `preparationTime`
-* **Arrays**: `allergens`, `ingredients`, `tags`
-* **Nested objects**: `nutritionInfo`, `portionSizes`
-
-Exempel på en komplett rätt:
-
-```json
-{
-  "id": "main-001",
-  "name": "Pasta Carbonara",
-  "description": "Klassisk italiensk pastarätt",
-  "price": 159,
-  "currency": "SEK",
-  "isVegetarian": false,
-  "isSpicy": false,
-  "allergens": ["gluten", "ägg", "laktos"],
-  "ingredients": ["pasta", "pancetta", "ägg", "parmesan", "svartpeppar"],
-  "nutritionInfo": {
-    "calories": 650,
-    "protein": 25,
-    "carbs": 70,
-    "fat": 28
-  },
-  "tags": ["populär", "klassiker"]
-}
-```
-
-### 5 - Rendera menyn
-Nu ska du visa menyn på en webbsida.
-
-1. Skapa en HTML-struktur för att visa menyn.
-
-2. Skriv JavaScript som:
-   * Hämtar JSON-datan
-   * Loopar genom kategorier och rätter
-   * Skapar HTML-element för varje del
-   * Visar allergi-information tydligt
-
-3. Tänk på användarvänlighet:
-   * Gruppera rätter under sina kategorier
-   * Visa priser tydligt
-   * Markera vegetariska alternativ
-   * Gör allergi-info lätt att hitta
-
-Skriv din egen HTML och CSS - använd gärna `global.css` som bas men lägg till specifik styling för menyn.
-
-### 6 - Utmaning: Filtrera menyn
-Lägg till interaktivitet:
-
-1. Skapa knappar eller checkboxar för att filtrera menyn:
-   * Visa endast vegetariskt
-   * Visa endast rätter utan en viss allergen
-   * Sortera efter pris
-
-2. Implementera filtreringen i JavaScript:
-
-```javascript
-function filterVegetarian(items) {
-  return items.filter(item => item.isVegetarian);
-}
-```
-
-3. Uppdatera visningen när användaren ändrar filter.
-
-<details>
-<summary>Tips för filterlogik</summary>
-
-```javascript
-let currentFilters = {
-  vegetarian: false,
-  maxPrice: null,
-  excludeAllergens: []
-};
-
-function applyFilters(items) {
-  return items.filter(item => {
-    if (currentFilters.vegetarian && !item.isVegetarian) {
-      return false;
-    }
-    if (currentFilters.maxPrice && item.price > currentFilters.maxPrice) {
-      return false;
-    }
-    // Fler filter...
-    return true;
-  });
-}
+analyzeMenu();
 ```
 </details>
+{/* 
+### 4 - Rendera menyn
+Nu ska du visa menyn i html-dokumentet.
+
+Skriv din egen HTML och CSS - använd gärna `global.css` som bas men lägg till specifik styling för menyn i en separat CSS-fil.
+
+1. Börja med att skapa en statisk HTML-struktur för att visa menyn.
+   * Se till att få med element för alla delar av din data.
+   * För element som kommer att upprepas många gånger behöver du bara lägga in en eller två exempel för att försäkra dig om att allt data blir presenterat, och att stilen ser bra ut som helhet.
+
+2. Skriv sedan JavaScript som:
+   * Hämtar JSON-datan
+   * Loopar genom kategorier, rätter etc.
+   * Skapar HTML-element dynamiskt och lägger in dem i DOM:en.
+      * Efterhand som du skapar elementen dynamiskt så kan du ta bort de statiska exempel-elementen från HTML-filen. */}
 
 **Reflektion**:
 * Hur påverkade din datastruktur kodens komplexitet?
 * Vad hade du gjort annorlunda om du fick börja om?
 * Vilka fler användningsfall skulle din struktur behöva stödja i verkligheten?
-* Hur skulle du hantera flerspråkighet i menyn?
 
+### Klart!
+Glöm inte commita och pusha ditt arbete till GitHub när du är klar!
 </main>

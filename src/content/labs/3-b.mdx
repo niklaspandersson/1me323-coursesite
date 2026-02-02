@@ -18,18 +18,17 @@ Att en operation är **asynkron** innebär att programmet inte väntar på att u
 
 </aside>
 
-
 <main>
 Hittills har all data vi arbetat med varit hårdkodad i JavaScript-filer. I verkligheten kommer data ofta från externa källor - filer, databaser eller API:er. `fetch` är webbläsarens inbyggda sätt att hämta data asynkront.
 
 ### 0 - Förberedelser
-* Skapa en ny mapp `3a` i din `labs`-mapp med `index.html` och `index.js`. Länka gärna in `global.css`.
+* Skapa en ny mapp `3b` i din `labs`-mapp med `index.html` och `index.js`. Länka också in din globala CSS-fil om du har en sådan.
 * Lägg till en rubrik och ett main-element i `index.html`. Main-elementet skall du komma åt från javascript.
 
 **Viktigt**: Precis som med moduler måste du köra sidan via en lokal webbserver (t.ex. Live Server) för att `fetch` ska fungera med lokala filer.
 
 ### 1 - Hämta en textfil
-Vi börjar med att hämta en enkel textfil.
+Vi börjar undersöka hur `fetch` fungerar genom att försöka oss på att hämta en enkel textfil.
 
 #### Så fungerar fetch-API:et
 Webbläsaren har en inbyggd funktion `fetch()` för att hämta data. Processen fungerar så här:
@@ -43,16 +42,14 @@ Webbläsaren har en inbyggd funktion `fetch()` för att hämta data. Processen f
 ---
 #### Testa
 
-1. Skapa en fil `message.txt` i din `3a`-mapp med valfritt innehåll (några meningar).
+1. Skapa en fil `message.txt` i din `3b`-mapp med valfritt innehåll (några meningar).
 
-
-
-2. Använd `fetch` för att göra en http-förfrågan som hämta filen:
+2. Använd `fetch` för att göra en http-förfrågan som hämtar filen:
     ```javascript
     const responsePromise = fetch("message.txt");
     console.log(responsePromise);
     ```
-    I konsolen ser du ett **Promise**-objekt - inte filinnehållet! Det är för att http-förfrågan inte är klar än.
+    I konsolen ser du ett **Promise**-objekt - inte filinnehållet! Det är för att http-förfrågan inte är klar när console.log körs.
 
 3. För att komma åt resultatet *när det är klart* använder vi `.then()`. Lägg till:
     ```javascript
@@ -60,9 +57,9 @@ Webbläsaren har en inbyggd funktion `fetch()` för att hämta data. Processen f
       console.log(response);
     });
     ```
-    Nu ser du ett **Response**-objekt i konsolen. Detta innehåller information om http-svaret, men fortfarande inte själva innehållet i textfilen.
+    Nu ser du ett **Response**-objekt i konsolen. Detta innehåller information om http-svaret som nu är tillgängligt, men fortfarande inte själva innehållet i textfilen.
 
-4. Response-objektet har en metod `.text()` som ger oss innehållet tolkat som text. Vi kan returnera det från `then`-hanteraren, då får vi ett nytt löfte vi måste vänta på, detta löftet kommer att ge oss den faktiska texten. 
+4. Response-objektet har en metod `.text()` som ger oss innehållet tolkat som text. Vi kan returnera det från `then`-hanteraren. Då får vi ett nytt löfte vi måste vänta på, detta löftet kommer att ge oss den faktiska texten. 
 
    Uppdatera `then`-hanteraren att returnera `response.text()` och spara sedan resultatet i en ny variabel:
 
@@ -79,11 +76,10 @@ Webbläsaren har en inbyggd funktion `fetch()` för att hämta data. Processen f
     });
     ```
 
-
     Nu kan vi äntligen se texten från textfilen i vår webbläsare!
 
 #### Kedjad syntax
-Eftersom `.then()` alltid returnerar ett Promise kan vi kedja anropen istället för att spara varje Promise i en variabel. Samma sak kan skrivas så här:
+Eftersom `fetch` och `.then()` alltid returnerar ett Promise kan vi kedja anropen istället för att spara varje Promise i en variabel. Koden ovan kan skrivas så här istället:
     ```javascript
     fetch("message.txt")
       .then(response => response.text())
@@ -94,17 +90,17 @@ Eftersom `.then()` alltid returnerar ett Promise kan vi kedja anropen istället 
     Detta är den vanliga syntaxen du kommer se. Varje `.then()` tar emot resultatet från föregående steg.
 
 ### 2 - Förstå Promise och Response
-När du använder `fetch` arbetar du med två viktiga typer av objekt: **Promise** och **Response**. Låt oss utforska dessa.
+När du använder `fetch` arbetar du med två viktiga, nya typer av objekt: **Promise** och **Response**. Låt oss utforska dessa lite. 
 
+0. Du kan kommentera bort all kod du skrivit hittills för att börja om.
 1. Logga vad `fetch` returnerar *direkt* (utan `.then()`):
 
 ```javascript
 const result = fetch("message.txt");
 console.log(result);
-console.log(typeof result);
 ```
 
-2. Du bör se att `result` är ett Promise-objekt. Ett Promise representerar ett värde som inte finns ännu men kommer att finnas i framtiden. När nätverksförfrågan är klar "uppfylls" (resolves) detta Promise med ett Response-objekt.
+2. Du bör se att `result` är ett Promise-objekt. Ett Promise representerar som sagt ett värde som inte finns ännu men kommer att finnas i framtiden. När nätverksförfrågan är klar "uppfylls" (resolves) detta Promise med ett Response-objekt.
 
 3. Nu ska vi titta på Response-objektet. Ändra koden:
 
@@ -129,32 +125,29 @@ fetch("message.txt")
 
 5. Notera att `response.text()` också returnerar ett Promise - det är därför vi behöver en till `.then()` för att få det faktiska innehållet.
 
-> **OBS**: Ibland går saker fel - filen kanske inte finns, eller servern svarar inte. Vi kommer att titta på hur man hanterar sådana fel senare i kursen. Just nu fokuserar vi på när allt fungerar som det ska.
-
-<details>
-<summary>Sammanfattning</summary>
-
-* `fetch()` returnerar ett **Promise** som "löser sig" till ett **Response**-objekt
-* Response-objektet innehåller information om svaret (status, headers, etc.)
-* För att få själva innehållet anropar du `.text()` eller `.json()` på Response-objektet
-* Dessa metoder returnerar också Promises, så du behöver ytterligare `.then()` eller `await`
-</details>
+**OBS**: Ibland går saker fel - filen kanske inte finns, eller servern svarar inte. Vi kommer att titta på hur man hanterar sådana fel senare i kursen. Just nu fokuserar vi på när allt fungerar som det ska.
 
 ### 3 - Hämta JSON
-JSON-filer är vanligare eftersom de kan innehålla strukturerad data.
+Att läsa in JSON-filer är mycket vanligare än textfiler eftersom de innehålla *strukturerad* data. Det finns speciellt stöd för JSON-filer i `fetch`-apiet. 
+
+#### Testa själv
 
 1. Skapa en fil `data.json` med följande innehåll:
+    ```json
+    {
+      "title": "Min första JSON-fil",
+      "author": "Ditt namn",
+      "items": ["äpple", "banan", "citron"]
+    }
+    ```
 
-```json
-{
-  "title": "Min första JSON-fil",
-  "author": "Ditt namn",
-  "items": ["äpple", "banan", "citron"]
-}
-```
+1. Använd `fetch` för att hämta och läsa in JSON-filen. 
+   * När vi läser JSON kan vi använda `Response.json()` istället för `Response.text()`, då får vi automatiskt JSON-filen tolkad till ett JavaScript-objekt (dvs vi slipper att explicit anropa `JSON.parse`). 
+   * Använd samma flöde som ovan.
+2. När du väl har fått ut objektet, logga då hela objektet, samt enskilda delar av det (t.ex. `title` och första elementet i `items`):
 
-2. Hämta och parsa JSON:en:
-
+<details>
+<summary>Förslag på lösning</summary>
 ```javascript
 fetch("data.json")
   .then(response => response.json())
@@ -164,16 +157,23 @@ fetch("data.json")
     console.log(data.items[0]);
   });
 ```
-
-3. Notera skillnaden: `.text()` för text, `.json()` för JSON.
+</details>
 
 **Testa själv**: Vad händer om du använder `.text()` på en JSON-fil? Vad händer om du använder `.json()` på en textfil som inte är giltig JSON?
 
 ### 4 - Async/await
-`.then()` fungerar men kan bli svårläst med många steg. `async/await` ger en mer läsbar syntax.
+`.then()` fungerar men kan bli svårläst med många steg. `async/await` ger en mer läsbar syntax. `await` lägger exekveringen av funktionen på vänt tills Promise:t är klart. 
+   * Om du vill använda `await` i en funktion så måste funktionen vara markerad med `async`. Då kommer den automatiskt också att returnera ett Promise (rimligt eftersom den kommer att köras färdigt *asynkront*). 
+   * Men det går också bra använda `await` på toppnivå i en modul (vilket din fil är om du använder `<script type="module">`):
 
-1. Skriv om din fetch med async/await:
+#### `await` på toppnivå i en javascript-fil:
+```javascript
+const response = await fetch("data.json");
+const data = await response.json();
+console.log(data);
+```
 
+#### funktion med `async/await`:
 ```javascript
 async function loadData() {
   const response = await fetch("data.json");
@@ -184,15 +184,17 @@ async function loadData() {
 loadData();
 ```
 
-2. `await` pausar funktionen tills Promise:t är klart. Funktionen måste vara markerad med `async`.
+#### Testa själv
+Prova nu själv att skriva om koden från övning 1 ovan (som läser in textfilen) till att använda `await` istället för `.then()`.
 
-3. Du kan också använda async/await på toppnivå i en modul (vilket din fil är om du använder `type="module"`):
-
+<details>
+<summary>Förslag på lösning</summary>
 ```javascript
-const response = await fetch("data.json");
-const data = await response.json();
-console.log(data);
+const response = await fetch("message.txt")
+const text = await response.text();
+document.querySelector('main').textContent = text;
 ```
+</details>
 
 <details>
 <summary>När använda vad?</summary>
@@ -203,78 +205,17 @@ console.log(data);
 I denna kurs rekommenderar vi async/await för de flesta fall.
 </details>
 
-### 5 - Visa data i DOM
-Nu ska vi kombinera fetch med DOM-manipulation.
+#### Sammanfattning
 
-1. Skapa HTML-element där du kan visa datan (en rubrik, en lista, etc.).
-
-2. Hämta JSON-datan och rendera den till sidan:
-
-```javascript
-async function displayData() {
-  const response = await fetch("data.json");
-  const data = await response.json();
-
-  // Uppdatera DOM med datan
-  // Din kod här...
-}
-
-displayData();
-```
-
-Tänk på:
-* Vad ska användaren se medan datan laddas?
-* Vad ska användaren se om något går fel?
-
-### 6 - Utmaning: Ladda flera filer
-Ibland behöver du hämta flera filer.
-
-#### Sekventiellt (en i taget)
-```javascript
-const response1 = await fetch("file1.json");
-const data1 = await response1.json();
-
-const response2 = await fetch("file2.json");
-const data2 = await response2.json();
-```
-
-#### Parallellt (samtidigt)
-```javascript
-const [response1, response2] = await Promise.all([
-  fetch("file1.json"),
-  fetch("file2.json")
-]);
-
-const data1 = await response1.json();
-const data2 = await response2.json();
-```
-
-1. Skapa två JSON-filer med olika data.
-
-2. Hämta båda och kombinera informationen på sidan.
-
-3. Mät tidsskillnaden mellan sekventiell och parallell hämtning med `console.time()`:
-
-```javascript
-console.time("fetch");
-// ... din kod
-console.timeEnd("fetch");
-```
-
-<details>
-<summary>Förklaring</summary>
-
-`Promise.all()` startar alla förfrågningar samtidigt och väntar tills alla är klara. Detta är snabbare än att vänta på varje fil i tur och ordning.
-
-Om en fil är 100ms bort och du hämtar 3 filer:
-* Sekventiellt: ~300ms
-* Parallellt: ~100ms
-</details>
+* `fetch()` returnerar ett **Promise** som "löser sig" till ett **Response**-objekt
+* Response-objektet innehåller information om svaret (status, headers, etc.)
+* För att få själva innehållet anropar du `.text()` eller `.json()` på Response-objektet
+* Dessa metoder returnerar också Promises, så du behöver ytterligare `.then()` eller `await`
 
 **Reflektion**:
 * Varför returnerar `fetch` ett Promise istället för datan direkt?
 * Vad är skillnaden mellan `response.text()` och `response.json()`?
-* Varför måste vi kontrollera `response.ok` manuellt?
-* När är parallell hämtning bättre än sekventiell?
 
+### Klart!
+Glöm inte commita och pusha ditt arbete till GitHub när du är klar!
 </main>

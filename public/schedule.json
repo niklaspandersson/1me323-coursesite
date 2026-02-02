@@ -163,14 +163,72 @@
         "title": "Asynkron kommunikation",
         "sessions": [
           {
-            "id": "web:http",
-            "title": "HTTP",
-            "tasks": []
+            "id": "js:arrow-functions",
+            "title": "Mer funktioner",
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Arrow functions",
+                "link": "https://javascript.info/arrow-functions-basics"
+              },
+              {
+                "id": "js:arrow-functions",
+                "type": "exercise",
+                "title": "Arrow funktioner",
+                "link": "../laborationer/3a/"
+              }
+            ]
           },
           {
             "id": "js:fetch",
             "title": "Fetch och \"löften\"",
-            "tasks": []
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Fetch API",
+                "link": "https://javascript.info/fetch",
+                "note": ["Läs fram till 'Response headers'"]
+              },
+              {
+                "type": "reading",
+                "title": "async/await",
+                "link": "https://javascript.info/async-await",
+                "note": ["Läs fram till 'Error handling'"]
+              },
+              {
+                "id": "js:fetch",
+                "type": "exercise",
+                "title": "Fetch och Promises",
+                "link": "../laborationer/3b/"
+              }
+            ]
+          },
+          {
+            "id": "js:dom-manipulation",
+            "title": "DOM-manipulation",
+            "tasks": [
+              {
+                "type": "exercise",
+                "title": "Strukturera data",
+                "link": "../laborationer/3c/"
+              },
+              {
+                "type": "reading",
+                "title": "Skapa, lägga till och ta bort element",
+                "link": "https://javascript.info/modifying-document",
+                "note": ["Läs till och med 'Node removal'"]
+              },
+              {
+                "type": "exercise",
+                "title": "DOM-manipulation",
+                "link": "../laborationer/3d/"
+              },
+              {
+                "type": "exercise",
+                "title": "Landningssida 2.0",
+                "link": "../laborationer/3e/"
+              }
+            ]
           },
           {
             "id": "deadline:assignment-1",

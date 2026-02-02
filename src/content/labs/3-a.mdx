@@ -12,10 +12,10 @@ title: Arrow-funktioner
 </aside>
 
 <main>
-Arrow-funktioner (även kallade pilfunktioner) är ett kortare sätt att skriva funktioner i JavaScript. De introducerades i ES6 och är särskilt användbara när du arbetar med callbacks och funktionella metoder som `.map()`, `.filter()` och `.then()`.
+Arrow-funktioner (även kallade pilfunktioner) är ett kortare sätt att skriva funktioner i JavaScript. De introducerades i ES6 och är särskilt praktiska när du arbetar med eventhantarere och callbacks, som vid `setTimeout()` och `Promise.then()` som vi kommer att använda när vi börjar läsa in data dynamiskt i nästa labb.
 
 ### 0 - Förberedelser
-* Skapa en ny mapp `3f` i din `labs`-mapp med `index.html` och `index.js`. Länka in din JavaScript-fil med `type="module"`.
+* Skapa en ny mapp `3a` i din `labs`-mapp med `index.html` och `index.js`. Länka in din JavaScript-fil med `type="module"`. Länka även in din globala CSS-fil om du har en sådan.
 * Öppna sidan i webbläsaren via Live Server.
 
 ### 1 - Grundläggande syntax
@@ -87,7 +87,7 @@ const double = (n) => {
 const double = (n) => n * 2;
 ```
 
-**OBS**: Detta fungerar bara när funktionskroppen är ett enda uttryck. Om du har flera satser eller behöver mellansteg måste du använda måsvingar.
+**OBS**: Detta fungerar som sagt bara när funktionskroppen är ett enda uttryck. Om du har flera satser eller behöver mellansteg måste du använda måsvingar.
 
 **Uppgift**: Förenkla dina funktioner från förra övningen genom att använda implicit return:
 
@@ -133,122 +133,6 @@ const square = x => x * x;         // ✓ En parameter - kan förenklas
 const sayHello = () => "Hej!";     // ✗ Noll parametrar - parenteser krävs
 const multiply = (a, b) => a * b;  // ✗ Två parametrar - parenteser krävs
 const increment = n => n + 1;      // ✓ En parameter - kan förenklas
-```
-</details>
-
-### 4 - Returnera objekt
-När du vill returnera ett objekt med implicit return uppstår ett problem: måsvingarna tolkas som funktionskropp istället för objekt.
-
-```javascript
-// FEL - måsvingarna tolkas som funktionskropp
-const createPerson = (name) => { name: name };
-
-// RÄTT - linda objektet i parenteser
-const createPerson = (name) => ({ name: name });
-```
-
-**Uppgift**: Skriv en arrow-funktion `createPoint` som tar emot `x` och `y` och returnerar ett objekt `{ x: x, y: y }`. Använd implicit return.
-
-<details>
-<summary>Förslag på lösning</summary>
-
-```javascript
-const createPoint = (x, y) => ({ x: x, y: y });
-
-// Eller med shorthand property syntax:
-const createPoint = (x, y) => ({ x, y });
-
-// Testa:
-console.log(createPoint(3, 5)); // { x: 3, y: 5 }
-```
-</details>
-
-### 5 - Arrow-funktioner som callbacks
-Arrow-funktioner är särskilt användbara som callbacks, till exempel med array-metoder eller event-hantering.
-
-#### Med `.map()`
-```javascript
-const numbers = [1, 2, 3, 4, 5];
-
-// Vanlig funktion
-const doubled = numbers.map(function(n) {
-  return n * 2;
-});
-
-// Arrow-funktion
-const doubled = numbers.map(n => n * 2);
-```
-
-#### Med `.filter()`
-```javascript
-const numbers = [1, 2, 3, 4, 5, 6];
-
-// Vanlig funktion
-const evenNumbers = numbers.filter(function(n) {
-  return n % 2 === 0;
-});
-
-// Arrow-funktion
-const evenNumbers = numbers.filter(n => n % 2 === 0);
-```
-
-**Uppgift**: Givet arrayen `const words = ["hej", "på", "dig", "kompis"]`, använd arrow-funktioner för att:
-
-1. Skapa en ny array med alla ord i versaler (tips: `.map()` och `.toUpperCase()`)
-2. Filtrera ut ord som har fler än 2 tecken (tips: `.filter()` och `.length`)
-
-<details>
-<summary>Förslag på lösning</summary>
-
-```javascript
-const words = ["hej", "på", "dig", "kompis"];
-
-// 1. Alla ord i versaler
-const upperWords = words.map(word => word.toUpperCase());
-console.log(upperWords); // ["HEJ", "PÅ", "DIG", "KOMPIS"]
-
-// 2. Ord med fler än 2 tecken
-const longWords = words.filter(word => word.length > 2);
-console.log(longWords); // ["hej", "dig", "kompis"]
-```
-</details>
-
-### 6 - Utmaning: Kombinera array-metoder
-Array-metoder kan kedjas för att utföra flera operationer efter varandra.
-
-```javascript
-const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-const result = numbers
-  .filter(n => n % 2 === 0)   // Behåll jämna tal
-  .map(n => n * 10);          // Multiplicera med 10
-
-console.log(result); // [20, 40, 60, 80, 100]
-```
-
-**Uppgift**: Givet arrayen `const prices = [29, 199, 85, 450, 15, 99]`:
-
-1. Filtrera ut priser över 50 kr
-2. Lägg på 25% moms på varje pris
-3. Avrunda till heltal (tips: `Math.round()`)
-
-<details>
-<summary>Förslag på lösning</summary>
-
-```javascript
-const prices = [29, 199, 85, 450, 15, 99];
-
-const pricesWithVAT = prices
-  .filter(price => price > 50)
-  .map(price => price * 1.25)
-  .map(price => Math.round(price));
-
-console.log(pricesWithVAT); // [249, 106, 563, 124]
-
-// Alternativ - kombinera de två sista stegen:
-const pricesWithVAT = prices
-  .filter(price => price > 50)
-  .map(price => Math.round(price * 1.25));
 ```
 </details>
 
