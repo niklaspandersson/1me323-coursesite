@@ -242,7 +242,60 @@
           {
             "id": "js:classes",
             "title": "Klasser och objekt",
-            "tasks": []
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Klasser",
+                "link": "https://javascript.info/class",
+                "note": "Grundläggande klasssyntax"
+              },
+              {
+                "type": "reading",
+                "title": "Privata och skyddade egenskaper",
+                "link": "https://javascript.info/private-protected-properties-methods"
+              },
+              {
+                "type": "reading",
+                "title": "Property getters och setters",
+                "link": "https://javascript.info/property-accessors"
+              },
+              {
+                "id": "js:classes-constructors",
+                "type": "exercise",
+                "title": "Klasser och konstruktorer",
+                "link": "../laborationer/4a/"
+              },
+              {
+                "id": "js:class-methods",
+                "type": "exercise",
+                "title": "Metoder i klasser",
+                "link": "../laborationer/4b/"
+              },
+              {
+                "id": "js:encapsulation",
+                "type": "exercise",
+                "title": "Inkapsling",
+                "link": "../laborationer/4c/"
+              }
+            ]
+          },
+          {
+            "id": "js:array-find",
+            "title": "Söka i arrayer",
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Array.find och Array.findIndex",
+                "link": "https://javascript.info/array-methods#find-and-findindex-findlastindex",
+                "note": "Läs avsnittet om find och findIndex"
+              },
+              {
+                "id": "js:array-find",
+                "type": "exercise",
+                "title": "Array.find",
+                "link": "../laborationer/4d/"
+              }
+            ]
           }
         ]
       },

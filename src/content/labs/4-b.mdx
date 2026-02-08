@@ -1,0 +1,351 @@
+---
+title: Metoder i klasser
+---
+
+<aside class="first">
+
+#### Syfte
+* Att kunna lägga till metoder i en klass.
+* Att förstå hur `this` fungerar i klassmetoder.
+* Att förstå skillnaden mellan vanliga metoder och arrow-funktioner i klasser.
+* Att veta när man ska använda vilken typ av funktion.
+
+</aside>
+
+<main>
+I förra labben skapade vi klasser med konstruktorer som definierar objektens egenskaper. Men objekt behöver inte bara *data* — de behöver också *beteende*. Metoder låter oss definiera vad ett objekt kan *göra*, inte bara vad det *innehåller*.
+
+### 0 - Förberedelser
+Skapa en ny mapp `4b` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul.
+
+### 1 - Lägga till metoder
+En metod definieras direkt i klassen, på samma nivå som `constructor`. Metoder har tillgång till objektets egenskaper via `this`.
+
+**Exempel:**
+```javascript
+class Dog {
+  constructor(name, breed) {
+    this.name = name;
+    this.breed = breed;
+  }
+
+  bark() {
+    console.log(`${this.name} säger: Voff!`);
+  }
+
+  describe() {
+    return `${this.name} är en ${this.breed}`;
+  }
+}
+
+const dog = new Dog("Fido", "Labrador");
+dog.bark();                    // "Fido säger: Voff!"
+console.log(dog.describe());   // "Fido är en Labrador"
+```
+
+Notera att metoder skrivs **utan** `function`-nyckelordet — samma korta syntax som vi använde för metoder i objekt-literaler.
+
+#### Övning
+1. Skapa en klass `Rectangle` med en konstruktor som tar emot `width` och `height`.
+2. Lägg till en metod `getArea()` som returnerar arean (bredd × höjd).
+3. Lägg till en metod `getPerimeter()` som returnerar omkretsen (2 × bredd + 2 × höjd).
+4. Lägg till en metod `describe()` som returnerar en sträng som t.ex. `"Rektangel: 5 x 3 (area: 15, omkrets: 16)"`.
+5. Skapa ett par rektanglar och testa alla metoder.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
+  getArea() {
+    return this.width * this.height;
+  }
+
+  getPerimeter() {
+    return 2 * this.width + 2 * this.height;
+  }
+
+  describe() {
+    return `Rektangel: ${this.width} x ${this.height} (area: ${this.getArea()}, omkrets: ${this.getPerimeter()})`;
+  }
+}
+
+const r1 = new Rectangle(5, 3);
+const r2 = new Rectangle(10, 10);
+
+console.log(r1.getArea());      // 15
+console.log(r1.getPerimeter()); // 16
+console.log(r1.describe());     // "Rektangel: 5 x 3 (area: 15, omkrets: 16)"
+console.log(r2.describe());     // "Rektangel: 10 x 10 (area: 100, omkrets: 40)"
+```
+</details>
+
+### 2 - Metoder som ändrar tillstånd
+Metoder kan inte bara läsa egenskaper — de kan också ändra dem. Det är så objekt hanterar sitt eget tillstånd.
+
+**Exempel:**
+```javascript
+class Counter {
+  constructor(startValue = 0) {
+    this.value = startValue;
+  }
+
+  increment() {
+    this.value++;
+  }
+
+  decrement() {
+    this.value--;
+  }
+
+  reset() {
+    this.value = 0;
+  }
+}
+
+const counter = new Counter();
+counter.increment();
+counter.increment();
+console.log(counter.value); // 2
+counter.reset();
+console.log(counter.value); // 0
+```
+
+#### Övning
+1. Skapa en klass `ShoppingCart` med en konstruktor som skapar en tom array `items`.
+2. Lägg till en metod `addItem(item)` som lägger till ett objekt `{ name: item, quantity: 1 }` i arrayen.
+3. Lägg till en metod `getTotal()` som returnerar det totala antalet varor (summan av alla `quantity`).
+4. Lägg till en metod `listItems()` som loggar alla varor till konsolen.
+5. Skapa en varukorg, lägg till några varor och testa metoderna.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class ShoppingCart {
+  constructor() {
+    this.items = [];
+  }
+
+  addItem(item) {
+    this.items.push({ name: item, quantity: 1 });
+  }
+
+  getTotal() {
+    let total = 0;
+    for (const item of this.items) {
+      total += item.quantity;
+    }
+    return total;
+  }
+
+  listItems() {
+    for (const item of this.items) {
+      console.log(`${item.name} (${item.quantity} st)`);
+    }
+  }
+}
+
+const cart = new ShoppingCart();
+cart.addItem("Äpple");
+cart.addItem("Bröd");
+cart.addItem("Mjölk");
+
+cart.listItems();
+// Äpple (1 st)
+// Bröd (1 st)
+// Mjölk (1 st)
+
+console.log("Totalt antal:", cart.getTotal()); // 3
+```
+</details>
+
+### 3 - Problemet med `this` och arrow-funktioner
+Nu kommer vi till en viktig skillnad som ofta ställer till problem. Vanliga metoder (definierade med den korta syntaxen) har sin **egen** `this` som refererar till objektet. Men **arrow-funktioner har inte sin egen `this`** — de ärver `this` från den omgivande kontexten (det omfång där de definieras).
+
+Det här spelar ingen roll i vanliga fall, men det blir viktigt i vissa situationer — till exempel i **event-lyssnare** och **callbacks**.
+
+**Exempel — det fungerar:**
+```javascript
+class Timer {
+  constructor() {
+    this.seconds = 0;
+  }
+
+  start() {
+    // Arrow-funktion i setTimeout ärver this från start()
+    setInterval(() => {
+      this.seconds++;
+      console.log(this.seconds);
+    }, 1000);
+  }
+}
+
+const timer = new Timer();
+timer.start(); // 1, 2, 3, 4...
+```
+
+Här fungerar `this.seconds` i arrow-funktionen eftersom arrow-funktioner ärver `this` från `start()`, som i sin tur har `this` satt till timer-objektet.
+
+**Exempel — det fungerar INTE:**
+```javascript
+class Timer {
+  constructor() {
+    this.seconds = 0;
+  }
+
+  start() {
+    // Vanlig funktion i setInterval — this pekar INTE på timer-objektet!
+    setInterval(function() {
+      this.seconds++; // PROBLEM: this är inte Timer-objektet
+      console.log(this.seconds);
+    }, 1000);
+  }
+}
+
+const timer = new Timer();
+timer.start(); // NaN, NaN, NaN...
+```
+
+Här använder vi en vanlig `function` i `setInterval`. Den har sin egen `this` som **inte** pekar på timer-objektet, utan styrs av hur funktionen anropas — i detta fall pekar `this` i en setInterval-callback inte alls på vår Timer.
+
+#### Tumregel
+* **Klassmetoder**: Använd vanlig syntax (`metodNamn() { ... }`)
+* **Callbacks inuti metoder** (t.ex. i `setTimeout`, `setInterval`, event-lyssnare): Använd **arrow-funktioner** (`() => { ... }`)
+
+#### Övning
+1. Skapa en klass `Clicker` med:
+   * En egenskap `count` som startar på 0
+   * En metod `setup()` som hämtar en knapp från DOM och lägger till en click-lyssnare som ökar `count` och visar det aktuella värdet i ett HTML-element
+2. Skapa ett HTML-gränssnitt med en knapp och ett element som visar antalet klick.
+3. Testa att det fungerar med en **arrow-funktion** som callback i `addEventListener`.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```html
+<!-- I index.html -->
+<p>Antal klick: <span id="display">0</span></p>
+<button id="click-btn">Klicka!</button>
+```
+
+```javascript
+class Clicker {
+  constructor() {
+    this.count = 0;
+  }
+
+  setup() {
+    const button = document.getElementById("click-btn");
+    const display = document.getElementById("display");
+
+    // Arrow-funktion — this refererar till Clicker-objektet
+    button.addEventListener("click", () => {
+      this.count++;
+      display.textContent = this.count;
+    });
+  }
+}
+
+const clicker = new Clicker();
+clicker.setup();
+```
+</details>
+
+4. **Testa själv**: Vad händer om du byter ut arrow-funktionen mot en vanlig `function` i `addEventListener`? Fungerar det fortfarande? Varför/varför inte?
+
+<details>
+<summary>Förklaring</summary>
+
+Med en vanlig `function` i `addEventListener` pekar `this` på **elementet som klickades** (knappen), inte på `Clicker`-objektet. Då fungerar inte `this.count` som förväntat.
+
+```javascript
+// Med vanlig function: this === knappen
+button.addEventListener("click", function() {
+  this.count++; // this är button-elementet, inte Clicker!
+  console.log(this); // <button id="click-btn">...</button>
+});
+```
+
+Det är därför arrow-funktioner är bäst för callbacks i klassmetoder — de behåller den `this` du förväntar dig.
+</details>
+
+### 4 - Metoder som returnerar nya objekt
+Metoder kan också returnera helt nya instanser av klassen. Det är ett vanligt mönster i mer avancerad programmering.
+
+**Exempel:**
+```javascript
+class Temperature {
+  constructor(celsius) {
+    this.celsius = celsius;
+  }
+
+  toFahrenheit() {
+    return this.celsius * 9 / 5 + 32;
+  }
+
+  warmer(degrees) {
+    return new Temperature(this.celsius + degrees);
+  }
+
+  describe() {
+    return `${this.celsius}°C (${this.toFahrenheit()}°F)`;
+  }
+}
+
+const today = new Temperature(20);
+console.log(today.describe()); // "20°C (68°F)"
+
+const tomorrow = today.warmer(5);
+console.log(tomorrow.describe()); // "25°C (77°F)"
+```
+
+#### Övning
+1. Skapa en klass `Vector` med en konstruktor som tar emot `x` och `y`.
+2. Lägg till en metod `add(other)` som tar emot ett annat `Vector`-objekt och returnerar en **ny** `Vector` med summerade koordinater.
+3. Lägg till en metod `toString()` som returnerar en sträng i formatet `"(x, y)"`.
+4. Testa genom att skapa två vektorer, addera dem, och logga resultatet.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Vector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  add(other) {
+    return new Vector(this.x + other.x, this.y + other.y);
+  }
+
+  toString() {
+    return `(${this.x}, ${this.y})`;
+  }
+}
+
+const v1 = new Vector(2, 3);
+const v2 = new Vector(4, 1);
+const v3 = v1.add(v2);
+
+console.log(v1.toString()); // "(2, 3)"
+console.log(v2.toString()); // "(4, 1)"
+console.log(v3.toString()); // "(6, 4)"
+```
+</details>
+
+**Reflektion**:
+* Varför är det bra att metoder i en klass kan använda `this`?
+* Förklara med egna ord varför arrow-funktioner fungerar bättre som callbacks i klassmetoder.
+* Vad händer om du anropar en metod som `describe()` utan att ha skapat ett objekt med `new` först?
+
+### Klar!
+Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
+
+</main>

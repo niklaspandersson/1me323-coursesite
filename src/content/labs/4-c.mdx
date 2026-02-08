@@ -1,0 +1,337 @@
+---
+title: Inkapsling
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå varför inkapsling (encapsulation) är viktigt.
+* Att kunna använda privata fält (`#`) i klasser.
+* Att kunna skapa getters och setters.
+* Att kunna använda setters för validering av data.
+
+</aside>
+
+<main>
+Hittills har alla egenskaper i våra klasser varit fritt åtkomliga utifrån — vem som helst kan läsa och ändra dem direkt. Det kan leda till problem: ingenting hindrar någon från att sätta ett banksaldo till ett negativt värde, eller en ålder till -5. **Inkapsling** handlar om att skydda ett objekts interna data och kontrollera hur den kan ändras.
+
+### 0 - Förberedelser
+Skapa en ny mapp `4c` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul.
+
+### 1 - Problemet med öppna egenskaper
+Låt oss titta på ett exempel som visar varför det kan vara problematiskt att alla egenskaper är publika.
+
+```javascript
+class BankAccount {
+  constructor(owner, balance) {
+    this.owner = owner;
+    this.balance = balance;
+  }
+}
+
+const account = new BankAccount("Anna", 1000);
+
+// Vem som helst kan göra detta:
+account.balance = -999999;
+console.log(account.balance); // -999999 — det borde inte vara möjligt!
+```
+
+Ingenting i koden förhindrar att saldot sätts till ett ogiltigt värde. I ett riktigt system vore detta ett allvarligt problem.
+
+### 2 - Privata fält med `#`
+JavaScript har stöd för **privata fält** som inte kan nås utifrån klassen. De markeras med `#` framför namnet.
+
+**Exempel:**
+```javascript
+class BankAccount {
+  #balance;
+
+  constructor(owner, balance) {
+    this.owner = owner;
+    this.#balance = balance;
+  }
+
+  getBalance() {
+    return this.#balance;
+  }
+
+  deposit(amount) {
+    if (amount > 0) {
+      this.#balance += amount;
+    }
+  }
+}
+
+const account = new BankAccount("Anna", 1000);
+console.log(account.getBalance()); // 1000
+account.deposit(500);
+console.log(account.getBalance()); // 1500
+
+// Detta fungerar INTE — privata fält kan inte nås utifrån:
+// console.log(account.#balance); // SyntaxError!
+```
+
+Notera att privata fält **måste deklareras** i klassen (raden `#balance;` i toppen) innan de kan användas i konstruktorn.
+
+#### Övning
+1. Skapa en klass `Password` med:
+   * Ett privat fält `#value` som sätts i konstruktorn.
+   * En metod `check(input)` som returnerar `true` om `input` matchar det lagrade lösenordet, annars `false`.
+2. Skapa ett `Password`-objekt och testa `check()` med rätt och fel lösenord.
+3. Verifiera att du **inte** kan komma åt `#value` utifrån.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Password {
+  #value;
+
+  constructor(password) {
+    this.#value = password;
+  }
+
+  check(input) {
+    return input === this.#value;
+  }
+}
+
+const myPassword = new Password("hemligt123");
+console.log(myPassword.check("fel"));         // false
+console.log(myPassword.check("hemligt123"));  // true
+
+// console.log(myPassword.#value); // SyntaxError!
+```
+</details>
+
+### 3 - Getters
+En **getter** är en speciell metod som ser ut som en egenskap när den används. Den definieras med nyckelordet `get` framför metodnamnet. Getters är användbara när du vill beräkna ett värde utifrån andra egenskaper, eller kontrollera åtkomst till privata fält.
+
+**Exempel:**
+```javascript
+class Circle {
+  #radius;
+
+  constructor(radius) {
+    this.#radius = radius;
+  }
+
+  get radius() {
+    return this.#radius;
+  }
+
+  get area() {
+    return Math.PI * this.#radius ** 2;
+  }
+
+  get circumference() {
+    return 2 * Math.PI * this.#radius;
+  }
+}
+
+const circle = new Circle(5);
+
+// Getters anropas utan parenteser — de ser ut som egenskaper:
+console.log(circle.radius);        // 5
+console.log(circle.area);          // 78.539...
+console.log(circle.circumference); // 31.415...
+```
+
+Notera att vi skriver `circle.area`, **inte** `circle.area()`. Gettern ser ut som en egenskap men kör kod i bakgrunden.
+
+#### Övning
+1. Skapa en klass `Person` med:
+   * Privata fält `#firstName` och `#lastName`.
+   * En getter `fullName` som returnerar `"Förnamn Efternamn"`.
+   * En getter `initials` som returnerar `"F.E."` (första bokstaven i varje namn, följt av punkt).
+2. Skapa en person och testa att använda getters.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Person {
+  #firstName;
+  #lastName;
+
+  constructor(firstName, lastName) {
+    this.#firstName = firstName;
+    this.#lastName = lastName;
+  }
+
+  get fullName() {
+    return `${this.#firstName} ${this.#lastName}`;
+  }
+
+  get initials() {
+    return `${this.#firstName[0]}.${this.#lastName[0]}.`;
+  }
+}
+
+const person = new Person("Ada", "Lovelace");
+console.log(person.fullName); // "Ada Lovelace"
+console.log(person.initials); // "A.L."
+```
+</details>
+
+### 4 - Setters
+En **setter** definieras med nyckelordet `set` och körs automatiskt när du tilldelar ett värde. Det är här vi kan lägga in **validering** — regler som kontrollerar att datan är giltig innan den sparas.
+
+**Exempel:**
+```javascript
+class Thermostat {
+  #temperature;
+
+  constructor(temperature) {
+    this.#temperature = temperature;
+  }
+
+  get temperature() {
+    return this.#temperature;
+  }
+
+  set temperature(value) {
+    if (value < -50 || value > 60) {
+      console.log("Ogiltig temperatur!");
+      return;
+    }
+    this.#temperature = value;
+  }
+}
+
+const thermostat = new Thermostat(20);
+console.log(thermostat.temperature); // 20
+
+thermostat.temperature = 25;
+console.log(thermostat.temperature); // 25
+
+thermostat.temperature = 100; // "Ogiltig temperatur!"
+console.log(thermostat.temperature); // 25 — oförändrad
+```
+
+Settern körs automatiskt vid tilldelning (`thermostat.temperature = 25`). Det ser ut som en vanlig tilldelning, men i bakgrunden körs vår valideringskod.
+
+#### Övning
+1. Skapa en klass `Product` med:
+   * Privata fält `#name` och `#price`.
+   * Getters för `name` och `price`.
+   * En setter för `price` som bara tillåter positiva tal (logga ett felmeddelande om värdet inte är giltigt).
+2. Skapa en produkt och testa att:
+   * Läsa namn och pris med getters.
+   * Ändra priset till ett giltigt värde — kontrollera att det ändras.
+   * Försöka ändra priset till ett negativt tal — kontrollera att det **inte** ändras.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Product {
+  #name;
+  #price;
+
+  constructor(name, price) {
+    this.#name = name;
+    this.#price = price;
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  get price() {
+    return this.#price;
+  }
+
+  set price(value) {
+    if (typeof value !== "number" || value <= 0) {
+      console.log("Priset måste vara ett positivt tal!");
+      return;
+    }
+    this.#price = value;
+  }
+}
+
+const product = new Product("Tangentbord", 899);
+console.log(product.name);  // "Tangentbord"
+console.log(product.price); // 899
+
+product.price = 749;
+console.log(product.price); // 749
+
+product.price = -100; // "Priset måste vara ett positivt tal!"
+console.log(product.price); // 749 — oförändrad
+```
+</details>
+
+### 5 - Allt tillsammans
+Låt oss kombinera privata fält, getters och setters i en mer komplett klass.
+
+#### Övning
+1. Skapa en klass `Student` med:
+   * Privata fält `#name`, `#grades` (en array med betyg, startar tom).
+   * En getter `name`.
+   * En metod `addGrade(grade)` som bara accepterar tal mellan 0 och 100.
+   * En getter `average` som beräknar och returnerar medelvärdet av betygen (eller 0 om inga betyg finns).
+   * En getter `status` som returnerar `"Godkänd"` om medelvärdet är minst 50, annars `"Underkänd"`.
+2. Skapa en student, lägg till flera betyg (inklusive ett ogiltigt), och logga namn, medelvärde och status.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Student {
+  #name;
+  #grades;
+
+  constructor(name) {
+    this.#name = name;
+    this.#grades = [];
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  addGrade(grade) {
+    if (typeof grade !== "number" || grade < 0 || grade > 100) {
+      console.log("Betyget måste vara ett tal mellan 0 och 100!");
+      return;
+    }
+    this.#grades.push(grade);
+  }
+
+  get average() {
+    if (this.#grades.length === 0) return 0;
+    let sum = 0;
+    for (const grade of this.#grades) {
+      sum += grade;
+    }
+    return sum / this.#grades.length;
+  }
+
+  get status() {
+    return this.average >= 50 ? "Godkänd" : "Underkänd";
+  }
+}
+
+const student = new Student("Maja");
+student.addGrade(75);
+student.addGrade(88);
+student.addGrade(62);
+student.addGrade(-5); // "Betyget måste vara ett tal mellan 0 och 100!"
+
+console.log(student.name);    // "Maja"
+console.log(student.average); // 75
+console.log(student.status);  // "Godkänd"
+```
+</details>
+
+**Reflektion**:
+* Varför vill man dölja ett objekts interna data?
+* Vad är skillnaden mellan en getter och en vanlig metod?
+* Kan du komma på ett eget exempel där en setter med validering vore användbar?
+
+### Klar!
+Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
+
+</main>
