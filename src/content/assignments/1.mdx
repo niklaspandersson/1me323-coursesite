@@ -4,9 +4,16 @@ title: Uppgift 1 - Samlingssida för inlämningsuppgifter
 
 <aside class="first">
 ### Redovisning
-Uppgiften redovisas tillsammans med uppgift 2 vid kursens första deadline.
+Uppgiften redovisas vid kursens första deadline.
 * **Deadline**: Feb 6, kl 23.59
 * **Inlämning**: [Deadline 1 i moodle](https://moodle.lnu.se/mod/assign/view.php?id=5083165)
+</aside>
+
+<aside>
+### Relativa sökvägar
+När du skapar länkar och inkluderar resurser i dina HTML-filer, se till att använda relativa sökvägar. Detta är viktigt för att säkerställa att din webbplats fungerar korrekt både när du kör den lokalt (t.ex. via LiveServer) och när den är publicerad på GitHub Pages. Testa alltid dina länkar och resursinkluderinger i båda miljöerna innan du lämnar in.
+
+Relativa sökvägar är sökvägar som är relativa till den aktuella filen, snarare än att använda absoluta sökvägar som börjar från rotkatalogen. Om du har en HTML-fil i en underkatalog som `assignment1/index.html` och du vill länka till `index.html` i rotkatalogen, behöver du använda `../index.html` som sökväg, för att gå upp en nivå i katalogstrukturen.
 </aside>
 
 <main>
@@ -31,6 +38,7 @@ Under kursens gång kommer du att göra flera inlämningsuppgifter. Precis som d
       * Du skall använda javascript för att dynamiskt generera navigationen på varje sida utifrån en gemensam datastruktur
       * Koden för detta skall ligga i en separat `.js`-fil som inkluderas i huvudscriptfilen för landningssidan och varje inlämningsuppgift.
       * Koden skall även inkludera logik för att markera den aktuella sidan i navigationen.
+      * Webbplatsen kommer att köras från en annan katalog på GitHub Pages än den körs i via LiveServer, så se till att använda relativa länkar i navigationen, och att testa att navigationen fungerar både lokalt och på GitHub Pages innan du lämnar in.
     * Innehållet på landningssidan skall bestå av "kort" med korta beskrivningar av varje inlämningsuppgift, inklusive titel och länk till respektive uppgift. Dessa kort skall genereras dynamiskt med JavaScript utifrån samma datastruktur som används för navigationen.
     * Kort information om dig själv (namn, kurs, och användarnamn).
 * Använd semantiska HTML-element för struktur.
@@ -55,7 +63,7 @@ Under kursens gång kommer du att göra flera inlämningsuppgifter. Precis som d
 * Skapa ett **publikt** repository på GitHub.
 * Koppla ditt lokala repository till GitHub och pusha din kod.
 * Konfigurera **GitHub Pages** att publicera från `main`-branchen.
-* Verifiera att din sida är tillgänglig på webben via din GitHub Pages-URL.
+* Verifiera att din sida är tillgänglig på webben via din GitHub Pages-URL och att alla länkar i navigationen fungerar korrekt.
 
 ### Inlämning
 
