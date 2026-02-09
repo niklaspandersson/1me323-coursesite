@@ -245,19 +245,15 @@
             "tasks": [
               {
                 "type": "reading",
+                "title": "Kontruktor-funktioner - bakgrund till klasser",
+                "note": "Läs bara till och med avsnittet 'Constructor function'",
+                "link": "https://javascript.info/constructor-new#constructor-function"
+              },
+              {
+                "type": "reading",
                 "title": "Klasser",
                 "link": "https://javascript.info/class",
                 "note": "Grundläggande klasssyntax"
-              },
-              {
-                "type": "reading",
-                "title": "Privata och skyddade egenskaper",
-                "link": "https://javascript.info/private-protected-properties-methods"
-              },
-              {
-                "type": "reading",
-                "title": "Property getters och setters",
-                "link": "https://javascript.info/property-accessors"
               },
               {
                 "id": "js:classes-constructors",
@@ -270,6 +266,17 @@
                 "type": "exercise",
                 "title": "Metoder i klasser",
                 "link": "../laborationer/4b/"
+              },
+              {
+                "type": "reading",
+                "title": "Privata och skyddade egenskaper",
+                "note": "Privata egenskapar är sedan ett par år tillbaka en del av JavaScript, medan skyddade egenskaper är mer av en konvention. Läs om båda.",
+                "link": "https://javascript.info/private-protected-properties-methods"
+              },
+              {
+                "type": "reading",
+                "title": "Property getters och setters",
+                "link": "https://javascript.info/property-accessors"
               },
               {
                 "id": "js:encapsulation",

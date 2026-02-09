@@ -105,7 +105,7 @@ console.log(myPassword.check("hemligt123"));  // true
 </details>
 
 ### 3 - Getters
-En **getter** är en speciell metod som ser ut som en egenskap när den används. Den definieras med nyckelordet `get` framför metodnamnet. Getters är användbara när du vill beräkna ett värde utifrån andra egenskaper, eller kontrollera åtkomst till privata fält.
+En **getter** är en speciell metod som ser ut som en egenskap när den används. Den definieras med nyckelordet `get` framför metodnamnet. Getters är användbara när du vill kontrollera åtkomst till privata fält, men de kan också till exempel användas för att beräkna ett värde utifrån andra egenskaper.
 
 **Exempel:**
 ```javascript
@@ -175,7 +175,7 @@ console.log(person.initials); // "A.L."
 </details>
 
 ### 4 - Setters
-En **setter** definieras med nyckelordet `set` och körs automatiskt när du tilldelar ett värde. Det är här vi kan lägga in **validering** — regler som kontrollerar att datan är giltig innan den sparas.
+En **setter** definieras med nyckelordet `set` och körs automatiskt när du tilldelar ett värde. Här kan du exempelvis lägga in **validering** — regler som kontrollerar att datan är giltig innan den sparas. På så sätt kan vi tillåta att någon ändrar ett visst värde, men samtidigt skydda mot ogiltiga värden.
 
 **Exempel:**
 ```javascript
@@ -191,7 +191,7 @@ class Thermostat {
   }
 
   set temperature(value) {
-    if (value < -50 || value > 60) {
+    if (value < 0 || value > 120) {
       console.log("Ogiltig temperatur!");
       return;
     }
@@ -199,17 +199,17 @@ class Thermostat {
   }
 }
 
-const thermostat = new Thermostat(20);
+const thermostat = new Thermostat(80);
+console.log(thermostat.temperature); // 80
+
+thermostat.temperature = 20;
 console.log(thermostat.temperature); // 20
 
-thermostat.temperature = 25;
-console.log(thermostat.temperature); // 25
-
-thermostat.temperature = 100; // "Ogiltig temperatur!"
-console.log(thermostat.temperature); // 25 — oförändrad
+thermostat.temperature = 250; // "Ogiltig temperatur!"
+console.log(thermostat.temperature); // 20 — oförändrad
 ```
 
-Settern körs automatiskt vid tilldelning (`thermostat.temperature = 25`). Det ser ut som en vanlig tilldelning, men i bakgrunden körs vår valideringskod.
+Settern körs automatiskt vid tilldelning (`thermostat.temperature = 20`). Det ser ut som en vanlig tilldelning, men i bakgrunden körs vår valideringskod.
 
 #### Övning
 1. Skapa en klass `Product` med:

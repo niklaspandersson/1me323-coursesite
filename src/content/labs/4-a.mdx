@@ -7,9 +7,21 @@ title: Klasser och konstruktorer
 #### Syfte
 * Att förstå varför klasser används och vad de löser.
 * Att kunna skapa en klass med en `constructor`.
-* Att kunna skapa flera instanser av en klass med `new`.
 * Att förstå att en klass fungerar som en mall för objekt.
+* Att kunna skapa flera instanser av en klass med `new`.
 
+</aside>
+
+<aside>
+#### Defaultvärden för argument
+Standardvärden (default values) låter oss ange vad en parameter ska ha för värde om inget skickas med vid anropet. Detta är användbart för att göra vissa argument valfria och för att säkerställa att variabler alltid har ett giltigt startvärde.
+
+**Syntax:**
+```javascript
+constructor(name, age = 0) { ... }
+```
+
+**Viktig regel:** Parametrar med defaultvärden måste placeras **efter** obligatoriska parametrar i listan. Om du lägger dem före kan JavaScript inte automatiskt fylla i dem korrekt när du utelämnar argument.
 </aside>
 
 <main>
@@ -51,7 +63,7 @@ const dog3 = {
 };
 ```
 
-Alla tre objekten har exakt samma struktur — `name`, `species` och `age` — men vi upprepar strukturen varje gång. Om vi dessutom vill lägga till en ny egenskap måste vi ändra på varje ställe. Det är det här problemet klasser löser.
+Alla tre objekten har exakt samma struktur — `name`, `species` och `age` — men vi upprepar strukturen varje gång. Lite samma problem som vi hade med upprepad html tidigare. Varje gång vi börjar upprepa oss introducerar vi risk för fel och inkonsekvenser. Och om vi dessutom vill lägga till en ny egenskap måste vi ändra på varje ställe. Det här är ett av problemen klasser löser.
 
 ### 2 - Din första klass
 En klass definieras med nyckelordet `class`. Inuti klassen finns en speciell metod som heter `constructor` — det är den som körs automatiskt när ett nytt objekt skapas. I konstruktorn använder vi `this` för att sätta egenskaper på det nya objektet.
@@ -204,10 +216,10 @@ class Movie {
 }
 
 const movies = [
-  new Movie("Inception", "Christopher Nolan", 9),
-  new Movie("Spirited Away", "Hayao Miyazaki", 10),
-  new Movie("Parasite", "Bong Joon-ho", 9),
-  new Movie("The Matrix", "Wachowski-systrarna", 8)
+  new Movie("Inception", "Christopher Nolan", 8),
+  new Movie("Spirited Away", "Hayao Miyazaki", 8),
+  new Movie("Parasite", "Bong Joon-ho", 7),
+  new Movie("The Matrix", "Wachowski-systrarna", 9)
 ];
 
 for (const movie of movies) {
@@ -228,7 +240,6 @@ container.innerHTML = html;
 **Reflektion**:
 * Vad är fördelen med att använda en klass istället för att skapa varje objekt med `{}`?
 * Vad händer om du glömmer att skriva `new` framför klassnamnet?
-* Hur liknar en klass en cookie-form och instanserna de kakor som pressas ut?
 
 ### Klar!
 Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.

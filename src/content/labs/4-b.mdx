@@ -13,7 +13,7 @@ title: Metoder i klasser
 </aside>
 
 <main>
-I förra labben skapade vi klasser med konstruktorer som definierar objektens egenskaper. Men objekt behöver inte bara *data* — de behöver också *beteende*. Metoder låter oss definiera vad ett objekt kan *göra*, inte bara vad det *innehåller*.
+I förra labben använde vi konstruktorer för att definiera egenskaper (data) i våra objekt. En av de stora poängerna med klasser är att vi kan samla både *data* och de *funktioner* som hör ihop med datan på ett och samma ställe. Genom att inkludera **metoder** i våra klasser slipper vi ha fristående funktioner utspridda i koden — istället bär objekten med sig sitt eget beteende och vet själva hur de ska hantera sin information. Vi tittade så smått på metoder i lab [2b](../2b/), men först nu när vi har klasser som mallar för objekt kan vi verkligen utnyttja kraften i metoder.
 
 ### 0 - Förberedelser
 Skapa en ny mapp `4b` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul.
@@ -108,12 +108,20 @@ class Counter {
   }
 }
 
-const counter = new Counter();
-counter.increment();
-counter.increment();
-console.log(counter.value); // 2
-counter.reset();
-console.log(counter.value); // 0
+const counter1 = new Counter();
+const counter2 = new Counter(100);
+
+counter1.increment();
+counter1.increment();
+console.log(counter1.value); // 2
+
+counter2.decrement();
+console.log(counter2.value); // 99
+
+// counter1 påverkas inte av vad vi gör med counter2 — de är helt isolerade
+counter1.reset();
+console.log(counter1.value); // 0
+console.log(counter2.value); // 99 fungerar fortfarande oberoende
 ```
 
 #### Övning
@@ -165,8 +173,10 @@ console.log("Totalt antal:", cart.getTotal()); // 3
 ```
 </details>
 
-### 3 - Problemet med `this` och arrow-funktioner
-Nu kommer vi till en viktig skillnad som ofta ställer till problem. Vanliga metoder (definierade med den korta syntaxen) har sin **egen** `this` som refererar till objektet. Men **arrow-funktioner har inte sin egen `this`** — de ärver `this` från den omgivande kontexten (det omfång där de definieras).
+### 3 - Problemet med `this` och händelsehantering
+Nu kommer vi till en viktig skillnad som ofta ställer till problem. En **vanlig funktion** får sitt `this` beroende på var den **körs** (anropas). Det innebär att `this` kan ändras om funktionen anropas i ett annat sammanhang än där den skapades.
+
+En **arrow-funktion** däremot får sitt `this` från var den **definieras**. Den "låser" `this` till den omgivande kontexten (din klassinstans) och behåller det värdet oavsett var funktionen senare körs.
 
 Det här spelar ingen roll i vanliga fall, men det blir viktigt i vissa situationer — till exempel i **event-lyssnare** och **callbacks**.
 
@@ -178,7 +188,7 @@ class Timer {
   }
 
   start() {
-    // Arrow-funktion i setTimeout ärver this från start()
+    // Arrow-funktion i setTimeout får samma this som start() har
     setInterval(() => {
       this.seconds++;
       console.log(this.seconds);
@@ -190,7 +200,7 @@ const timer = new Timer();
 timer.start(); // 1, 2, 3, 4...
 ```
 
-Här fungerar `this.seconds` i arrow-funktionen eftersom arrow-funktioner ärver `this` från `start()`, som i sin tur har `this` satt till timer-objektet.
+Här fungerar `this.seconds` i arrow-funktionen eftersom arrow-funktioner får `this` från `start()`, som i sin tur har `this` satt till Timer-objektet.
 
 **Exempel — det fungerar INTE:**
 ```javascript
@@ -212,7 +222,7 @@ const timer = new Timer();
 timer.start(); // NaN, NaN, NaN...
 ```
 
-Här använder vi en vanlig `function` i `setInterval`. Den har sin egen `this` som **inte** pekar på timer-objektet, utan styrs av hur funktionen anropas — i detta fall pekar `this` i en setInterval-callback inte alls på vår Timer.
+Här använder vi en vanlig `function` i `setInterval`. Eftersom `this` för vanliga funktioner bestäms **när funktionen körs** (och inte när den definieras), så kommer `this` att peka fel när `setInterval` väl kör koden. Kopplingen till `Timer`-objektet tappades bort i samma ögonblick som funktionen skickades iväg.
 
 #### Tumregel
 * **Klassmetoder**: Använd vanlig syntax (`metodNamn() { ... }`)
@@ -274,8 +284,8 @@ button.addEventListener("click", function() {
 
 Det är därför arrow-funktioner är bäst för callbacks i klassmetoder — de behåller den `this` du förväntar dig.
 </details>
-
-### 4 - Metoder som returnerar nya objekt
+{/* 
+### 4 - Fördjupning: metoder som returnerar nya objekt
 Metoder kan också returnera helt nya instanser av klassen. Det är ett vanligt mönster i mer avancerad programmering.
 
 **Exempel:**
@@ -338,12 +348,11 @@ console.log(v1.toString()); // "(2, 3)"
 console.log(v2.toString()); // "(4, 1)"
 console.log(v3.toString()); // "(6, 4)"
 ```
-</details>
+</details> */}
 
 **Reflektion**:
 * Varför är det bra att metoder i en klass kan använda `this`?
 * Förklara med egna ord varför arrow-funktioner fungerar bättre som callbacks i klassmetoder.
-* Vad händer om du anropar en metod som `describe()` utan att ha skapat ett objekt med `new` först?
 
 ### Klar!
 Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
