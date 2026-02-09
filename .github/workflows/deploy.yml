@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,8 +20,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Only run on PRs from claude/* branches or direct pushes to main
-    if: github.event_name == 'push' || startsWith(github.head_ref, 'claude/')
+    # Only run on PRs from claude/* branches, direct pushes to main, or manual triggers
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'claude/')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,8 +49,8 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    # Only deploy on pushes to main, not on PRs
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Deploy on pushes to main or manual triggers, not on PRs
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
