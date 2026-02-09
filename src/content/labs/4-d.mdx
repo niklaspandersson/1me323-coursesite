@@ -1,0 +1,285 @@
+---
+title: Array.find
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå hur `Array.find()` fungerar.
+* Att kunna använda `find()` för att söka i arrayer.
+* Att kunna kombinera `find()` med objekt och klassinstanser.
+
+</aside>
+
+<main>
+Ofta behöver vi hitta ett specifikt element i en array — en viss användare, en produkt med rätt id, eller ett objekt som uppfyller ett visst villkor. Att skriva en loop varje gång blir omständligt. `Array.find()` gör detta enklare genom att returnera det **första** elementet som matchar ett villkor.
+
+### 0 - Förberedelser
+Skapa en ny mapp `4d` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul.
+
+### 1 - Grundläggande find
+`find()` tar emot en callback-funktion som anropas för varje element i arrayen. Callbacken ska returnera `true` eller `false`. `find()` returnerar det **första** elementet där callbacken returnerar `true`. Om inget element matchar returneras `undefined`.
+
+**Exempel:**
+```javascript
+const numbers = [3, 7, 12, 5, 18, 2];
+
+const firstBig = numbers.find(n => n > 10);
+console.log(firstBig); // 12
+
+const notFound = numbers.find(n => n > 100);
+console.log(notFound); // undefined
+```
+
+Callbacken `n => n > 10` testas för varje element: 3 (nej), 7 (nej), 12 (ja!) — sökningen stannar och returnerar 12. Den hittar alltså inte 18 eftersom sökningen avbryts vid det första elementet som matchar.
+
+#### Övning
+1. Skapa en array med minst 8 tal.
+2. Använd `find()` för att hitta det första talet som är **jämnt** (delbart med 2).
+3. Använd `find()` för att hitta det första talet som är **större än 50**.
+4. Logga resultaten. Vad händer om inget tal är större än 50?
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const numbers = [13, 7, 24, 51, 8, 33, 60, 2];
+
+const firstEven = numbers.find(n => n % 2 === 0);
+console.log("Första jämna:", firstEven); // 24
+
+const firstBig = numbers.find(n => n > 50);
+console.log("Första > 50:", firstBig); // 51
+
+const impossible = numbers.find(n => n > 1000);
+console.log("Första > 1000:", impossible); // undefined
+```
+</details>
+
+### 2 - find med strängar
+`find()` fungerar med alla typer av värden, inte bara tal.
+
+**Exempel:**
+```javascript
+const fruits = ["äpple", "banan", "citron", "druva", "eldorado-äpple"];
+
+const longFruit = fruits.find(fruit => fruit.length > 5);
+console.log(longFruit); // "eldorado-äpple"... eller "banan"?
+```
+
+**Testa själv**: Varför returnerar koden ovan `"banan"` och inte `"eldorado-äpple"`? Ändra villkoret så att du hittar det första ordet som är längre än 6 tecken.
+
+#### Övning
+1. Skapa en array med namn på 6–8 städer.
+2. Använd `find()` för att hitta den första staden som börjar med bokstaven "S" (tips: använd `startsWith()`).
+3. Använd `find()` för att hitta den första staden som innehåller bokstaven "ö" (tips: använd `includes()`).
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const cities = ["Malmö", "Göteborg", "Stockholm", "Uppsala", "Sundsvall", "Luleå", "Örebro"];
+
+const startsWithS = cities.find(city => city.startsWith("S"));
+console.log("Börjar med S:", startsWithS); // "Stockholm"
+
+const containsO = cities.find(city => city.includes("ö"));
+console.log("Innehåller ö:", containsO); // "Malmö"
+```
+</details>
+
+### 3 - find med objekt
+Den vanligaste användningen av `find()` är att söka i arrayer av objekt — till exempel för att hitta en produkt med ett visst id, eller en användare med ett visst namn.
+
+**Exempel:**
+```javascript
+const products = [
+  { id: 1, name: "Kaffe", price: 49 },
+  { id: 2, name: "Te", price: 39 },
+  { id: 3, name: "Juice", price: 29 },
+  { id: 4, name: "Vatten", price: 15 }
+];
+
+const tea = products.find(product => product.name === "Te");
+console.log(tea);       // { id: 2, name: "Te", price: 39 }
+console.log(tea.price); // 39
+
+const expensive = products.find(product => product.price > 40);
+console.log(expensive.name); // "Kaffe"
+```
+
+#### Övning
+1. Skapa en array med minst 5 objekt som representerar böcker. Varje bok ska ha: `title`, `author`, `year` och `pages`.
+2. Använd `find()` för att hitta boken med titeln `"1984"` (eller en titel som finns i din lista).
+3. Använd `find()` för att hitta den första boken som publicerades efter år 2000.
+4. Använd `find()` för att hitta den första boken med fler än 400 sidor.
+5. **Hantera att inget hittas**: Vad händer om du söker efter en bok som inte finns? Skriv kod som kontrollerar om resultatet är `undefined` och loggar ett meddelande istället.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const books = [
+  { title: "1984", author: "George Orwell", year: 1949, pages: 328 },
+  { title: "Dune", author: "Frank Herbert", year: 1965, pages: 412 },
+  { title: "Harry Potter", author: "J.K. Rowling", year: 1997, pages: 223 },
+  { title: "The Hunger Games", author: "Suzanne Collins", year: 2008, pages: 374 },
+  { title: "Klara and the Sun", author: "Kazuo Ishiguro", year: 2021, pages: 307 }
+];
+
+const book1984 = books.find(book => book.title === "1984");
+console.log(book1984); // { title: "1984", ... }
+
+const modern = books.find(book => book.year > 2000);
+console.log("Första moderna:", modern.title); // "The Hunger Games"
+
+const thick = books.find(book => book.pages > 400);
+console.log("Tjock bok:", thick.title); // "Dune"
+
+// Hantera saknade resultat
+const mystery = books.find(book => book.title === "Dracula");
+if (mystery === undefined) {
+  console.log("Boken hittades inte!");
+} else {
+  console.log(mystery.title);
+}
+```
+</details>
+
+### 4 - find med klassinstanser
+`find()` fungerar lika bra med arrayer av klassinstanser. Här kan vi dra nytta av getters och metoder som vi lärt oss i tidigare labbar.
+
+**Exempel:**
+```javascript
+class Student {
+  #name;
+  #grade;
+
+  constructor(name, grade) {
+    this.#name = name;
+    this.#grade = grade;
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  get grade() {
+    return this.#grade;
+  }
+
+  get passed() {
+    return this.#grade >= 50;
+  }
+}
+
+const students = [
+  new Student("Alice", 82),
+  new Student("Bob", 45),
+  new Student("Charlie", 91),
+  new Student("Diana", 38)
+];
+
+// Hitta en student med namn
+const bob = students.find(s => s.name === "Bob");
+console.log(bob.name, bob.grade); // "Bob" 45
+
+// Hitta första student som inte klarat sig
+const failed = students.find(s => !s.passed);
+console.log(failed.name, "fick", failed.grade); // "Bob fick 45"
+```
+
+Notera att vi använder getters (`s.name`, `s.passed`) i callback-funktionen — de fungerar precis som vanliga egenskaper.
+
+#### Övning
+1. Skapa en klass `Product` med:
+   * Privata fält `#id`, `#name`, `#price`, `#inStock` (boolean).
+   * Getters för alla fält.
+   * En getter `isExpensive` som returnerar `true` om priset är över 500.
+2. Skapa en array med minst 6 produkter.
+3. Använd `find()` för att:
+   * Hitta produkten med id 3.
+   * Hitta den första produkten som inte finns i lager.
+   * Hitta den första dyra produkten (använd gettern `isExpensive`).
+4. Visa den hittade produktens information på HTML-sidan.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Product {
+  #id;
+  #name;
+  #price;
+  #inStock;
+
+  constructor(id, name, price, inStock) {
+    this.#id = id;
+    this.#name = name;
+    this.#price = price;
+    this.#inStock = inStock;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get name() {
+    return this.#name;
+  }
+
+  get price() {
+    return this.#price;
+  }
+
+  get inStock() {
+    return this.#inStock;
+  }
+
+  get isExpensive() {
+    return this.#price > 500;
+  }
+}
+
+const products = [
+  new Product(1, "Mus", 299, true),
+  new Product(2, "Tangentbord", 899, true),
+  new Product(3, "Skärm", 3499, false),
+  new Product(4, "Headset", 449, true),
+  new Product(5, "Webbkamera", 599, false),
+  new Product(6, "USB-hub", 149, true)
+];
+
+// Hitta med id
+const product3 = products.find(p => p.id === 3);
+console.log("Produkt 3:", product3.name); // "Skärm"
+
+// Första ej i lager
+const outOfStock = products.find(p => !p.inStock);
+console.log("Ej i lager:", outOfStock.name); // "Skärm"
+
+// Första dyra
+const expensive = products.find(p => p.isExpensive);
+console.log("Dyr produkt:", expensive.name); // "Tangentbord"
+
+// Visa på sidan
+const container = document.getElementById("result");
+if (product3) {
+  container.innerHTML = `
+    <h2>${product3.name}</h2>
+    <p>Pris: ${product3.price} kr</p>
+    <p>I lager: ${product3.inStock ? "Ja" : "Nej"}</p>
+  `;
+}
+```
+</details>
+
+**Reflektion**:
+* Vad är skillnaden mellan `find()` och en `for`-loop som söker igenom en array?
+* Varför returnerar `find()` just `undefined` när inget hittas?
+* I vilka situationer vore det bättre att använda `filter()` istället för `find()`?
+
+### Klar!
+Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
+
+</main>

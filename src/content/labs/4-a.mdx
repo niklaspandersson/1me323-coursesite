@@ -1,0 +1,236 @@
+---
+title: Klasser och konstruktorer
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå varför klasser används och vad de löser.
+* Att kunna skapa en klass med en `constructor`.
+* Att kunna skapa flera instanser av en klass med `new`.
+* Att förstå att en klass fungerar som en mall för objekt.
+
+</aside>
+
+<main>
+Hittills har vi skapat objekt med objekt-literaler (`{}`). Det fungerar bra när vi bara behöver ett eller två objekt, men vad händer när vi behöver skapa många objekt med samma struktur? Tänk dig att du bygger ett spel med hundra fiender, eller en kontaktlista med tusen personer. Att skriva varje objekt för hand vore opraktiskt och felbenäget. Klasser löser detta genom att fungera som en **mall** (engelska: *template*) som beskriver hur objekt ska se ut.
+
+### 0 - Förberedelser
+Skapa en ny mapp `4a` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul. Länka gärna in din `global.css` om du har en sådan.
+
+```
+labs/
+├── 1a/
+├── ...
+├── 3e/
+└── 4a/
+    ├── index.html
+    └── main.js
+```
+
+### 1 - Problemet med objekt-literaler
+Innan vi tittar på klasser, låt oss se varför de behövs. Tänk dig att du ska skapa flera djur-objekt:
+
+```javascript
+const dog1 = {
+  name: "Fido",
+  species: "Hund",
+  age: 3
+};
+
+const dog2 = {
+  name: "Rex",
+  species: "Hund",
+  age: 5
+};
+
+const dog3 = {
+  name: "Bella",
+  species: "Hund",
+  age: 2
+};
+```
+
+Alla tre objekten har exakt samma struktur — `name`, `species` och `age` — men vi upprepar strukturen varje gång. Om vi dessutom vill lägga till en ny egenskap måste vi ändra på varje ställe. Det är det här problemet klasser löser.
+
+### 2 - Din första klass
+En klass definieras med nyckelordet `class`. Inuti klassen finns en speciell metod som heter `constructor` — det är den som körs automatiskt när ett nytt objekt skapas. I konstruktorn använder vi `this` för att sätta egenskaper på det nya objektet.
+
+**Exempel:**
+```javascript
+class Animal {
+  constructor(name, species, age) {
+    this.name = name;
+    this.species = species;
+    this.age = age;
+  }
+}
+```
+
+Här definierar `Animal` en mall som säger: "Varje djur har ett namn, en art och en ålder." Konstruktorn tar emot dessa värden som parametrar och sparar dem som egenskaper på objektet med `this`.
+
+För att skapa ett objekt från klassen använder vi nyckelordet `new`:
+
+```javascript
+const dog1 = new Animal("Fido", "Hund", 3);
+const dog2 = new Animal("Rex", "Hund", 5);
+const dog3 = new Animal("Bella", "Hund", 2);
+
+console.log(dog1.name); // "Fido"
+console.log(dog2.age);  // 5
+```
+
+Varje anrop av `new Animal(...)` skapar ett **nytt, unikt objekt** (en *instans*) med de egenskaper vi anger. Klassen är mallen, objekten är de faktiska sakerna som skapas från mallen.
+
+#### Övning
+1. Skapa en klass `Car` med en konstruktor som tar emot `brand`, `model` och `year`.
+2. Skapa tre bilobjekt med `new Car(...)`.
+3. Logga varje bils `brand` och `year` till konsolen.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Car {
+  constructor(brand, model, year) {
+    this.brand = brand;
+    this.model = model;
+    this.year = year;
+  }
+}
+
+const car1 = new Car("Volvo", "V40", 2018);
+const car2 = new Car("Toyota", "Corolla", 2020);
+const car3 = new Car("Tesla", "Model 3", 2022);
+
+console.log(car1.brand, car1.year); // "Volvo" 2018
+console.log(car2.brand, car2.year); // "Toyota" 2020
+console.log(car3.brand, car3.year); // "Tesla" 2022
+```
+</details>
+
+### 3 - Konstruktorn bestämmer strukturen
+Konstruktorn kan göra mer än att bara spara parametrar. Du kan sätta standardvärden, beräkna egenskaper eller lägga till egenskaper som inte kommer från parametrarna.
+
+**Exempel:**
+```javascript
+class Player {
+  constructor(name) {
+    this.name = name;
+    this.score = 0;       // Alla spelare börjar med 0 poäng
+    this.isAlive = true;  // Alla spelare börjar som levande
+  }
+}
+
+const p1 = new Player("Alice");
+console.log(p1.name);    // "Alice"
+console.log(p1.score);   // 0
+console.log(p1.isAlive); // true
+```
+
+Här behöver vi bara ange spelarens namn — `score` och `isAlive` sätts automatiskt av konstruktorn.
+
+#### Övning
+1. Skapa en klass `BankAccount` med en konstruktor som tar emot `owner` (kontoägare) och `balance` (saldo).
+2. Om inget saldo anges ska det vara 0 (använd ett standardvärde i parametern: `balance = 0`).
+3. Lägg till en egenskap `currency` som alltid sätts till `"SEK"`.
+4. Skapa två konton: ett med ett startsaldo och ett utan.
+5. Logga ägarens namn, saldot och valutan för båda kontona.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class BankAccount {
+  constructor(owner, balance = 0) {
+    this.owner = owner;
+    this.balance = balance;
+    this.currency = "SEK";
+  }
+}
+
+const account1 = new BankAccount("Anna", 5000);
+const account2 = new BankAccount("Erik");
+
+console.log(account1.owner, account1.balance, account1.currency);
+// "Anna" 5000 "SEK"
+
+console.log(account2.owner, account2.balance, account2.currency);
+// "Erik" 0 "SEK"
+```
+</details>
+
+### 4 - Klasser och arrayer
+En vanlig användning av klasser är att skapa många instanser och samla dem i en array. Detta ger oss en lista av objekt med samma struktur — mycket användbart för att visa data i en tabell, ett galleri eller liknande.
+
+**Exempel:**
+```javascript
+class Book {
+  constructor(title, author, pages) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+  }
+}
+
+const books = [
+  new Book("Frankenstein", "Mary Shelley", 280),
+  new Book("1984", "George Orwell", 328),
+  new Book("Dune", "Frank Herbert", 412)
+];
+
+// Logga alla boktitlar
+for (const book of books) {
+  console.log(book.title);
+}
+```
+
+#### Övning
+1. Skapa en klass `Movie` med en konstruktor som tar emot `title`, `director` och `rating` (betyg 1–10).
+2. Skapa en array `movies` med minst fyra filmer.
+3. Använd en `for...of`-loop för att logga alla filmers titlar och betyg i formatet `"Titel: X/10"`.
+4. Visa filmerna på din HTML-sida genom att generera HTML med template-strängar och `innerHTML`.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+class Movie {
+  constructor(title, director, rating) {
+    this.title = title;
+    this.director = director;
+    this.rating = rating;
+  }
+}
+
+const movies = [
+  new Movie("Inception", "Christopher Nolan", 9),
+  new Movie("Spirited Away", "Hayao Miyazaki", 10),
+  new Movie("Parasite", "Bong Joon-ho", 9),
+  new Movie("The Matrix", "Wachowski-systrarna", 8)
+];
+
+for (const movie of movies) {
+  console.log(`${movie.title}: ${movie.rating}/10`);
+}
+
+// Visa på sidan
+const container = document.getElementById("movies");
+let html = "<h2>Mina filmer</h2><ul>";
+for (const movie of movies) {
+  html += `<li><strong>${movie.title}</strong> (${movie.director}) - ${movie.rating}/10</li>`;
+}
+html += "</ul>";
+container.innerHTML = html;
+```
+</details>
+
+**Reflektion**:
+* Vad är fördelen med att använda en klass istället för att skapa varje objekt med `{}`?
+* Vad händer om du glömmer att skriva `new` framför klassnamnet?
+* Hur liknar en klass en cookie-form och instanserna de kakor som pressas ut?
+
+### Klar!
+Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
+
+</main>
