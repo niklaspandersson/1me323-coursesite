@@ -283,6 +283,11 @@
                 "type": "exercise",
                 "title": "Inkapsling",
                 "link": "../laborationer/4c/"
+              },
+              {
+                "type": "download",
+                "title": "Föreläsning 4: exempel (dagens känslor)",
+                "link": "../downloads/feelings.zip"
               }
             ]
           },
@@ -311,6 +316,26 @@
         "sessions": []
       },
       {
+        "title": "Formulär och felhantering",
+        "sessions": [
+          {
+            "id": "html:form-advanced",
+            "title": "Input-element och formulärhantering",
+            "tasks": []
+          },
+          {
+            "id": "js:form-validation",
+            "title": "Validering",
+            "tasks": []
+          },
+          {
+            "id": "js:error-handling",
+            "title": "Felhantering",
+            "tasks": []
+          }
+        ]
+      },
+      {
         "title": "API och webbtjänster",
         "sessions": [
           {
@@ -325,22 +350,7 @@
           },
           {
             "id": "deadline:assignment-2",
-            "title": "Deadline 2: fredag 27/2 kl. 23:59"
-          }
-        ]
-      },
-      {
-        "title": "Formulär",
-        "sessions": [
-          {
-            "id": "html:form-advanced",
-            "title": "Input-element och formulärhantering",
-            "tasks": []
-          },
-          {
-            "id": "js:form-validation",
-            "title": "Validering",
-            "tasks": []
+            "title": "Deadline 2: fredag 6/3 kl. 23:59"
           }
         ]
       },
