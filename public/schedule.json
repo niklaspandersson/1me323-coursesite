@@ -313,7 +313,89 @@
       },
       {
         "title": "Smått och gott",
-        "sessions": []
+        "sessions": [
+          {
+            "id": "js:array-filter",
+            "title": "Filtrera arrayer",
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Array.filter",
+                "link": "https://javascript.info/array-methods#filter",
+                "note": "Läs avsnittet om filter"
+              },
+              {
+                "type": "reading",
+                "title": "Valfritt: Mer teknisk referens till Array.filter",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+              },
+              {
+                "id": "js:array-filter",
+                "type": "exercise",
+                "title": "Array.filter",
+                "link": "../laborationer/5a/"
+              }
+            ]
+          },
+          {
+            "id": "js:nullish",
+            "title": "Hantering av saknade värden",
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Nullish coalescing-operatorn (??)",
+                "note": "Läs till och med 'Comparison with ||'",
+                "link": "https://javascript.info/nullish-coalescing-operator"
+              },
+              {
+                "type": "reading",
+                "title": "Optional chaining (?.)",
+                "link": "https://javascript.info/optional-chaining"
+              },
+              {
+                "id": "js:nullish",
+                "type": "exercise",
+                "title": "Hantering av saknade värden",
+                "link": "../laborationer/5b/"
+              }
+            ]
+          },
+          {
+            "id": "js:array-map",
+            "title": "Omvandla arrayer",
+            "tasks": [
+              {
+                "type": "reading",
+                "title": "Array.map",
+                "link": "https://javascript.info/array-methods#map",
+                "note": "Läs avsnittet om map"
+              },
+              {
+                "type": "reading",
+                "title": "Valfritt: Mer teknisk referens till Array.map",
+                "link": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+              },
+              {
+                "id": "js:array-map",
+                "type": "exercise",
+                "title": "Array.map",
+                "link": "../laborationer/5c/"
+              }
+            ]
+          },
+          {
+            "id": "git:revert-reset",
+            "title": "Återställa commits med Git",
+            "tasks": [
+              {
+                "id": "git:revert-reset",
+                "type": "exercise",
+                "title": "Återställa commits",
+                "link": "../laborationer/5d/"
+              }
+            ]
+          }
+        ]
       },
       {
         "title": "Formulär och felhantering",

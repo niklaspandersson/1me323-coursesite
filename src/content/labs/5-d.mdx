@@ -1,0 +1,217 @@
+---
+title: Återställa commits med Git
+---
+
+<aside class="first">
+#### Läsanvisning
+* [Pro Git](https://git-scm.com/book/en/v2) (Kapitel 2.4: Undoing Things)
+</aside>
+
+<aside class="first">
+
+#### Syfte
+* Att kunna ångra en commit med `git revert`.
+* Att förstå skillnaden mellan `git revert` och `git reset`.
+* Att kunna använda branches som säkerhetsnät vid `git reset`.
+* Att förstå när man bör använda respektive metod.
+
+</aside>
+
+<main>
+I lab [1b](../1b/) lärde vi oss grunderna i Git — att stagea filer och skapa commits. I lab [1c](../1c/) lärde vi oss att ångra ostageade ändringar och att arbeta med branches. Men vad gör man om man redan har committat något man vill ångra? Kanske skapade du en commit med en bugg, eller så vill du gå tillbaka till ett tidigare tillstånd i projektet.
+
+I denna laboration utforskar vi två kraftfulla verktyg för att hantera commit-historiken: **git revert** och **git reset**.
+
+### 0 - Förberedelser
+Fortsätt arbeta i samma `labs`-repository som du använt i tidigare laborationer. Se till att du är på **main**-branchen.
+
+Vi behöver en tydlig commit-historik att arbeta med. Skapa en ny mapp `5d` med en fil `app.js`:
+
+```javascript
+// Version 1: Grundfunktion
+function greet(name) {
+  return `Hej ${name}!`;
+}
+
+console.log(greet("Världen"));
+```
+
+Stagea och committa med meddelandet: `Lab 5-d: Add greeting function`
+
+Gör sedan följande tre ändringar, en commit per ändring:
+
+**Commit 2** — Lägg till en funktion i `app.js`:
+```javascript
+function farewell(name) {
+  return `Hejdå ${name}!`;
+}
+
+console.log(farewell("Världen"));
+```
+Commit-meddelande: `Add farewell function`
+
+**Commit 3** — Lägg till en funktion som innehåller ett medvetet "fel":
+```javascript
+function multiply(a, b) {
+  return a + b; // Obs: detta är fel! Borde vara a * b
+}
+
+console.log(multiply(3, 4)); // Skriver ut 7 istället för 12
+```
+Commit-meddelande: `Add multiply function`
+
+**Commit 4** — Lägg till en till funktion:
+```javascript
+function divide(a, b) {
+  return a / b;
+}
+
+console.log(divide(10, 2));
+```
+Commit-meddelande: `Add divide function`
+
+Kontrollera i Source Control → Graph att du har fyra commits. Din historik bör se ut ungefär så här (nyaste överst):
+
+```
+* Add divide function
+* Add multiply function
+* Add farewell function
+* Lab 5-d: Add greeting function
+```
+
+### 1 - Granska historiken
+Innan vi ångrar något, låt oss bekanta oss med commit-historiken.
+
+1. Öppna Source Control-panelen och expandera **Graph**.
+2. Klicka på commiten "Add multiply function" i grafen.
+3. Du ser nu vilka filer som ändrades i den commiten, och kan klicka på filnamnet för att se exakt vad som ändrades (diff-vyn).
+
+Varje commit har en unik **commit-hash** — en lång sträng som `a1b2c3d...`. Vi behöver den snart. Du ser den om du klickar på en commit i Graph-panelen.
+
+### 2 - Ångra en commit med git revert
+`git revert` är det säkraste sättet att ångra en commit. Det skapar en **ny commit** som tar bort ändringarna från en specifik commit, utan att röra historiken. Tänk på det som att "lägga till en ändring som tar bort en tidigare ändring".
+
+Vi ska ångra commiten "Add multiply function" (den med buggen) med hjälp av VS Codes Graph.
+
+1. Öppna Source Control-panelen och expandera **Graph**.
+
+2. Högerklicka på commiten **"Add multiply function"** i grafen.
+
+3. Välj **Revert Commit...** från menyn.
+
+4. VS Code skapar nu en ny commit som tar bort ändringarna från "Add multiply function". En editor kan öppnas med ett förifyllt commit-meddelande (t.ex. `Revert "Add multiply function"`). Spara och stäng den.
+
+5. Titta i Graph-panelen — du ser nu en **ny commit** överst:
+```
+* Revert "Add multiply function"
+* Add divide function
+* Add multiply function
+* Add farewell function
+* Lab 5-d: Add greeting function
+```
+
+6. Öppna `app.js` och kontrollera: `multiply`-funktionen är borta, men `divide`-funktionen finns kvar! All annan kod är oförändrad.
+
+#### Varför är git revert säkert?
+
+Det viktiga med `revert` är att ingen historik försvinner. Den ursprungliga commiten "Add multiply function" finns fortfarande kvar i historiken. Vi har bara lagt till en ny commit som gör motsatsen. Det betyder att:
+* Vi kan se exakt vad som hände och varför
+* Om vi ångrar oss kan vi till och med revertera reverten!
+* Det är helt säkert att använda, även om man delar koden med andra
+
+### 3 - Förbered för git reset
+Nu ska vi utforska `git reset`, som fungerar helt annorlunda. Medan `revert` lägger till en ny commit, **flyttar `reset` tillbaka** branch-pekaren till en tidigare commit. De nyare commitsen "försvinner" från branchen.
+
+Eftersom `reset` ändrar historiken vill vi vara försiktiga. Därför skapar vi först en **säkerhetsbranch** — precis som man gör en säkerhetskopia innan man gör något riskfyllt.
+
+1. Se till att du är på **main**-branchen.
+
+2. Skapa en ny branch som heter `backup-main`. Du kan göra detta genom att klicka på branch-namnet längst ner till vänster i VS Code och välja **Create new branch...**.
+
+3. Byt tillbaka till **main** genom att klicka på branch-namnet igen och välja **main**.
+
+Nu har `backup-main` en kopia av hela historiken, inklusive alla commits. Om något går fel med `reset` kan vi alltid gå tillbaka till `backup-main`.
+
+### 4 - Använda git reset
+Vi ska använda `git reset` för att flytta `main`-branchen tillbaka till commiten "Add farewell function" — det vill säga, vi vill ta bort de tre senaste commitsen ("Add multiply function", "Add divide function" och reverten).
+
+Eftersom VS Code inte har en grafisk knapp för `reset` behöver vi använda terminalen denna gång.
+
+1. Öppna terminalen i VS Code (View → Terminal).
+
+2. Först behöver vi ta reda på commit-hashen för "Add farewell function". Skriv:
+```bash
+git log --oneline
+```
+
+Du ser något liknande:
+```
+f4e5d6c Revert "Add multiply function"
+d3c2b1a Add divide function
+b2a1c3d Add multiply function
+a1b2c3d Add farewell function    ← denna vill vi gå tillbaka till
+9f8e7d6 Lab 5-d: Add greeting function
+```
+
+3. Kopiera hashen (de första tecknen räcker, t.ex. `a1b2c3d`) för "Add farewell function".
+
+4. Kör `git reset` med `--hard` flaggan, som återställer både historiken och filerna:
+```bash
+git reset --hard a1b2c3d
+```
+(Ersätt `a1b2c3d` med din faktiska hash.)
+
+5. Titta på resultatet:
+   * I **Graph** ser du att `main` nu pekar på "Add farewell function". De senare commitsen syns inte längre på main.
+   * Öppna `app.js` — bara `greet` och `farewell` finns kvar.
+
+```
+* Add farewell function      ← main är nu här
+* Lab 5-d: Add greeting function
+```
+
+#### Varför är git reset mer riskfyllt?
+
+Till skillnad från `revert` **skriver `reset --hard` om historiken**. De commits som "försvinner" från branchen är borta (om man inte har en backup). Det är därför vi skapade `backup-main` först!
+
+**Tumregel**: Använd `revert` som standard. Använd `reset` bara om du verkligen vill ta bort commits från historiken, och gör alltid en backup-branch först.
+
+### 5 - Återställa från backup
+Nu ska vi bevisa att vår backup fungerar. Låt oss säga att vi ångrar vår `reset` och vill ha tillbaka alla commits.
+
+1. Klicka på branch-namnet längst ner till vänster och byt till **backup-main**.
+
+2. Titta i Graph-panelen. Byt till "All" vyn om den inte redan är aktiv. Du kan nu se att:
+   * **backup-main** har den fulla historiken med alla commits, inklusive "Add divide function" och revert-commiten
+   * **main** stannar vid "Add farewell function"
+
+3. Byt tillbaka till **main**.
+
+Det här visar kraften med branches som säkerhetsnät — även efter en `reset --hard` finns vår fullständiga historik kvar på `backup-main`.
+
+### 6 - Utmaning: Rätt verktyg för rätt situation
+
+Tänk igenom följande scenarion och avgör om du skulle använda `git revert` eller `git reset` (med en backup-branch). Diskutera gärna med en kurskamrat.
+
+1. **Du committade av misstag en `console.log` som inte borde vara med, och har redan gjort fler commits efter det.** Vilken metod passar bäst?
+
+2. **Du har gjort tre commits som alla tillhör ett experiment som du vill skrota helt.** Vilken metod skulle du välja?
+
+3. **Du jobbar i ett team och har delat din branch med andra.** Vilken metod är säkrast?
+
+<details>
+<summary>Diskussionsförslag</summary>
+
+1. **`git revert`** — du vill bara ta bort en specifik ändring utan att röra resten av historiken. De commits som gjorts efter behålls.
+
+2. **`git reset`** (med backup-branch) — du vill helt radera de tre senaste commitsen. Skapa en backup-branch först, sedan `git reset --hard` tillbaka till rätt commit.
+
+3. **Alltid `git revert`** — om andra har hämtat din kod ändrar `reset` historiken på ett sätt som skapar problem för alla andra. `revert` lägger bara till en ny commit, vilket alla kan hantera.
+</details>
+
+**Reflektion**:
+* Vad är den viktigaste skillnaden mellan `git revert` och `git reset`?
+* Varför bör man skapa en backup-branch innan man använder `git reset --hard`?
+* I vilka situationer är det bättre att använda `git revert` istället för `git reset`?
+
+</main>
