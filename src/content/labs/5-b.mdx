@@ -1,0 +1,378 @@
+---
+title: Hantering av saknade värden, null och undefined
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå vad `null` och `undefined` betyder i JavaScript.
+* Att kunna ge default-värden till variabler med `??` (nullish coalescing).
+* Att kunna använda optional chaining (`?.`) för säker åtkomst till nästlade objekt.
+* Att hantera saknade eller odefinierade värden i objekt och API-svar.
+
+</aside>
+
+<main>
+Ibland saknas information. Tänk dig att du hämtar data om en användare och inte alla har angett sin e-postadress, eller att ett API-svar saknar ett visst fält. I dessa situationer ger JavaScript oss värdena `null` och `undefined` — två speciella värden som betyder "inget värde finns här". I den här labben lär vi oss hantera sådana saknade värden på ett säkert och elegant sätt.
+
+### 0 - Förberedelser
+Skapa en ny mapp `5a` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul. Länka gärna in din `global.css` om du har en sådan.
+
+```
+labs/
+├── 1a/
+├── ...
+├── 4d/
+└── 5a/
+    ├── index.html
+    └── main.js
+```
+
+### 1 - null och undefined
+Innan vi tittar på lösningen behöver vi förstå problemet. JavaScript har två olika värden som representerar "inget":
+
+* **`undefined`** — variabeln finns, men har aldrig fått något värde. Det är också vad du får om du försöker läsa en egenskap som inte finns på ett objekt.
+* **`null`** — ett medvetet satt "tomt" värde. Någon har aktivt bestämt att det inte finns något värde här.
+
+**Exempel:**
+```javascript
+const user = {
+  name: "Anna",
+  age: null       // Vi vet att åldern är okänd
+};
+
+console.log(user.name);   // "Anna"
+console.log(user.age);    // null — medvetet satt som "okänd"
+console.log(user.email);  // undefined — egenskapen finns inte alls
+```
+
+Skillnaden är subtil men viktig: `null` betyder "vi vet att det inte finns något värde", medan `undefined` betyder "värdet har aldrig angetts". I praktiken behöver vi ofta hantera båda på samma sätt — vi vill ge ett rimligt ersättningsvärde när något saknas.
+
+#### Övning
+1. Skapa ett objekt `book` med egenskaperna `title` (en sträng), `year` (ett tal) och `isbn` satt till `null`.
+2. Logga `book.title`, `book.isbn` och `book.publisher` till konsolen.
+3. Studera utskriften — vilka värden får du för `isbn` respektive `publisher`? Kan du förklara varför?
+
+### 2 - Nullish coalescing (`??`)
+Nu när vi vet att `null` och `undefined` representerar saknade värden, behöver vi ett sätt att ge **ersättningsvärden** (default-värden) när de dyker upp. Det är precis vad operatorn `??` gör.
+
+`??` (kallas *nullish coalescing*) fungerar så här: om värdet till vänster är `null` eller `undefined` används värdet till höger istället. Annars behålls det vänstra värdet.
+
+**Exempel:**
+```javascript
+const age = null;
+const displayAge = age ?? "Okänd";
+console.log(displayAge); // "Okänd" — age var null, så vi fick ersättningsvärdet
+
+const score = 0;
+const displayScore = score ?? 100;
+console.log(displayScore); // 0 — score var varken null eller undefined, så värdet behålls!
+```
+
+Det sista exemplet är viktigt: `0` är ett fullständigt giltigt värde, och `??` förstår det. Nollan behålls eftersom den inte är `null` eller `undefined`. Samma sak gäller en tom sträng (`""`) eller `false` — dessa är giltiga värden, inte saknade, även om de kan vara "falsy" i andra sammanhang (alltså utvärdera till `false` om de används som villkor).
+
+#### Övning
+1. Skapa tre variabler: `username` med värdet `null`, `level` med värdet `0`, och `bio` med värdet `""` (tom sträng).
+2. Använd `??` för att skapa nya variabler med ersättningsvärden:
+   * `displayName` som ska vara `username ?? "Anonym"`
+   * `displayLevel` som ska vara `level ?? 1`
+   * `displayBio` som ska vara `bio ?? "Ingen bio angiven"`
+3. Logga alla tre till konsolen.
+4. Vilka variabler fick ersättningsvärdet och vilka behöll sitt originalvärde? Förklara varför.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const username = null;
+const level = 0;
+const bio = "";
+
+const displayName = username ?? "Anonym";
+const displayLevel = level ?? 1;
+const displayBio = bio ?? "Ingen bio angiven";
+
+console.log(displayName);  // "Anonym" — username var null
+console.log(displayLevel); // 0 — level var 0, inte null/undefined
+console.log(displayBio);   // "" — bio var en tom sträng, inte null/undefined
+```
+
+Bara `username` fick sitt ersättningsvärde, eftersom det var det enda som var `null`. Både `0` och `""` behålls — de är giltiga värden.
+</details>
+
+### 3 - Använda `??` med objekt
+En av de vanligaste situationerna där `??` behövs är när du arbetar med objekt som kan ha saknade egenskaper. Tänk dig att du bygger en kontaktsida som visar information om personer — men inte alla har angett alla uppgifter.
+
+**Exempel:**
+```javascript
+const contact = {
+  name: "Erik",
+  email: null,
+  // phone saknas helt
+};
+
+const email = contact.email ?? "Ej angiven";    // "Ej angiven" (email är null)
+const phone = contact.phone ?? "Ej angiven";    // "Ej angiven" (phone är undefined)
+const name = contact.name ?? "Okänt namn";      // "Erik" (name finns)
+```
+
+#### Övning
+Du ska bygga en enkel profilvisare som hanterar saknade uppgifter.
+
+1. Skapa en array `profiles` med minst tre objekt. Varje objekt ska ha egenskapen `name`, men de övriga egenskaperna (`email`, `phone`, `city`) ska saknas eller vara `null` på olika sätt. Till exempel:
+   * En profil med alla uppgifter
+   * En profil där `email` är `null` och `city` saknas
+   * En profil som bara har `name`
+2. Skapa en funktion `createProfileCard(profile)` som:
+   * Använder `??` för att ge ersättningsvärdet `"Ej angiven"` till saknade fält.
+   * Skapar och returnerar ett `div`-element med personens information (namn, e-post, telefon, stad).
+3. Loopa igenom arrayen med `for...of` och lägg till varje profilkort i ett container-element i din HTML.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const profiles = [
+  { name: "Anna", email: "anna@example.com", phone: "070-111222", city: "Uppsala" },
+  { name: "Erik", email: null, phone: "073-333444" },
+  { name: "Maria" }
+];
+
+function createProfileCard(profile) {
+  const name = profile.name ?? "Okänt namn";
+  const email = profile.email ?? "Ej angiven";
+  const phone = profile.phone ?? "Ej angiven";
+  const city = profile.city ?? "Ej angiven";
+
+  const card = document.createElement("div");
+  card.classList.add("profile-card");
+
+  const heading = document.createElement("h3");
+  heading.textContent = name;
+
+  const emailP = document.createElement("p");
+  emailP.textContent = `E-post: ${email}`;
+
+  const phoneP = document.createElement("p");
+  phoneP.textContent = `Telefon: ${phone}`;
+
+  const cityP = document.createElement("p");
+  cityP.textContent = `Stad: ${city}`;
+
+  card.append(heading, emailP, phoneP, cityP);
+  return card;
+}
+
+const container = document.getElementById("profiles");
+for (const profile of profiles) {
+  container.append(createProfileCard(profile));
+}
+```
+</details>
+
+### 4 - Optional chaining (`?.`)
+Ibland är det inte bara enstaka egenskaper som saknas — hela delar av ett objekt kan vara `null` eller `undefined`. Om du försöker läsa en egenskap på `null` eller `undefined` kraschar programmet med ett fel.
+
+**Exempel på problemet:**
+```javascript
+const user = {
+  name: "Anna",
+  address: null
+};
+
+// Detta kraschar! Vi försöker läsa .city på null
+// console.log(user.address.city); // TypeError!
+```
+
+**Optional chaining** (`?.`) löser detta. Operatorn `?.` kontrollerar om värdet till vänster är `null` eller `undefined` — och i så fall returneras `undefined` direkt istället för att krascha.
+
+```javascript
+const user = {
+  name: "Anna",
+  address: null
+};
+
+console.log(user.address?.city); // undefined — ingen krasch!
+```
+
+Det riktigt kraftfulla är att vi kan **kombinera `?.` med `??`** för att både navigera säkert och ge ersättningsvärden:
+
+```javascript
+console.log(user.address?.city ?? "Okänd stad"); // "Okänd stad"
+```
+
+Läs det som: "Hämta `user.address.city` om det går, annars ge mig `"Okänd stad"`."
+
+#### Övning
+Nu ska du bygga vidare på din `createProfileCard`-funktion från förra övningen. Byt ut din `profiles`-array mot denna nya version, där profilerna har fått en nästlad egenskap `address` som kan vara ett objekt, `null`, eller saknas helt:
+
+```javascript
+const profiles = [
+  { name: "Anna", email: "anna@example.com", address: { city: "Uppsala", street: "Svartbäcksgatan 12" } },
+  { name: "Erik", email: null, address: { city: "Göteborg" } },
+  { name: "Maria", email: "maria@example.com", address: null },
+  { name: "Johan" }
+];
+```
+
+1. Uppdatera `createProfileCard` så att varje kort även visar **stad** och **gatuadress** från `address`-objektet.
+2. Använd `?.` för att säkert komma åt `address.city` och `address.street` — hela `address` kan ju vara `null` eller saknas.
+3. Kombinera med `??` för att ge ersättningsvärden som `"Okänd stad"` och `"Okänd gatuadress"`.
+4. Testa att alla fyra profiler visas utan krasch.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const profiles = [
+  { name: "Anna", email: "anna@example.com", address: { city: "Uppsala", street: "Svartbäcksgatan 12" } },
+  { name: "Erik", email: null, address: { city: "Göteborg" } },
+  { name: "Maria", email: "maria@example.com", address: null },
+  { name: "Johan" }
+];
+
+function createProfileCard(profile) {
+  const name = profile.name ?? "Okänt namn";
+  const email = profile.email ?? "Ej angiven";
+  const city = profile.address?.city ?? "Okänd stad";
+  const street = profile.address?.street ?? "Okänd gatuadress";
+
+  const card = document.createElement("div");
+  card.classList.add("profile-card");
+
+  const heading = document.createElement("h3");
+  heading.textContent = name;
+
+  const emailP = document.createElement("p");
+  emailP.textContent = `E-post: ${email}`;
+
+  const cityP = document.createElement("p");
+  cityP.textContent = `Stad: ${city}`;
+
+  const streetP = document.createElement("p");
+  streetP.textContent = `Adress: ${street}`;
+
+  card.append(heading, emailP, cityP, streetP);
+  return card;
+}
+
+const container = document.getElementById("profiles");
+for (const profile of profiles) {
+  container.append(createProfileCard(profile));
+}
+```
+
+Notera att `profile.address?.city` är nödvändigt — utan `?.` hade koden kraschat för Maria (där `address` är `null`) och Johan (där `address` är `undefined`). Enbart `??` hade inte räckt här, eftersom vi måste navigera *genom* `address` för att nå `city`.
+</details>
+
+### 5 - Utmaning: Väderprognos
+Du har fått väderdata från ett API, men som ofta händer med verklig data saknas vissa värden. Din uppgift är att visa en snygg väderprognos på sidan som hanterar alla saknade värden.
+
+#### Data
+Kopiera denna array till din `main.js`:
+
+```javascript
+const forecasts = [
+  {
+    city: "Stockholm",
+    temperature: 12,
+    description: "Växlande molnighet",
+    wind: { speed: 5, direction: "SV" },
+    precipitation: 0
+  },
+  {
+    city: "Göteborg",
+    temperature: null,
+    description: "Regn",
+    wind: { speed: 12, direction: null },
+    precipitation: 8
+  },
+  {
+    city: "Malmö",
+    temperature: 15,
+    description: null,
+    wind: null,
+    precipitation: null
+  },
+  {
+    city: "Kiruna",
+    temperature: -3,
+    wind: { speed: 2 }
+  },
+  {
+    city: null,
+    temperature: 9,
+    description: "Soligt",
+    wind: { speed: 0, direction: "N" },
+    precipitation: 0
+  }
+];
+```
+
+#### Uppgift
+1. Skapa en funktion `createForecastCard(forecast)` som tar emot ett prognosobjekt och returnerar ett HTML-element. Funktionen ska hantera alla saknade värden med `??` och `?.`:
+   * Temperaturen i formatet `"X°C"` (eller `"Temperatur saknas"`)
+   * Beskrivning av vädret (eller `"Ingen prognos"`)
+   * Vindhastighet och vindriktning (använd `?.` eftersom hela `wind`-objektet kan vara `null`)
+   * Nederbörd i mm (eller `"Ingen data"`)
+2. Innan vi skapar korten, filtrera bort alla prognoser där `city` är `null` eller `undefined` — det är onödigt att visa prognoser där orten är inte känd. Se lab [5a](../5a/) för att repetera hur `filter()` fungerar.
+2. Loopa igenom den filtrerade listan och visa alla väderkort i ett container-element.
+
+Tänk igenom: vilka egenskaper kräver `?.` (för att undvika krasch) och vilka klarar sig med bara `??`?
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+function createForecastCard(forecast) {
+  const city = forecast.city;
+  const temp = forecast.temperature ?? "Okänd temperatur";
+  const description = forecast.description ?? "Ingen prognos";
+  const windSpeed = forecast.wind?.speed ?? null;
+  const windDir = forecast.wind?.direction ?? "okänd riktning";
+  const precip = forecast.precipitation;
+
+  const card = document.createElement("div");
+  card.classList.add("forecast-card");
+
+  const heading = document.createElement("h3");
+  heading.textContent = city;
+
+  const tempP = document.createElement("p");
+  tempP.textContent = temp !== null && temp !== undefined
+    ? `Temperatur: ${temp}°C`
+    : "Temperatur saknas";
+
+  const descP = document.createElement("p");
+  descP.textContent = description;
+
+  const windP = document.createElement("p");
+  windP.textContent = windSpeed !== null
+    ? `Vind: ${windSpeed} m/s (${windDir})`
+    : "Vinddata saknas";
+
+  const precipP = document.createElement("p");
+  precipP.textContent = precip !== null && precip !== undefined
+    ? `Nederbörd: ${precip} mm`
+    : "Nederbörd: Ingen data";
+
+  card.append(heading, tempP, descP, windP, precipP);
+  return card;
+}
+
+const container = document.getElementById("forecasts");
+for (const forecast of forecasts) {
+  container.append(createForecastCard(forecast));
+}
+```
+</details>
+
+**Reflektion**:
+* Vad är skillnaden mellan `null` och `undefined`?
+* Varför är `??` bättre än att kontrollera `if (value === null || value === undefined)` varje gång?
+* I vilka situationer behöver du `?.` (optional chaining) utöver `??`?
+
+### Klar!
+Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
+
+</main>

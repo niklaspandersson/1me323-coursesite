@@ -63,14 +63,12 @@ console.log("Första > 1000:", impossible); // undefined
 ```javascript
 const fruits = ["äpple", "banan", "citron", "druva", "eldorado-äpple"];
 
-const longFruit = fruits.find(fruit => fruit.length > 5);
-console.log(longFruit); // "eldorado-äpple"... eller "banan"?
+const longFruit = fruits.find(fruit => fruit.length > 6);
+console.log(longFruit); // "eldorado-äpple"
 ```
 
-**Testa själv**: Varför returnerar koden ovan `"banan"` och inte `"eldorado-äpple"`? Ändra villkoret så att du hittar det första ordet som är längre än 6 tecken.
-
 #### Övning
-1. Skapa en array med namn på 6–8 städer.
+1. Skapa en array med namn på 6-8 städer.
 2. Använd `find()` för att hitta den första staden som börjar med bokstaven "S" (tips: använd `startsWith()`).
 3. Använd `find()` för att hitta den första staden som innehåller bokstaven "ö" (tips: använd `includes()`).
 

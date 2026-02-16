@@ -1,0 +1,306 @@
+---
+title: Array.filter
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå hur `Array.filter()` fungerar.
+* Att kunna filtrera arrayer baserat på villkor.
+* Att kunna kombinera `filter()` med objekt för att söka och filtrera data.
+
+</aside>
+
+<main>
+I förra labben använde vi `find()` för att hitta **ett enda** element i en array. Men ofta behöver vi hitta **alla** element som uppfyller ett villkor — till exempel alla produkter under ett visst pris, alla studenter som klarat ett prov, eller alla städer i en viss region. Det är precis vad `Array.filter()` gör: den skapar en **ny array** som bara innehåller de element som matchar villkoret.
+
+### 0 - Förberedelser
+Skapa en ny mapp `5a` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul. Länka gärna in din `global.css` om du har en sådan.
+
+```
+labs/
+├── 1a/
+├── ...
+└── 5a/
+    ├── index.html
+    └── main.js
+```
+
+### 1 - Grunderna i filter
+`filter()` fungerar på samma sätt som `find()` — den tar emot en callback-funktion som anropas för varje element i arrayen. Callbacken ska returnera `true` eller `false`. Skillnaden är att `filter()` inte stannar vid det första elementet som matchar, utan samlar **alla** matchande element i en ny array.
+
+**Exempel:**
+```javascript
+const numbers = [3, 7, 12, 5, 18, 2, 15, 9];
+
+const bigNumbers = numbers.filter((n) => n > 10);
+console.log(bigNumbers); // [12, 18, 15]
+```
+
+Callbacken `n => n > 10` testas för varje element. De element som ger `true` (12, 18 och 15) hamnar i den nya arrayen. Den ursprungliga arrayen `numbers` är **oförändrad** — `filter()` skapar alltid en helt ny array.
+
+Om inget element matchar villkoret returneras en tom array `[]`, inte `undefined` som `find()`:
+
+```javascript
+const huge = numbers.filter((n) => n > 100);
+console.log(huge); // [] — tom array, inga fel
+```
+
+#### Övning
+1. Skapa en array med minst 10 tal (blanda positiva, negativa och noll).
+2. Använd `filter()` för att skapa en ny array med bara de **positiva** talen.
+3. Använd `filter()` för att skapa en ny array med bara de **jämna** talen (tips: jämna tal uppfyller villkoret: `n % 2 === 0` dvs "n delat med 2 ger ingen rest").
+4. Logga originalarray och de nya arrayerna till konsolen.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const numbers = [4, -2, 7, 0, -5, 12, 3, -8, 6, 1];
+
+const positive = numbers.filter(n => n > 0);
+console.log("Positiva:", positive); // [4, 7, 12, 3, 6, 1]
+
+const even = numbers.filter(n => n % 2 === 0);
+console.log("Jämna:", even); // [4, -2, 0, 12, -8, 6]
+
+console.log("Original:", numbers); // Oförändrad!
+```
+</details>
+
+### 2 - Filtrera strängar
+`filter()` fungerar med alla typer av värden. Med strängar kan vi kombinera den med strängmetoder som `startsWith()`, `includes()` och `length` för att filtrera på olika sätt.
+
+**Exempel:**
+```javascript
+const words = ["sol", "stjärna", "moln", "snö", "storm", "regn"];
+
+const sWords = words.filter(word => word.startsWith("s"));
+console.log(sWords); // ["sol", "stjärna", "snö", "storm"]
+```
+
+#### Övning
+1. Skapa en array med namn på 8-10 djur.
+2. Använd `filter()` för att skapa en ny array med alla djur vars namn är **längre än 5 tecken**.
+3. Använd `filter()` för att skapa en ny array med alla djur vars namn **innehåller bokstaven "a"**.
+4. Logga resultaten.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const animals = ["katt", "häst", "elefant", "mus", "flodhäst", "orm", "papegoja", "igelkott"];
+
+const longNames = animals.filter(animal => animal.length > 5);
+console.log("Långa namn:", longNames); // ["elefant", "flodhäst", "papegoja", "igelkott"]
+
+const withA = animals.filter(animal => animal.includes("a"));
+console.log("Innehåller a:", withA); // ["katt", "papegoja"]
+```
+</details>
+
+### 3 - Filtrera objekt
+Den vanligaste användningen av `filter()` är att filtrera arrayer av objekt. Tänk dig en produktlista, en lista med elever eller en samling filmer — med `filter()` kan vi snabbt plocka ut precis de objekt vi vill visa.
+
+**Exempel:**
+```javascript
+const products = [
+  { name: "Kaffe", price: 49, inStock: true },
+  { name: "Te", price: 39, inStock: false },
+  { name: "Juice", price: 29, inStock: true },
+  { name: "Smoothie", price: 59, inStock: true },
+  { name: "Vatten", price: 15, inStock: false }
+];
+
+const available = products.filter(p => p.inStock);
+console.log(available);
+// [{ name: "Kaffe", ... }, { name: "Juice", ... }, { name: "Smoothie", ... }]
+
+const affordable = products.filter(p => p.price < 40);
+console.log(affordable);
+// [{ name: "Te", ... }, { name: "Juice", ... }, { name: "Vatten", ... }]
+```
+
+#### Övning
+1. Skapa en array med minst 6 objekt som representerar elever. Varje elev ska ha: `name`, `age` och `grade` (betyg, 0–100).
+2. Använd `filter()` för att skapa en ny array med alla elever som har **godkänt** (betyg 50 eller högre).
+3. Använd `filter()` för att skapa en ny array med alla elever som är **under 20 år**.
+4. Logga ut respektive antal till konsolen (tips: den filtrerade arrayens `.length`).
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const students = [
+  { name: "Alice", age: 19, grade: 82 },
+  { name: "Bob", age: 22, grade: 45 },
+  { name: "Charlie", age: 18, grade: 91 },
+  { name: "Diana", age: 20, grade: 38 },
+  { name: "Erik", age: 19, grade: 67 },
+  { name: "Fiona", age: 23, grade: 55 }
+];
+
+const passed = students.filter(s => s.grade >= 50);
+console.log("Godkända:", passed.length); // 4
+
+const young = students.filter(s => s.age < 20);
+console.log("Under 20:", young); // Alice, Charlie, Erik
+
+const failed = students.filter(s => s.grade < 50);
+console.log("Underkända:", failed.length); // 2
+```
+</details>
+
+### 4 - Filtrera och visa på sidan
+En vanlig situation i webbutveckling är att filtrera data och visa resultatet i HTML. Låt oss kombinera `filter()` med DOM-manipulation.
+
+#### Övning
+1. Skapa en array med minst 8 objekt som representerar filmer. Varje film ska ha: `title`, `year`, `genre` och `rating` (1-10).
+2. Skapa en funktion `displayMovies(movies)` som tar emot en array av filmer och visar dem som en lista i ett container-element i din HTML. Funktionen ska först **tömma** containern (så att gammal data försvinner) och sedan skapa nya element för varje film.
+3. Använd `filter()` för att skapa tre olika filtrerade listor:
+   * Alla filmer med betyg 7 eller högre
+   * Alla filmer i en viss genre (t.ex. `"Action"`)
+   * Alla filmer från 2000-talet (year >= 2000)
+4. Skapa tre knappar i din HTML. Varje knapp ska, vid klick, filtrera filmerna och anropa `displayMovies()` med rätt filtrerad lista.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```html
+<!-- I index.html -->
+<button id="btn-top">Toppbetyg (7+)</button>
+<button id="btn-action">Action</button>
+<button id="btn-modern">2000-talet</button>
+<div id="movies"></div>
+```
+
+```javascript
+const movies = [
+  { title: "Inception", year: 2010, genre: "Action", rating: 9 },
+  { title: "The Godfather", year: 1972, genre: "Drama", rating: 9 },
+  { title: "Toy Story", year: 1995, genre: "Animation", rating: 8 },
+  { title: "Die Hard", year: 1988, genre: "Action", rating: 7 },
+  { title: "Frozen", year: 2013, genre: "Animation", rating: 6 },
+  { title: "Mad Max: Fury Road", year: 2015, genre: "Action", rating: 8 },
+  { title: "The Room", year: 2003, genre: "Drama", rating: 3 },
+  { title: "Interstellar", year: 2014, genre: "Drama", rating: 8 }
+];
+
+const container = document.getElementById("movies");
+
+function displayMovies(movieList) {
+  container.innerHTML = "";
+
+  for (const movie of movieList) {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <h3>${movie.title} (${movie.year})</h3>
+      <p>${movie.genre} — ${movie.rating}/10</p>
+    `;
+    container.append(div);
+  }
+}
+
+document.getElementById("btn-top").addEventListener("click", () => {
+  const topRated = movies.filter(m => m.rating >= 7);
+  displayMovies(topRated);
+});
+
+document.getElementById("btn-action").addEventListener("click", () => {
+  const actionMovies = movies.filter(m => m.genre === "Action");
+  displayMovies(actionMovies);
+});
+
+document.getElementById("btn-modern").addEventListener("click", () => {
+  const modernMovies = movies.filter(m => m.year >= 2000);
+  displayMovies(modernMovies);
+});
+
+// Visa alla filmer från start
+displayMovies(movies);
+```
+</details>
+
+### 5 - Utmaning: Sökfunktion
+Bygg en enkel sökfunktion som filtrerar en lista i realtid medan användaren skriver.
+
+#### Uppgift
+1. Skapa en array med minst 10 objekt som representerar kontakter. Varje kontakt ska ha `name`, `email` och `city`.
+2. Skapa ett sökfält (`<input>`) och en container i din HTML.
+3. Lyssna på `"input"`-händelsen på sökfältet. Varje gång användaren skriver något ska du:
+   * Hämta söktexten från fältet (gör den till gemener med `.toLowerCase()` för att sökningen ska vara skiftlägesokänslig).
+   * Filtrera kontakterna — en kontakt ska matcha om **namn**, **e-post** eller **stad** innehåller söktexten.
+   * Visa de matchande kontakterna i containern.
+4. Om sökfältet är tomt ska alla kontakter visas.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```html
+<!-- I index.html -->
+<input type="text" id="search" placeholder="Sök kontakter...">
+<div id="contacts"></div>
+```
+
+```javascript
+const contacts = [
+  { name: "Anna Andersson", email: "anna@example.com", city: "Stockholm" },
+  { name: "Erik Eriksson", email: "erik@gmail.com", city: "Göteborg" },
+  { name: "Maria Svensson", email: "maria@example.com", city: "Malmö" },
+  { name: "Johan Berg", email: "johan@hotmail.com", city: "Uppsala" },
+  { name: "Lisa Holm", email: "lisa@gmail.com", city: "Stockholm" },
+  { name: "Oscar Nilsson", email: "oscar@example.com", city: "Linköping" },
+  { name: "Klara Johansson", email: "klara@gmail.com", city: "Göteborg" },
+  { name: "David Lundgren", email: "david@example.com", city: "Malmö" },
+  { name: "Sara Blom", email: "sara@hotmail.com", city: "Lund" },
+  { name: "Nils Ekström", email: "nils@example.com", city: "Stockholm" }
+];
+
+const container = document.getElementById("contacts");
+const searchInput = document.getElementById("search");
+
+function displayContacts(list) {
+  container.innerHTML = "";
+
+  for (const contact of list) {
+    const div = document.createElement("div");
+    const heading = document.createElement("h3");
+    heading.textContent = contact.name;
+
+    const emailP = document.createElement("p");
+    emailP.textContent = contact.email;
+
+    const cityP = document.createElement("p");
+    cityP.textContent = contact.city;
+
+    div.append(heading, emailP, cityP);
+    container.append(div);
+  }
+}
+
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.toLowerCase();
+
+  const filtered = contacts.filter(contact => {
+    return contact.name.toLowerCase().includes(query)
+      || contact.email.toLowerCase().includes(query)
+      || contact.city.toLowerCase().includes(query);
+  });
+
+  displayContacts(filtered);
+});
+
+// Visa alla kontakter från start
+displayContacts(contacts);
+```
+</details>
+
+**Reflektion**:
+* Vad är skillnaden mellan `find()` och `filter()`? När använder du vilken?
+* Vad returnerar `filter()` om inga element matchar villkoret?
+* Varför är det bra att `filter()` skapar en **ny** array istället för att ändra den ursprungliga?
+
+### Klar!
+Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
+
+</main>

@@ -1,0 +1,254 @@
+---
+title: Array.map
+---
+
+<aside class="first">
+
+#### Syfte
+* Att förstå hur `Array.map()` fungerar.
+* Att kunna omvandla (transformera) data med `map()`.
+* Att kunna kombinera `map()` med `filter()` för att bearbeta data i flera steg.
+
+</aside>
+
+<main>
+Ofta behöver vi **omvandla** varje element till något nytt. Kanske vill vi beräkna priset inklusive moms för varje produkt, extrahera bara namnen ur en lista av objekt eller skapa ett html-element att lägga till i DOM:en för varje objekt. `Array.map()` skapar en **ny array** där varje element har omvandlats enligt en funktion vi anger.
+
+### 0 - Förberedelser
+Skapa en ny mapp `5c` i din `labs`-mapp med `index.html` och `main.js`. Länka in JavaScript-filen som en modul. Länka gärna in din `global.css` om du har en sådan.
+
+```
+labs/
+├── 1a/
+├── ...
+├── 5b/
+└── 5c/
+    ├── index.html
+    └── main.js
+```
+
+### 1 - Grunderna i map
+`map()` anropar en callback-funktion för varje element i arrayen, precis som `filter()`. Men istället för att bestämma vilka element som ska vara med, bestämmer callbacken **vad varje element ska bli**. Det värde som callbacken returnerar hamnar i den nya arrayen.
+
+**Exempel:**
+```javascript
+const numbers = [1, 2, 3, 4, 5];
+
+const doubled = numbers.map(n => n * 2);
+console.log(doubled); // [2, 4, 6, 8, 10]
+```
+
+Callbacken `n => n * 2` anropas för varje element. Talet 1 blir 2, talet 2 blir 4, och så vidare. Den ursprungliga arrayen `numbers` är **oförändrad** — `map()` skapar alltid en helt ny array.
+
+En viktig skillnad mot `filter()`: den nya arrayen har **alltid samma antal element** som originalet. `filter()` kan ge färre element, men `map()` omvandlar varje element 1-till-1.
+
+#### Övning
+1. Skapa en array med minst 6 tal.
+2. Använd `map()` för att skapa en ny array där varje tal har **kvadrerats** (multiplicerats med sig själv).
+3. Använd `map()` för att skapa en ny array med varje tal **som en sträng** i formatet `"Tal: X"` (tips: använd en template-sträng).
+4. Logga alla tre arrayer.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const numbers = [3, 7, 1, 9, 4, 6];
+
+const squared = numbers.map(n => n * n);
+console.log("Kvadrerade:", squared); // [9, 49, 1, 81, 16, 36]
+
+const labels = numbers.map(n => `Tal: ${n}`);
+console.log("Etiketter:", labels); // ["Tal: 3", "Tal: 7", ...]
+
+console.log("Original:", numbers); // Oförändrad!
+```
+</details>
+
+### 2 - map med strängar
+`map()` är användbar för att omvandla strängar — till exempel göra dem till versaler, lägga till prefix, eller extrahera delar av dem.
+
+**Exempel:**
+```javascript
+const names = ["anna", "erik", "maria"];
+
+const capitalized = names.map(name => name[0].toUpperCase() + name.slice(1));
+console.log(capitalized); // ["Anna", "Erik", "Maria"]
+```
+
+Här tar vi första bokstaven (`name[0]`), gör den till versal, och lägger till resten av strängen (`name.slice(1)`).
+
+#### Övning
+1. Skapa en array med 6-8 ord i gemener (t.ex. djur, frukter eller städer).
+2. Använd `map()` för att skapa en ny array där alla ord är i **VERSALER** (tips: `.toUpperCase()`).
+3. Använd `map()` för att skapa en ny array där varje ord har fått sitt **antal tecken** tillagt, i formatet `"ord (X tecken)"`.
+4. Logga resultaten.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const fruits = ["äpple", "banan", "citron", "druva", "fikon", "mango"];
+
+const upper = fruits.map(fruit => fruit.toUpperCase());
+console.log("Versaler:", upper); // ["ÄPPLE", "BANAN", ...]
+
+const withLength = fruits.map(fruit => `${fruit} (${fruit.length} tecken)`);
+console.log("Med längd:", withLength); // ["äpple (5 tecken)", "banan (5 tecken)", ...]
+```
+</details>
+
+### 3 - map med objekt
+En av de vanligaste användningarna av `map()` är att omvandla objekt — plocka ut vissa egenskaper, beräkna nya värden, eller ändra formen på datan. Till exempel kan du ha en array med produktobjekt och vilja skapa en ny array med bara namnen, eller beräkna priset inklusive moms.
+
+**Exempel:**
+```javascript
+const products = [
+  { name: "Kaffe", price: 49 },
+  { name: "Te", price: 39 },
+  { name: "Juice", price: 29 }
+];
+
+// Plocka ut bara namnen
+const names = products.map(p => p.name);
+console.log(names); // ["Kaffe", "Te", "Juice"]
+
+// Skapa nya objekt med moms
+const withVAT = products.map(p => {
+  return {
+    name: p.name,
+    price: p.price,
+    priceWithVAT: p.price * 1.25
+  };
+});
+console.log(withVAT);
+// [{ name: "Kaffe", price: 49, priceWithVAT: 61.25 }, ...]
+```
+
+#### Övning
+1. Skapa en array med minst 5 objekt som representerar böcker. Varje bok ska ha `title`, `author` och `pages`.
+2. Använd `map()` för att skapa en ny array med bara **titlarna** (en array av strängar).
+3. Använd `map()` för att skapa en ny array med **nya objekt** som har egenskaperna `title` och `readingTime` (beräknat som `pages / 30`, avrundat uppåt med `Math.ceil()` — antagandet är 30 sidor per timme).
+4. Logga resultaten.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const books = [
+  { title: "1984", author: "George Orwell", pages: 328 },
+  { title: "Dune", author: "Frank Herbert", pages: 412 },
+  { title: "Frankenstein", author: "Mary Shelley", pages: 280 },
+  { title: "Neuromancer", author: "William Gibson", pages: 271 },
+  { title: "The Road", author: "Cormac McCarthy", pages: 287 }
+];
+
+const titles = books.map(book => book.title);
+console.log("Titlar:", titles);
+// ["1984", "Dune", "Frankenstein", "Neuromancer", "The Road"]
+
+const readingTimes = books.map(book => ({
+  title: book.title,
+  readingTime: Math.ceil(book.pages / 30)
+}));
+console.log("Lästider:", readingTimes);
+// [{ title: "1984", readingTime: 11 }, { title: "Dune", readingTime: 14 }, ...]
+```
+</details>
+
+### 4 - Kombinera map och filter
+Den verkliga kraften visar sig när vi **kedjar** (chains) `map()` och `filter()` efter varandra. Eftersom båda returnerar nya arrayer kan vi anropa den ena direkt på resultatet av den andra.
+
+**Exempel:**
+```javascript
+const students = [
+  { name: "Alice", grade: 82 },
+  { name: "Bob", grade: 45 },
+  { name: "Charlie", grade: 91 },
+  { name: "Diana", grade: 38 }
+];
+
+// Först filtrera ut godkända, sedan omvandla till strängar
+const passedNames = students
+  .filter(s => s.grade >= 50)
+  .map(s => `${s.name} (${s.grade} poäng)`);
+
+console.log(passedNames); // ["Alice (82 poäng)", "Charlie (91 poäng)"]
+```
+
+Ordningen spelar roll: först filtrerar vi bort de vi inte vill ha, sedan omvandlar vi de som är kvar.
+
+#### Övning
+Kolsvala djurparken behöver hjälp med sin hemsida. De har en array med alla sina djur och vill visa informationen på olika sätt.
+
+1. Kopiera denna array till din `main.js`:
+
+```javascript
+const animals = [
+  { name: "Gösta", species: "Pingvin", age: 4, weight: 5, habitat: "Arktis" },
+  { name: "Barbro", species: "Elefant", age: 32, weight: 4200, habitat: "Savann" },
+  { name: "Sansen", species: "Papegoja", age: 67, weight: 1, habitat: "Regnskog" },
+  { name: "Doris", species: "Sköldpadda", age: 104, weight: 80, habitat: "Savann" },
+  { name: "Bengt-Åke", species: "Pingvin", age: 2, weight: 4, habitat: "Arktis" },
+  { name: "Sigrid", species: "Flodhäst", age: 18, weight: 1800, habitat: "Savann" },
+  { name: "Margit", species: "Papegoja", age: 12, weight: 1, habitat: "Regnskog" },
+  { name: "Knansen", species: "Krokodil", age: 45, weight: 450, habitat: "Regnskog" }
+];
+```
+
+2. Använd `filter()` och `map()` i kombination för att:
+   * Plocka ut **namnen** på alla djur som bor i `"Savann"`.
+   * Skapa en array med strängar i formatet `"Gösta (Pingvin, 4 år)"` för alla djur som väger **under 10 kg** (de små djuren).
+   * Skapa en array med **skyltar** för djur äldre än 20 år — strängar i formatet `"🏆 Doris, Sköldpadda — 104 år"`.
+3. Visa alla tre listor på din HTML-sida med lämpliga rubriker.
+
+<details>
+<summary>Lösningsförslag</summary>
+
+```javascript
+const savannNames = animals
+  .filter(a => a.habitat === "Savann")
+  .map(a => a.name);
+console.log("Savann:", savannNames); // ["Barbro", "Doris", "Sigrid"]
+
+const smallAnimals = animals
+  .filter(a => a.weight < 10)
+  .map(a => `${a.name} (${a.species}, ${a.age} år)`);
+console.log("Små djur:", smallAnimals);
+
+const veteranSigns = animals
+  .filter(a => a.age > 20)
+  .map(a => `🏆 ${a.name}, ${a.species} — ${a.age} år`);
+console.log("Veteraner:", veteranSigns);
+
+// Visa på sidan
+const container = document.getElementById("results");
+
+function addSection(title, items) {
+  const heading = document.createElement("h2");
+  heading.textContent = title;
+  container.append(heading);
+
+  const list = document.createElement("ul");
+  for (const item of items) {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.append(li);
+  }
+  container.append(list);
+}
+
+addSection("Djur i savannen", savannNames);
+addSection("Små djur (under 10 kg)", smallAnimals);
+addSection("Veteraner (över 20 år)", veteranSigns);
+```
+</details>
+
+**Reflektion**:
+* Vad är skillnaden mellan `map()` och `filter()`? Kan du förklara med en mening vardera?
+* Varför är det användbart att kedja `filter()` och `map()` tillsammans?
+* Vad hade hänt om du bara använt `map()` utan `filter()` — hur hade du kunnat lösa samma problem?
+
+### Klar!
+Glöm inte att uppdatera startsidan i ditt labbprojekt med länk till denna labb.
+
+</main>
