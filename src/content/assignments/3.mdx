@@ -469,6 +469,60 @@ Matchen sker alltså i *två steg* — först utmattning, sedan duell — vilket
 * Implementera en runda i taget. Få kvartsfinalen att fungera helt innan du går vidare till semifinalen.
 * Testa `localStorage` tidigt — det är lättare att bygga in från början än att lägga till i efterhand.
 
+<details>
+<summary><strong>CSS-hjälp: Bracket-layout</strong> — Så placerar du matcherna i ett utslagsträd</summary>
+
+Tricket för en bracket-layout är att hela bracketen är en **flexbox-rad** (en kolumn per runda), och varje runda är en **flexbox-kolumn** med `justify-content: space-around`. Eftersom varje runda har hälften så många matcher som den förra, centreras matcherna automatiskt mittemot sina "föräldra-matcher".
+
+**HTML-strukturen** ser ut ungefär så här:
+
+```html
+<div class="bracket">
+  <div class="round">          <!-- Kvartsfinal: 4 matcher -->
+    <div class="match">...</div>
+    <div class="match">...</div>
+    <div class="match">...</div>
+    <div class="match">...</div>
+  </div>
+  <div class="round">          <!-- Semifinal: 2 matcher -->
+    <div class="match">...</div>
+    <div class="match">...</div>
+  </div>
+  <div class="round">          <!-- Final: 1 match -->
+    <div class="match">...</div>
+  </div>
+</div>
+```
+
+**CSS:**
+
+```css
+.bracket {
+  display: flex;
+  gap: 2rem;
+  min-height: 600px;  /* Fast höjd behövs — annars har inte rundorna utrymme att fördela sig i */
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;  /* Matcherna fördelas jämnt — det här är hela magin */
+  min-width: 250px;
+  gap: 1rem;
+}
+
+.match {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+}
+```
+
+Nyckeln är att `.bracket` har en fast höjd och att varje `.round` fyller hela den höjden. `space-around` fördelar matcherna jämnt — så semifinalens 2 matcher hamnar exakt mittemot kvartsfinalens 4 matcher, och finalen centreras mittemot semifinalens 2.
+
+Du kommer sedan vilja styla `.match` mer (bilder, namn, stats, vinnare-markering), men **ovanstående räcker för att få den visuella bracket-strukturen på plats**.
+</details>
+
 ### Versionshantering
 
 * Commita och pusha till GitHub regelbundet.
