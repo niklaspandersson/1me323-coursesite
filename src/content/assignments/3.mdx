@@ -385,33 +385,41 @@ Varje deltagare i JSON-datan är ett vanligt objekt — det behövs ingen klass 
 * Försök komma på en egen algoritm! Tänk på: hur räknar du ut vem som är "starkare"? Hur gör du så att slumpen fortfarande spelar roll?
 
 <details>
-<summary><strong>Exempelimplementation</strong> — Kika här om du kör fast</summary>
+<summary><strong>Exempelimplementation (Robotarenan)</strong> — Kika här om du kör fast</summary>
 
-Här är **ett** sätt att lösa det på. Du får använda denna lösning, men försök gärna hitta på en egen variant.
+Här är **ett** sätt att lösa det på med robottema. Du får använda denna lösning, men försök gärna hitta på en egen variant som passar ditt tema.
+
+Idén: Först avgörs vilken robot som tröttnar snabbast genom att jämföra **snabbhet mot batteri** — en snabb robot med dåligt batteri sliter ut sig. Den utmattningsfaktorn påverkar sedan huvudduellen: **pansar mot eldkraft**.
 
 ```js
 compete () {
-  // Beräkna totalstyrka för varje deltagare.
-  // Om en stat är null, använd 5 som standardvärde.
-  const statsA = Object.values(this.#contestantA.stats)
-  const statsB = Object.values(this.#contestantB.stats)
+  const a = this.#contestantA.stats
+  const b = this.#contestantB.stats
 
-  const totalA = statsA.reduce((sum, val) => sum + (val ?? 5), 0)
-  const totalB = statsB.reduce((sum, val) => sum + (val ?? 5), 0)
+  // Steg 1: Utmattning — snabbhet kostar batteri.
+  // En snabb robot med svagt batteri tröttnar fortare.
+  const fatigueA = (a.agility ?? 5) - (a.battery ?? 5)
+  const fatigueB = (b.agility ?? 5) - (b.battery ?? 5)
 
-  // Räkna ut sannolikheten att deltagare A vinner.
-  // Om A har 30 och B har 20 → A vinner med 60% sannolikhet.
-  const chanceA = totalA / (totalA + totalB)
+  // Steg 2: Stridsvärde — eldkraft mot motståndarens pansar.
+  // Draget minskas av utmattning (en trött robot slåss sämre).
+  const attackA = (a.firepower ?? 5) - (b.armor ?? 5) * 0.5 - fatigueA
+  const attackB = (b.firepower ?? 5) - (a.armor ?? 5) * 0.5 - fatigueB
 
-  // Slumpa och jämför med sannolikheten.
+  // Steg 3: Omvandla till en sannolikhet mellan 0 och 1.
+  // Skillnaden skalas ned så att även en svagare robot har chans.
+  const advantage = (attackA - attackB) / 10
+  const chanceA = 0.5 + advantage  // t.ex. 0.65 om A har ett övertag
+
+  // Steg 4: Slumpen avgör!
   const roll = Math.random()
-
   this.#winner = roll < chanceA ? this.#contestantA : this.#contestantB
+
   return this.#winner
 }
 ```
 
-Algoritmen ger den starkare deltagaren en fördel, men aldrig en garanti. Även en deltagare med lägre stats kan vinna — precis som i en riktig turnering.
+Matchen sker alltså i *två steg* — först utmattning, sedan strid — vilket gör att alla fyra stats spelar roll. Men `Math.random()` avgör i slutändan, så även en underdog kan vinna.
 </details>
 
 #### Turneringsflöde
