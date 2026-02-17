@@ -1,0 +1,537 @@
+---
+title: Uppgift 3 - Turneringsgeneratorn
+---
+
+<aside class="first">
+### Redovisning
+* **Deadline**: TBD
+* **Inlämning**: TBD
+</aside>
+
+<main>
+
+I denna uppgift ska du bygga en turneringsapplikation där deltagare tävlar mot varandra i ett utslagssystem. Deltagardata hämtas från en JSON-fil med `fetch`, modelleras med JavaScript-klasser, och en visuell turnering renderas dynamiskt med `createElement()`. Användaren driver turneringen framåt genom att simulera matcher.
+
+### Förberedelser
+
+Skapa en ny mapp `assignment3` i din `assignments`-mapp.
+
+```
+assignments/
+├── ...
+└── assignment3/
+```
+
+* Lägg in information om uppgiften i datastrukturen i `assignments.js` så att den visas på startsidan.
+
+### Välj ett tema
+
+Välj **ett** tema för din turnering och använd det färdiga datasetet nedan. Du får även hitta på ett eget tema, men deltagarna ska ha **minst fyra numeriska stats** och minst 2 deltagare med ofullständig data.
+
+Bilderna i dataseten är platshållare — du behöver hitta eller skapa egna bilder för dina deltagare (t.ex. via [Unsplash](https://unsplash.com/), [Pexels](https://www.pexels.com/) eller AI-genererade bilder).
+
+<details>
+<summary><strong>Robotarenan</strong> — Stridande robotar (pansar, eldkraft, snabbhet, batteri)</summary>
+
+```json
+[
+  {
+    "id": "r-001",
+    "name": "Torsten Turbomotor",
+    "image": "images/torsten.jpg",
+    "stats": { "armor": 7, "firepower": 9, "agility": 4, "battery": 6 },
+    "specialty": "Flammkastare-snurr",
+    "backstory": "Byggd av en pensionerad brandman som saknade spänningen.",
+    "catchphrase": "Brinner för att vinna!"
+  },
+  {
+    "id": "r-002",
+    "name": "Greta Grindfräs",
+    "image": "images/greta.jpg",
+    "stats": { "armor": 5, "firepower": 6, "agility": 9, "battery": 8 },
+    "specialty": "Dubbla cirkelsågar",
+    "backstory": "Ursprungligen en trädgårdsrobot som fick nog av ogräs.",
+    "catchphrase": "Jag klipper konkurrensen!"
+  },
+  {
+    "id": "r-003",
+    "name": "Björn-Borg 3000",
+    "image": "images/bjornborg.jpg",
+    "stats": { "armor": 10, "firepower": 3, "agility": 2, "battery": 9 },
+    "specialty": "Oförstörbar sköld",
+    "backstory": "Döpt efter tennislegenden, men spelar inte tennis.",
+    "catchphrase": "Ni kan inte röra mig!"
+  },
+  {
+    "id": "r-004",
+    "name": "Blixtra",
+    "image": "images/blixtra.jpg",
+    "stats": { "armor": 3, "firepower": 7, "agility": 10, "battery": 5 },
+    "specialty": "Elektrostatisk stöt",
+    "backstory": null,
+    "catchphrase": "Snabbare än din WiFi!"
+  },
+  {
+    "id": "r-005",
+    "name": "Hammare-Henrietta",
+    "image": "images/henrietta.jpg",
+    "stats": { "armor": 8, "firepower": 8, "agility": 3, "battery": 7 },
+    "specialty": "Hydraulisk hammarslag",
+    "backstory": "Byggd av ett team av gymnasieelever som vann regionmästerskapet.",
+    "catchphrase": "Det är hammar-dags!"
+  },
+  {
+    "id": "r-006",
+    "name": "Mystiska Molnet",
+    "image": "images/molnet.jpg",
+    "stats": { "armor": 4, "firepower": 5, "agility": 7, "battery": 10 },
+    "specialty": "Rökridå och överraskningsattack",
+    "backstory": "Ingen vet vem som byggde den. Den dök bara upp en dag.",
+    "catchphrase": null
+  },
+  {
+    "id": "r-007",
+    "name": "Skrot-Sigge",
+    "image": "images/sigge.jpg",
+    "stats": { "armor": 6, "firepower": 4, "agility": 6, "battery": 4 },
+    "specialty": "Magnetisk skrotkanon",
+    "backstory": "Ihopsatt av reservdelar från en bilskrot. Ser ut som kaos, men fungerar.",
+    "catchphrase": "En robots skräp är en annan robots skatt!"
+  },
+  {
+    "id": "r-008",
+    "name": "Nolla Noll-Åtta",
+    "image": "images/nolla.jpg",
+    "stats": { "armor": 6, "firepower": 10, "agility": 5, "battery": null },
+    "specialty": "Okänd — ingen har sett den slåss ännu",
+    "backstory": null,
+    "catchphrase": "..."
+  }
+]
+```
+</details>
+
+<details>
+<summary><strong>Kockduellen</strong> — Kockar i en matlagnings-tävling (kreativitet, precision, snabbhet, presentation)</summary>
+
+```json
+[
+  {
+    "id": "k-001",
+    "name": "Britta Brynt",
+    "image": "images/britta.jpg",
+    "stats": { "creativity": 6, "precision": 9, "speed": 5, "presentation": 8 },
+    "specialty": "Perfekt stekt kött, varje gång",
+    "backstory": "Tredje generationens slaktare som sadlade om till finrestaurang.",
+    "catchphrase": "Medium rare är inte en förfrågan, det är en livsstil."
+  },
+  {
+    "id": "k-002",
+    "name": "Lars Lansen",
+    "image": "images/lars.jpg",
+    "stats": { "creativity": 10, "precision": 4, "speed": 7, "presentation": 6 },
+    "specialty": "Oväntade smakkombinationer",
+    "backstory": "Före detta kemilärare som upptäckte att molekylär gastronomi är roligare.",
+    "catchphrase": "Regler finns till för att brytas — precis som ägg."
+  },
+  {
+    "id": "k-003",
+    "name": "Kimchi-Kim",
+    "image": "images/kim.jpg",
+    "stats": { "creativity": 8, "precision": 7, "speed": 8, "presentation": 5 },
+    "specialty": "Fermenterade smaker i allt",
+    "backstory": "Växte upp i sin mormors restaurang i Seoul, flyttade till Malmö.",
+    "catchphrase": "Ge det tid, så blir det gott."
+  },
+  {
+    "id": "k-004",
+    "name": "Patrik Petit-Four",
+    "image": "images/patrik.jpg",
+    "stats": { "creativity": 5, "precision": 10, "speed": 3, "presentation": 10 },
+    "specialty": "Miniatyrdesseter som ser ut som konstverk",
+    "backstory": "Utbildad konditor i Paris, besatt av geometriska former.",
+    "catchphrase": null
+  },
+  {
+    "id": "k-005",
+    "name": "Frida Flambé",
+    "image": "images/frida.jpg",
+    "stats": { "creativity": 7, "precision": 6, "speed": 9, "presentation": 7 },
+    "specialty": "Flamberade rätter med dramatisk effekt",
+    "backstory": "Jobbade som stuntkvinna innan hon bytte till köket.",
+    "catchphrase": "Om det inte brinner, är det inte klart!"
+  },
+  {
+    "id": "k-006",
+    "name": "Nansen Nudel",
+    "image": "images/nansen.jpg",
+    "stats": { "creativity": 7, "precision": 8, "speed": 10, "presentation": 4 },
+    "specialty": "Handgjord pasta på under 3 minuter",
+    "backstory": null,
+    "catchphrase": "Snabbare än en mikrovågsugn!"
+  },
+  {
+    "id": "k-007",
+    "name": "Berit Bouillon",
+    "image": "images/berit.jpg",
+    "stats": { "creativity": 4, "precision": 7, "speed": 6, "presentation": 6 },
+    "specialty": "Soppor och buljonger som läker själen",
+    "backstory": "Pensionerad sjuksköterska som tror att rätt soppa botar allt.",
+    "catchphrase": "Ta en skål till, du ser blek ut."
+  },
+  {
+    "id": "k-008",
+    "name": "X-kansen",
+    "image": "images/xkansen.jpg",
+    "stats": { "creativity": null, "precision": 6, "speed": 7, "presentation": 8 },
+    "specialty": "Hemlig — avslöjas först i tävlingen",
+    "backstory": null,
+    "catchphrase": "Vänta bara."
+  }
+]
+```
+</details>
+
+<details>
+<summary><strong>Magikermästerskapet</strong> — Trollkarlar i en besvärjelse-duell (kraft, precision, uthållighet, list)</summary>
+
+```json
+[
+  {
+    "id": "m-001",
+    "name": "Ragnhild Runvävar",
+    "image": "images/ragnhild.jpg",
+    "stats": { "power": 6, "precision": 9, "stamina": 7, "cunning": 8 },
+    "specialty": "Fornnordiska runbesvärjelser",
+    "backstory": "Hittade en äkta runsten i trädgården som sjuåring. Har inte slutat trolla sedan dess.",
+    "catchphrase": "Runorna ljuger aldrig."
+  },
+  {
+    "id": "m-002",
+    "name": "Dimme Dubbelsynt",
+    "image": "images/dimme.jpg",
+    "stats": { "power": 4, "precision": 5, "stamina": 9, "cunning": 10 },
+    "specialty": "Illusioner och synvillor",
+    "backstory": "Före detta ficktjuv som upptäckte att magi betalar bättre.",
+    "catchphrase": "Är det verkligen mig du ser?"
+  },
+  {
+    "id": "m-003",
+    "name": "Elsa Eldblåst",
+    "image": "images/elsa.jpg",
+    "stats": { "power": 10, "precision": 6, "stamina": 5, "cunning": 4 },
+    "specialty": "Eldbollsbesvärjelser",
+    "backstory": "Studerade vid akademin i 12 år. Fick bara toppbetyg i förstörelsemagi.",
+    "catchphrase": "Brinn, baby, brinn!"
+  },
+  {
+    "id": "m-004",
+    "name": "Frost-Filip",
+    "image": "images/filip.jpg",
+    "stats": { "power": 8, "precision": 8, "stamina": 6, "cunning": 3 },
+    "specialty": "Ismagi som fryser allt inom räckhåll",
+    "backstory": "Född i Kiruna. Säger att kylan valde honom.",
+    "catchphrase": "Lugna dig. Bokstavligen."
+  },
+  {
+    "id": "m-005",
+    "name": "Sigrid Skuggvisk",
+    "image": "images/sigrid.jpg",
+    "stats": { "power": 5, "precision": 7, "stamina": 8, "cunning": 9 },
+    "specialty": "Skuggmagi och teleportering",
+    "backstory": null,
+    "catchphrase": "Du såg mig inte. Det var meningen."
+  },
+  {
+    "id": "m-006",
+    "name": "Bertil Blixtsnansen",
+    "image": "images/bertil.jpg",
+    "stats": { "power": 9, "precision": 4, "stamina": 4, "cunning": 7 },
+    "specialty": "Blixt och åska",
+    "backstory": "Träffades av blixten tre gånger. Tredje gången tackade han ja.",
+    "catchphrase": "BOOM!"
+  },
+  {
+    "id": "m-007",
+    "name": "Mildred Mjölksyra",
+    "image": "images/mildred.jpg",
+    "stats": { "power": 3, "precision": 10, "stamina": 10, "cunning": 6 },
+    "specialty": "Läkningsbesvärjelser och uthållighetsbuffar",
+    "backstory": "Ville egentligen bli veterinär men råkade söka trollkarlsskolan.",
+    "catchphrase": "Jag kan hålla på hela dagen."
+  },
+  {
+    "id": "m-008",
+    "name": "Okände Omar",
+    "image": "images/omar.jpg",
+    "stats": { "power": 7, "precision": null, "stamina": 6, "cunning": 7 },
+    "specialty": "Ingen vet — han har aldrig tävlat förut",
+    "backstory": null,
+    "catchphrase": null
+  }
+]
+```
+</details>
+
+<details>
+<summary><strong>Husdjursmästerskapet</strong> — Husdjur i en atletisk tävling (fart, styrka, intelligens, uthållighet)</summary>
+
+```json
+[
+  {
+    "id": "h-001",
+    "name": "Turbo-Tansen",
+    "image": "images/tansen.jpg",
+    "stats": { "speed": 10, "strength": 3, "intelligence": 6, "endurance": 5 },
+    "specialty": "Greyhound med jetmotor-ambitioner",
+    "backstory": "Adopterad från en tävlingskennel. Är fortfarande övertävlig om allt, inklusive vem som äter snabbast.",
+    "catchphrase": "Hann du blinka? Tråkigt, du missade mig."
+  },
+  {
+    "id": "h-002",
+    "name": "Bulldåsen Bansen",
+    "image": "images/bansen.jpg",
+    "stats": { "speed": 2, "strength": 10, "intelligence": 5, "endurance": 8 },
+    "specialty": "Brittisk bulldog som aldrig ger upp",
+    "backstory": "Väger 25 kilo ren envishet. Har aldrig släppt ett dragkampssrep frivilligt.",
+    "catchphrase": "Jag flyttar mig inte."
+  },
+  {
+    "id": "h-003",
+    "name": "Professor Plutten",
+    "image": "images/plutten.jpg",
+    "stats": { "speed": 4, "strength": 2, "intelligence": 10, "endurance": 7 },
+    "specialty": "Border collie som löser problem snabbare än sin ägare",
+    "backstory": "Kan öppna alla dörrar i huset, inklusive kylskåpet. Ägaren har gett upp.",
+    "catchphrase": "Jag visste att du skulle göra det där."
+  },
+  {
+    "id": "h-004",
+    "name": "Smansen Smansen",
+    "image": "images/smansen.jpg",
+    "stats": { "speed": 8, "strength": 4, "intelligence": 8, "endurance": 6 },
+    "specialty": "Siamesisk katt med attityd och vassa reflexer",
+    "backstory": "Bor egentligen hos grannen också. Och grannen efter det. Har tre familjer.",
+    "catchphrase": null
+  },
+  {
+    "id": "h-005",
+    "name": "Pansen Pansen",
+    "image": "images/pansen.jpg",
+    "stats": { "speed": 6, "strength": 7, "intelligence": 4, "endurance": 9 },
+    "specialty": "Labrador med oändlig energi",
+    "backstory": "Har sprungit varje morgon i fem år. Ägaren slutade hänga med efter vecka två.",
+    "catchphrase": "BOLL! BOLL! BOLL!"
+  },
+  {
+    "id": "h-006",
+    "name": "Herr Skansen",
+    "image": "images/skansen.jpg",
+    "stats": { "speed": 1, "strength": 5, "intelligence": 9, "endurance": 10 },
+    "specialty": "Sköldpadda med orubbligt tålamod",
+    "backstory": "37 år gammal. Har sett husdjur komma och gå. Stressar inte.",
+    "catchphrase": "Jag kommer fram när jag kommer fram."
+  },
+  {
+    "id": "h-007",
+    "name": "Ansen Kanansen",
+    "image": "images/kanansen.jpg",
+    "stats": { "speed": 7, "strength": 6, "intelligence": 3, "endurance": 4 },
+    "specialty": "Kanin med explosiv sprintstyrka",
+    "backstory": null,
+    "catchphrase": "Hopp hopp!"
+  },
+  {
+    "id": "h-008",
+    "name": "Mystansen",
+    "image": "images/mystansen.jpg",
+    "stats": { "speed": 5, "strength": null, "intelligence": 7, "endurance": 6 },
+    "specialty": "Hemlig — ingen har lyckats artbestämma den",
+    "backstory": null,
+    "catchphrase": "..."
+  }
+]
+```
+</details>
+
+### Krav
+
+#### Deltagardata (JSON)
+
+* Skapa en JSON-fil (t.ex. `contestants.json`) med en array av **8 deltagare**.
+* Varje deltagare ska ha **minst** följande egenskaper:
+  * `id` — Unikt id (t.ex. `"r-001"`)
+  * `name` — Deltagarens namn
+  * `image` — Sökväg till en bild
+  * `stats` — Ett objekt med **minst 4 numeriska egenskaper** (t.ex. `{ "armor": 7, "firepower": 9, ... }`)
+  * `specialty` — En kort beskrivning av deltagarens specialförmåga
+* **Minst 2 deltagare** ska ha ofullständig data — t.ex. `catchphrase: null`, en stat satt till `null` (oprövad nykomling), eller saknad `backstory`.
+* JSON-filen ska hämtas med `fetch`, **inte** importeras som en JavaScript-modul.
+
+#### Klass för match
+
+Varje deltagare i JSON-datan är ett vanligt objekt — det behövs ingen klass för dem. Däremot har en *match* ett tydligt tillstånd som förändras: den har två deltagare, den kan spelas, och den har en vinnare. Det gör den till en bra kandidat för en klass.
+
+* Skapa en `Match`-klass som modellerar en match mellan två deltagare.
+* **Privata fält** (`#`) för de två deltagarna och vinnaren — de ska inte kunna ändras utifrån.
+* **Getters** för att läsa deltagarna, vinnaren, och om matchen är spelad (`isPlayed`).
+* En **metod** `compete()` som avgör vinnaren av matchen (se nedan).
+* Hantera saknade/null-värden med `?.` och `??` — t.ex. en stat som är `null` får ett standardvärde.
+
+#### Matchlogik
+
+* Metoden `compete()` ska jämföra de två deltagarnas stats och avgöra en vinnare.
+* **Viktat slumpmässigt resultat** — den starkare deltagaren ska ha högre sannolikhet att vinna, men den svagare ska alltid ha en chans. En match får alltså **inte** vara helt förutbestämd av datan.
+* Försök komma på en egen algoritm! Tänk på: hur räknar du ut vem som är "starkare"? Hur gör du så att slumpen fortfarande spelar roll?
+
+<details>
+<summary><strong>Exempelimplementation (Husdjursmästerskapet)</strong> — Kika här om du kör fast</summary>
+
+Här är **ett** sätt att lösa det på med husdjurstemat. Du får använda denna lösning, men försök gärna hitta på en egen variant som passar ditt tema.
+
+Idén: Först avgörs vilken husdjur som tröttnar snabbast genom att jämföra **fart mot uthållighet** — ett snabbt djur som inte orkar länge bränner ut sig tidigt. Den utmattningen påverkar sedan huvudduellen: **styrka mot motståndarens intelligens** (ett smart djur kan ducka och undvika).
+
+```js
+compete () {
+  const a = this.#contestantA.stats
+  const b = this.#contestantB.stats
+
+  // Steg 1: Utmattning — fart kostar uthållighet.
+  // Turbo-Tansen (speed 10, endurance 5) tröttnar snabbt!
+  const fatigueA = (a.speed ?? 5) - (a.endurance ?? 5)
+  const fatigueB = (b.speed ?? 5) - (b.endurance ?? 5)
+
+  // Steg 2: Poäng — styrka mot motståndarens intelligens.
+  // Professor Plutten (intelligence 10) undviker de flesta attacker.
+  // Utmattning sänker poängen — ett trött djur presterar sämre.
+  const scoreA = (a.strength ?? 5) - (b.intelligence ?? 5) * 0.5 - fatigueA
+  const scoreB = (b.strength ?? 5) - (a.intelligence ?? 5) * 0.5 - fatigueB
+
+  // Steg 3: Omvandla till en sannolikhet mellan 0 och 1.
+  // Skillnaden skalas ned så att även en underdog har chans.
+  const advantage = (scoreA - scoreB) / 10
+  const chanceA = 0.5 + advantage  // t.ex. 0.62 om A har ett övertag
+
+  // Steg 4: Slumpen avgör!
+  const roll = Math.random()
+  this.#winner = roll < chanceA ? this.#contestantA : this.#contestantB
+
+  return this.#winner
+}
+```
+
+Matchen sker alltså i *två steg* — först utmattning, sedan duell — vilket gör att alla fyra stats spelar roll. Men `Math.random()` avgör i slutändan, så även Herr Skansen (sköldpaddan) kan vinna mot Turbo-Tansen.
+</details>
+
+#### Turneringsflöde
+
+* **8 deltagare → Kvartsfinal (4 matcher) → Semifinal (2 matcher) → Final → Mästare**
+* Vid start: hämta JSON → `map()` deltagarna till `Match`-instanser (par om två) → rendera första rundan.
+* Efter varje runda: hämta vinnarna → `map()` till nya `Match`-instanser → rendera nästa runda.
+* Använd `find()` för att slå upp deltagare på `id` vid behov (t.ex. vid återställning från localStorage).
+
+#### Rendering
+
+* All HTML ska skapas dynamiskt med `createElement()` — inga deltagare eller matcher hårdkodade i HTML.
+* Varje match visas som ett kort/block med båda deltagarnas namn, bild och stats.
+* En knapp per match ("Simulera match") eller per runda ("Simulera runda") driver turneringen framåt.
+* Vinnare markeras visuellt. Förlorare tonas ned eller markeras.
+* Mästaren får en tydlig visuell markering vid turneringens slut.
+
+#### Hantering av saknade värden
+
+* Använd **optional chaining** (`?.`) och **nullish coalescing** (`??`) för att hantera deltagare med ofullständig data.
+* Exempel: `contestant.catchphrase ?? "Inget slagord..."` eller `contestant.stats?.agility ?? 5`.
+* I `Match`-klassen: använd `??` för att ge null-stats ett standardvärde vid beräkning av totalstyrka.
+
+#### Persistens med localStorage
+
+* Turneringens tillstånd (vilka som vunnit varje runda) ska sparas i `localStorage`.
+* Vid omladdning: kontrollera om det finns ett sparat tillstånd och återställ turneringen.
+* En knapp för att starta om turneringen (rensar `localStorage` och börjar om).
+
+#### HTML och CSS
+
+* En `index.html` med header, global navigation (från uppgift 1), och en container för turneringen.
+* Separat CSS-fil — turneringen ska ha en tydlig visuell struktur där rundorna syns (t.ex. kolumner eller sektioner).
+* Sidan behöver bara fungera på desktop.
+
+#### Kodkvalitet
+
+* Välstrukturerad kod uppdelad i logiska funktioner och gärna separata filer/moduler.
+* Beskrivande namn på variabler och funktioner.
+* Arrow functions ska användas för callbacks och korta funktioner.
+
+### Tips
+
+* Börja med att kopiera in JSON-filen och skapa `Match`-klassen. Testa i konsolen att `compete()` fungerar innan du bygger vidare.
+* Bygg bracket-layouten i HTML/CSS först (hårdkodat), så du vet hur det ska se ut — byt sedan till dynamisk rendering.
+* Implementera en runda i taget. Få kvartsfinalen att fungera helt innan du går vidare till semifinalen.
+* Testa `localStorage` tidigt — det är lättare att bygga in från början än att lägga till i efterhand.
+
+<details>
+<summary><strong>CSS-hjälp: Bracket-layout</strong> — Så placerar du matcherna i ett utslagsträd</summary>
+
+Tricket för en bracket-layout är att hela bracketen är en **flexbox-rad** (en kolumn per runda), och varje runda är en **flexbox-kolumn** med `justify-content: space-around`. Eftersom varje runda har hälften så många matcher som den förra, centreras matcherna automatiskt mittemot sina "föräldra-matcher".
+
+**HTML-strukturen** ser ut ungefär så här:
+
+```html
+<div class="bracket">
+  <div class="round">          <!-- Kvartsfinal: 4 matcher -->
+    <div class="match">...</div>
+    <div class="match">...</div>
+    <div class="match">...</div>
+    <div class="match">...</div>
+  </div>
+  <div class="round">          <!-- Semifinal: 2 matcher -->
+    <div class="match">...</div>
+    <div class="match">...</div>
+  </div>
+  <div class="round">          <!-- Final: 1 match -->
+    <div class="match">...</div>
+  </div>
+</div>
+```
+
+**CSS:**
+
+```css
+.bracket {
+  display: flex;
+  gap: 2rem;
+  min-height: 600px;  /* Fast höjd behövs — annars har inte rundorna utrymme att fördela sig i */
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;  /* Matcherna fördelas jämnt — det här är hela magin */
+  min-width: 250px;
+  gap: 1rem;
+}
+
+.match {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+}
+```
+
+Nyckeln är att `.bracket` har en fast höjd och att varje `.round` fyller hela den höjden. `space-around` fördelar matcherna jämnt — så semifinalens 2 matcher hamnar exakt mittemot kvartsfinalens 4 matcher, och finalen centreras mittemot semifinalens 2.
+
+Du kommer sedan vilja styla `.match` mer (bilder, namn, stats, vinnare-markering), men **ovanstående räcker för att få den visuella bracket-strukturen på plats**.
+</details>
+
+### Versionshantering
+
+* Commita och pusha till GitHub regelbundet.
+
+### Inlämning
+
+* Verifiera att den kompletta, fungerande versionen är publicerad på GitHub Pages.
+* Lämna in URL:en till din publicerade sida i Moodle.
+
+### Lycka till!
+
+</main>
