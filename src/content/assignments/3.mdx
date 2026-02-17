@@ -385,31 +385,32 @@ Varje deltagare i JSON-datan är ett vanligt objekt — det behövs ingen klass 
 * Försök komma på en egen algoritm! Tänk på: hur räknar du ut vem som är "starkare"? Hur gör du så att slumpen fortfarande spelar roll?
 
 <details>
-<summary><strong>Exempelimplementation (Robotarenan)</strong> — Kika här om du kör fast</summary>
+<summary><strong>Exempelimplementation (Husdjursmästerskapet)</strong> — Kika här om du kör fast</summary>
 
-Här är **ett** sätt att lösa det på med robottema. Du får använda denna lösning, men försök gärna hitta på en egen variant som passar ditt tema.
+Här är **ett** sätt att lösa det på med husdjurstemat. Du får använda denna lösning, men försök gärna hitta på en egen variant som passar ditt tema.
 
-Idén: Först avgörs vilken robot som tröttnar snabbast genom att jämföra **snabbhet mot batteri** — en snabb robot med dåligt batteri sliter ut sig. Den utmattningsfaktorn påverkar sedan huvudduellen: **pansar mot eldkraft**.
+Idén: Först avgörs vilken husdjur som tröttnar snabbast genom att jämföra **fart mot uthållighet** — ett snabbt djur som inte orkar länge bränner ut sig tidigt. Den utmattningen påverkar sedan huvudduellen: **styrka mot motståndarens intelligens** (ett smart djur kan ducka och undvika).
 
 ```js
 compete () {
   const a = this.#contestantA.stats
   const b = this.#contestantB.stats
 
-  // Steg 1: Utmattning — snabbhet kostar batteri.
-  // En snabb robot med svagt batteri tröttnar fortare.
-  const fatigueA = (a.agility ?? 5) - (a.battery ?? 5)
-  const fatigueB = (b.agility ?? 5) - (b.battery ?? 5)
+  // Steg 1: Utmattning — fart kostar uthållighet.
+  // Turbo-Tansen (speed 10, endurance 5) tröttnar snabbt!
+  const fatigueA = (a.speed ?? 5) - (a.endurance ?? 5)
+  const fatigueB = (b.speed ?? 5) - (b.endurance ?? 5)
 
-  // Steg 2: Stridsvärde — eldkraft mot motståndarens pansar.
-  // Draget minskas av utmattning (en trött robot slåss sämre).
-  const attackA = (a.firepower ?? 5) - (b.armor ?? 5) * 0.5 - fatigueA
-  const attackB = (b.firepower ?? 5) - (a.armor ?? 5) * 0.5 - fatigueB
+  // Steg 2: Poäng — styrka mot motståndarens intelligens.
+  // Professor Plutten (intelligence 10) undviker de flesta attacker.
+  // Utmattning sänker poängen — ett trött djur presterar sämre.
+  const scoreA = (a.strength ?? 5) - (b.intelligence ?? 5) * 0.5 - fatigueA
+  const scoreB = (b.strength ?? 5) - (a.intelligence ?? 5) * 0.5 - fatigueB
 
   // Steg 3: Omvandla till en sannolikhet mellan 0 och 1.
-  // Skillnaden skalas ned så att även en svagare robot har chans.
-  const advantage = (attackA - attackB) / 10
-  const chanceA = 0.5 + advantage  // t.ex. 0.65 om A har ett övertag
+  // Skillnaden skalas ned så att även en underdog har chans.
+  const advantage = (scoreA - scoreB) / 10
+  const chanceA = 0.5 + advantage  // t.ex. 0.62 om A har ett övertag
 
   // Steg 4: Slumpen avgör!
   const roll = Math.random()
@@ -419,7 +420,7 @@ compete () {
 }
 ```
 
-Matchen sker alltså i *två steg* — först utmattning, sedan strid — vilket gör att alla fyra stats spelar roll. Men `Math.random()` avgör i slutändan, så även en underdog kan vinna.
+Matchen sker alltså i *två steg* — först utmattning, sedan duell — vilket gör att alla fyra stats spelar roll. Men `Math.random()` avgör i slutändan, så även Herr Skansen (sköldpaddan) kan vinna mot Turbo-Tansen.
 </details>
 
 #### Turneringsflöde
