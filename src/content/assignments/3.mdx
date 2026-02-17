@@ -26,12 +26,333 @@ assignments/
 
 ### Välj ett tema
 
-Välj **ett** tema för din turnering. Temat bestämmer vilka deltagarna är och vilka stats de har. Välj från listan eller hitta på ett eget, men deltagarna ska ha **minst fyra numeriska stats**.
+Välj **ett** tema för din turnering och använd det färdiga datasetet nedan. Du får även hitta på ett eget tema, men deltagarna ska ha **minst fyra numeriska stats** och minst 2 deltagare med ofullständig data.
 
-* **Robotarenan** — Stridande robotar (t.ex. pansar, eldkraft, snabbhet, batteri)
-* **Kockduellen** — Kockar i en matlagnings-tävling (t.ex. kreativitet, precision, snabbhet, presentation)
-* **Magikermästerskapet** — Trollkarlar i en besvärjelse-duell (t.ex. kraft, precision, uthållighet, list)
-* **Eget tema** — Valfritt, men samma krav gäller
+Bilderna i dataseten är platshållare — du behöver hitta eller skapa egna bilder för dina deltagare (t.ex. via [Unsplash](https://unsplash.com/), [Pexels](https://www.pexels.com/) eller AI-genererade bilder).
+
+<details>
+<summary><strong>Robotarenan</strong> — Stridande robotar (pansar, eldkraft, snabbhet, batteri)</summary>
+
+```json
+[
+  {
+    "id": "r-001",
+    "name": "Torsten Turbomotor",
+    "image": "images/torsten.jpg",
+    "stats": { "armor": 7, "firepower": 9, "agility": 4, "battery": 6 },
+    "specialty": "Flammkastare-snurr",
+    "backstory": "Byggd av en pensionerad brandman som saknade spänningen.",
+    "catchphrase": "Brinner för att vinna!"
+  },
+  {
+    "id": "r-002",
+    "name": "Greta Grindfräs",
+    "image": "images/greta.jpg",
+    "stats": { "armor": 5, "firepower": 6, "agility": 9, "battery": 8 },
+    "specialty": "Dubbla cirkelsågar",
+    "backstory": "Ursprungligen en trädgårdsrobot som fick nog av ogräs.",
+    "catchphrase": "Jag klipper konkurrensen!"
+  },
+  {
+    "id": "r-003",
+    "name": "Björn-Borg 3000",
+    "image": "images/bjornborg.jpg",
+    "stats": { "armor": 10, "firepower": 3, "agility": 2, "battery": 9 },
+    "specialty": "Oförstörbar sköld",
+    "backstory": "Döpt efter tennislegenden, men spelar inte tennis.",
+    "catchphrase": "Ni kan inte röra mig!"
+  },
+  {
+    "id": "r-004",
+    "name": "Blixtra",
+    "image": "images/blixtra.jpg",
+    "stats": { "armor": 3, "firepower": 7, "agility": 10, "battery": 5 },
+    "specialty": "Elektrostatisk stöt",
+    "backstory": null,
+    "catchphrase": "Snabbare än din WiFi!"
+  },
+  {
+    "id": "r-005",
+    "name": "Hammare-Henrietta",
+    "image": "images/henrietta.jpg",
+    "stats": { "armor": 8, "firepower": 8, "agility": 3, "battery": 7 },
+    "specialty": "Hydraulisk hammarslag",
+    "backstory": "Byggd av ett team av gymnasieelever som vann regionmästerskapet.",
+    "catchphrase": "Det är hammar-dags!"
+  },
+  {
+    "id": "r-006",
+    "name": "Mystiska Molnet",
+    "image": "images/molnet.jpg",
+    "stats": { "armor": 4, "firepower": 5, "agility": 7, "battery": 10 },
+    "specialty": "Rökridå och överraskningsattack",
+    "backstory": "Ingen vet vem som byggde den. Den dök bara upp en dag.",
+    "catchphrase": null
+  },
+  {
+    "id": "r-007",
+    "name": "Skrot-Sigge",
+    "image": "images/sigge.jpg",
+    "stats": { "armor": 6, "firepower": 4, "agility": 6, "battery": 4 },
+    "specialty": "Magnetisk skrotkanon",
+    "backstory": "Ihopsatt av reservdelar från en bilskrot. Ser ut som kaos, men fungerar.",
+    "catchphrase": "En robots skräp är en annan robots skatt!"
+  },
+  {
+    "id": "r-008",
+    "name": "Nolla Noll-Åtta",
+    "image": "images/nolla.jpg",
+    "stats": { "armor": 6, "firepower": 10, "agility": 5, "battery": null },
+    "specialty": "Okänd — ingen har sett den slåss ännu",
+    "backstory": null,
+    "catchphrase": "..."
+  }
+]
+```
+</details>
+
+<details>
+<summary><strong>Kockduellen</strong> — Kockar i en matlagnings-tävling (kreativitet, precision, snabbhet, presentation)</summary>
+
+```json
+[
+  {
+    "id": "k-001",
+    "name": "Britta Brynt",
+    "image": "images/britta.jpg",
+    "stats": { "creativity": 6, "precision": 9, "speed": 5, "presentation": 8 },
+    "specialty": "Perfekt stekt kött, varje gång",
+    "backstory": "Tredje generationens slaktare som sadlade om till finrestaurang.",
+    "catchphrase": "Medium rare är inte en förfrågan, det är en livsstil."
+  },
+  {
+    "id": "k-002",
+    "name": "Lars Lansen",
+    "image": "images/lars.jpg",
+    "stats": { "creativity": 10, "precision": 4, "speed": 7, "presentation": 6 },
+    "specialty": "Oväntade smakkombinationer",
+    "backstory": "Före detta kemilärare som upptäckte att molekylär gastronomi är roligare.",
+    "catchphrase": "Regler finns till för att brytas — precis som ägg."
+  },
+  {
+    "id": "k-003",
+    "name": "Kimchi-Kim",
+    "image": "images/kim.jpg",
+    "stats": { "creativity": 8, "precision": 7, "speed": 8, "presentation": 5 },
+    "specialty": "Fermenterade smaker i allt",
+    "backstory": "Växte upp i sin mormors restaurang i Seoul, flyttade till Malmö.",
+    "catchphrase": "Ge det tid, så blir det gott."
+  },
+  {
+    "id": "k-004",
+    "name": "Patrik Petit-Four",
+    "image": "images/patrik.jpg",
+    "stats": { "creativity": 5, "precision": 10, "speed": 3, "presentation": 10 },
+    "specialty": "Miniatyrdesseter som ser ut som konstverk",
+    "backstory": "Utbildad konditor i Paris, besatt av geometriska former.",
+    "catchphrase": null
+  },
+  {
+    "id": "k-005",
+    "name": "Frida Flambé",
+    "image": "images/frida.jpg",
+    "stats": { "creativity": 7, "precision": 6, "speed": 9, "presentation": 7 },
+    "specialty": "Flamberade rätter med dramatisk effekt",
+    "backstory": "Jobbade som stuntkvinna innan hon bytte till köket.",
+    "catchphrase": "Om det inte brinner, är det inte klart!"
+  },
+  {
+    "id": "k-006",
+    "name": "Nansen Nudel",
+    "image": "images/nansen.jpg",
+    "stats": { "creativity": 7, "precision": 8, "speed": 10, "presentation": 4 },
+    "specialty": "Handgjord pasta på under 3 minuter",
+    "backstory": null,
+    "catchphrase": "Snabbare än en mikrovågsugn!"
+  },
+  {
+    "id": "k-007",
+    "name": "Berit Bouillon",
+    "image": "images/berit.jpg",
+    "stats": { "creativity": 4, "precision": 7, "speed": 6, "presentation": 6 },
+    "specialty": "Soppor och buljonger som läker själen",
+    "backstory": "Pensionerad sjuksköterska som tror att rätt soppa botar allt.",
+    "catchphrase": "Ta en skål till, du ser blek ut."
+  },
+  {
+    "id": "k-008",
+    "name": "X-kansen",
+    "image": "images/xkansen.jpg",
+    "stats": { "creativity": null, "precision": 6, "speed": 7, "presentation": 8 },
+    "specialty": "Hemlig — avslöjas först i tävlingen",
+    "backstory": null,
+    "catchphrase": "Vänta bara."
+  }
+]
+```
+</details>
+
+<details>
+<summary><strong>Magikermästerskapet</strong> — Trollkarlar i en besvärjelse-duell (kraft, precision, uthållighet, list)</summary>
+
+```json
+[
+  {
+    "id": "m-001",
+    "name": "Ragnhild Runvävar",
+    "image": "images/ragnhild.jpg",
+    "stats": { "power": 6, "precision": 9, "stamina": 7, "cunning": 8 },
+    "specialty": "Fornnordiska runbesvärjelser",
+    "backstory": "Hittade en äkta runsten i trädgården som sjuåring. Har inte slutat trolla sedan dess.",
+    "catchphrase": "Runorna ljuger aldrig."
+  },
+  {
+    "id": "m-002",
+    "name": "Dimme Dubbelsynt",
+    "image": "images/dimme.jpg",
+    "stats": { "power": 4, "precision": 5, "stamina": 9, "cunning": 10 },
+    "specialty": "Illusioner och synvillor",
+    "backstory": "Före detta ficktjuv som upptäckte att magi betalar bättre.",
+    "catchphrase": "Är det verkligen mig du ser?"
+  },
+  {
+    "id": "m-003",
+    "name": "Elsa Eldblåst",
+    "image": "images/elsa.jpg",
+    "stats": { "power": 10, "precision": 6, "stamina": 5, "cunning": 4 },
+    "specialty": "Eldbollsbesvärjelser",
+    "backstory": "Studerade vid akademin i 12 år. Fick bara toppbetyg i förstörelsemagi.",
+    "catchphrase": "Brinn, baby, brinn!"
+  },
+  {
+    "id": "m-004",
+    "name": "Frost-Filip",
+    "image": "images/filip.jpg",
+    "stats": { "power": 8, "precision": 8, "stamina": 6, "cunning": 3 },
+    "specialty": "Ismagi som fryser allt inom räckhåll",
+    "backstory": "Född i Kiruna. Säger att kylan valde honom.",
+    "catchphrase": "Lugna dig. Bokstavligen."
+  },
+  {
+    "id": "m-005",
+    "name": "Sigrid Skuggvisk",
+    "image": "images/sigrid.jpg",
+    "stats": { "power": 5, "precision": 7, "stamina": 8, "cunning": 9 },
+    "specialty": "Skuggmagi och teleportering",
+    "backstory": null,
+    "catchphrase": "Du såg mig inte. Det var meningen."
+  },
+  {
+    "id": "m-006",
+    "name": "Bertil Blixtsnansen",
+    "image": "images/bertil.jpg",
+    "stats": { "power": 9, "precision": 4, "stamina": 4, "cunning": 7 },
+    "specialty": "Blixt och åska",
+    "backstory": "Träffades av blixten tre gånger. Tredje gången tackade han ja.",
+    "catchphrase": "BOOM!"
+  },
+  {
+    "id": "m-007",
+    "name": "Mildred Mjölksyra",
+    "image": "images/mildred.jpg",
+    "stats": { "power": 3, "precision": 10, "stamina": 10, "cunning": 6 },
+    "specialty": "Läkningsbesvärjelser och uthållighetsbuffar",
+    "backstory": "Ville egentligen bli veterinär men råkade söka trollkarlsskolan.",
+    "catchphrase": "Jag kan hålla på hela dagen."
+  },
+  {
+    "id": "m-008",
+    "name": "Okände Omar",
+    "image": "images/omar.jpg",
+    "stats": { "power": 7, "precision": null, "stamina": 6, "cunning": 7 },
+    "specialty": "Ingen vet — han har aldrig tävlat förut",
+    "backstory": null,
+    "catchphrase": null
+  }
+]
+```
+</details>
+
+<details>
+<summary><strong>Husdjursmästerskapet</strong> — Husdjur i en atletisk tävling (fart, styrka, intelligens, uthållighet)</summary>
+
+```json
+[
+  {
+    "id": "h-001",
+    "name": "Turbo-Tansen",
+    "image": "images/tansen.jpg",
+    "stats": { "speed": 10, "strength": 3, "intelligence": 6, "endurance": 5 },
+    "specialty": "Greyhound med jetmotor-ambitioner",
+    "backstory": "Adopterad från en tävlingskennel. Är fortfarande övertävlig om allt, inklusive vem som äter snabbast.",
+    "catchphrase": "Hann du blinka? Tråkigt, du missade mig."
+  },
+  {
+    "id": "h-002",
+    "name": "Bulldåsen Bansen",
+    "image": "images/bansen.jpg",
+    "stats": { "speed": 2, "strength": 10, "intelligence": 5, "endurance": 8 },
+    "specialty": "Brittisk bulldog som aldrig ger upp",
+    "backstory": "Väger 25 kilo ren envishet. Har aldrig släppt ett dragkampssrep frivilligt.",
+    "catchphrase": "Jag flyttar mig inte."
+  },
+  {
+    "id": "h-003",
+    "name": "Professor Plutten",
+    "image": "images/plutten.jpg",
+    "stats": { "speed": 4, "strength": 2, "intelligence": 10, "endurance": 7 },
+    "specialty": "Border collie som löser problem snabbare än sin ägare",
+    "backstory": "Kan öppna alla dörrar i huset, inklusive kylskåpet. Ägaren har gett upp.",
+    "catchphrase": "Jag visste att du skulle göra det där."
+  },
+  {
+    "id": "h-004",
+    "name": "Smansen Smansen",
+    "image": "images/smansen.jpg",
+    "stats": { "speed": 8, "strength": 4, "intelligence": 8, "endurance": 6 },
+    "specialty": "Siamesisk katt med attityd och vassa reflexer",
+    "backstory": "Bor egentligen hos grannen också. Och grannen efter det. Har tre familjer.",
+    "catchphrase": null
+  },
+  {
+    "id": "h-005",
+    "name": "Pansen Pansen",
+    "image": "images/pansen.jpg",
+    "stats": { "speed": 6, "strength": 7, "intelligence": 4, "endurance": 9 },
+    "specialty": "Labrador med oändlig energi",
+    "backstory": "Har sprungit varje morgon i fem år. Ägaren slutade hänga med efter vecka två.",
+    "catchphrase": "BOLL! BOLL! BOLL!"
+  },
+  {
+    "id": "h-006",
+    "name": "Herr Skansen",
+    "image": "images/skansen.jpg",
+    "stats": { "speed": 1, "strength": 5, "intelligence": 9, "endurance": 10 },
+    "specialty": "Sköldpadda med orubbligt tålamod",
+    "backstory": "37 år gammal. Har sett husdjur komma och gå. Stressar inte.",
+    "catchphrase": "Jag kommer fram när jag kommer fram."
+  },
+  {
+    "id": "h-007",
+    "name": "Ansen Kanansen",
+    "image": "images/kanansen.jpg",
+    "stats": { "speed": 7, "strength": 6, "intelligence": 3, "endurance": 4 },
+    "specialty": "Kanin med explosiv sprintstyrka",
+    "backstory": null,
+    "catchphrase": "Hopp hopp!"
+  },
+  {
+    "id": "h-008",
+    "name": "Mystansen",
+    "image": "images/mystansen.jpg",
+    "stats": { "speed": 5, "strength": null, "intelligence": 7, "endurance": 6 },
+    "specialty": "Hemlig — ingen har lyckats artbestämma den",
+    "backstory": null,
+    "catchphrase": "..."
+  }
+]
+```
+</details>
 
 ### Krav
 
