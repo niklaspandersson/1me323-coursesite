@@ -1,0 +1,120 @@
+---
+title: Uppgift 3 - Turneringsgeneratorn
+---
+
+<aside class="first">
+### Redovisning
+* **Deadline**: TBD
+* **Inlämning**: TBD
+</aside>
+
+<main>
+
+I denna uppgift ska du bygga en turneringsapplikation där deltagare tävlar mot varandra i ett utslagssystem. Deltagardata hämtas från en JSON-fil med `fetch`, modelleras med JavaScript-klasser, och en visuell turnering renderas dynamiskt med `createElement()`. Användaren driver turneringen framåt genom att simulera matcher.
+
+### Förberedelser
+
+Skapa en ny mapp `assignment3` i din `assignments`-mapp.
+
+```
+assignments/
+├── ...
+└── assignment3/
+```
+
+* Lägg in information om uppgiften i datastrukturen i `assignments.js` så att den visas på startsidan.
+
+### Välj ett tema
+
+Välj **ett** tema för din turnering. Temat bestämmer vilka deltagarna är och vilka stats de har. Välj från listan eller hitta på ett eget, men deltagarna ska ha **minst fyra numeriska stats**.
+
+* **Robotarenan** — Stridande robotar (t.ex. pansar, eldkraft, snabbhet, batteri)
+* **Kockduellen** — Kockar i en matlagnings-tävling (t.ex. kreativitet, precision, snabbhet, presentation)
+* **Magikermästerskapet** — Trollkarlar i en besvärjelse-duell (t.ex. kraft, precision, uthållighet, list)
+* **Eget tema** — Valfritt, men samma krav gäller
+
+### Krav
+
+#### Deltagardata (JSON)
+
+* Skapa en JSON-fil (t.ex. `contestants.json`) med en array av **8 deltagare**.
+* Varje deltagare ska ha **minst** följande egenskaper:
+  * `id` — Unikt id (t.ex. `"r-001"`)
+  * `name` — Deltagarens namn
+  * `image` — Sökväg till en bild
+  * `stats` — Ett objekt med **minst 4 numeriska egenskaper** (t.ex. `{ "armor": 7, "firepower": 9, ... }`)
+  * `specialty` — En kort beskrivning av deltagarens specialförmåga
+* **Minst 2 deltagare** ska ha ofullständig data — t.ex. `catchphrase: null`, en stat satt till `null` (oprövad nykomling), eller saknad `backstory`.
+* JSON-filen ska hämtas med `fetch`, **inte** importeras som en JavaScript-modul.
+
+#### Klass för deltagare
+
+* Skapa en `Contestant`-klass som modellerar varje deltagare.
+* **Privata fält** (`#`) för stats — de ska inte kunna ändras utifrån.
+* **Getters** för att läsa individuella stats och en beräknad `overallRating` (t.ex. medelvärdet av alla stats).
+* En **metod** `compete(opponent)` som avgör vinnaren av en match (se nedan).
+* Hantera saknade/null-värden med `?.` och `??` — t.ex. en stat som är `null` får ett standardvärde.
+
+#### Matchlogik
+
+* Metoden `compete(opponent)` ska jämföra deltagarnas stats och returnera vinnaren.
+* **Viktat slumpmässigt resultat** — den starkare deltagaren ska ha högre sannolikhet att vinna, men den svagare ska alltid ha en chans. En match får alltså **inte** vara helt förutbestämd av datan.
+* Du väljer själv hur du implementerar detta, men det ska vara tydligt i koden hur sannolikheten beräknas.
+
+#### Turneringsflöde
+
+* **8 deltagare → Kvartsfinal (4 matcher) → Semifinal (2 matcher) → Final → Mästare**
+* Vid start: hämta JSON → skapa `Contestant`-instanser → `map()` deltagarna till matchpar → rendera första rundan.
+* Efter varje runda: `filter()` vinnarna → `map()` till nya par → rendera nästa runda.
+* Använd `find()` för att slå upp deltagare på `id` vid behov (t.ex. vid återställning från localStorage).
+
+#### Rendering
+
+* All HTML ska skapas dynamiskt med `createElement()` — inga deltagare eller matcher hårdkodade i HTML.
+* Varje match visas som ett kort/block med båda deltagarnas namn, bild och stats.
+* En knapp per match ("Simulera match") eller per runda ("Simulera runda") driver turneringen framåt.
+* Vinnare markeras visuellt. Förlorare tonas ned eller markeras.
+* Mästaren får en tydlig visuell markering vid turneringens slut.
+
+#### Hantering av saknade värden
+
+* Använd **optional chaining** (`?.`) och **nullish coalescing** (`??`) för att hantera deltagare med ofullständig data.
+* Exempel: `contestant.catchphrase ?? "Inget slagord..."` eller `contestant.stats?.agility ?? 5`.
+
+#### Persistens med localStorage
+
+* Turneringens tillstånd (vilka som vunnit varje runda) ska sparas i `localStorage`.
+* Vid omladdning: kontrollera om det finns ett sparat tillstånd och återställ turneringen.
+* En knapp för att starta om turneringen (rensar `localStorage` och börjar om).
+
+#### HTML och CSS
+
+* En `index.html` med header, global navigation (från uppgift 1), och en container för turneringen.
+* Separat CSS-fil — turneringen ska ha en tydlig visuell struktur där rundorna syns (t.ex. kolumner eller sektioner).
+* Sidan behöver bara fungera på desktop.
+
+#### Kodkvalitet
+
+* Välstrukturerad kod uppdelad i logiska funktioner och gärna separata filer/moduler.
+* Beskrivande namn på variabler och funktioner.
+* Arrow functions ska användas för callbacks och korta funktioner.
+
+### Tips
+
+* Börja med att skapa JSON-filen och `Contestant`-klassen. Testa i konsolen att `compete()` fungerar.
+* Bygg bracket-layouten i HTML/CSS först (hårdkodat), så du vet hur det ska se ut — byt sedan till dynamisk rendering.
+* Implementera en runda i taget. Få kvartsfinalen att fungera helt innan du går vidare till semifinalen.
+* Testa `localStorage` tidigt — det är lättare att bygga in från början än att lägga till i efterhand.
+
+### Versionshantering
+
+* Commita och pusha till GitHub regelbundet.
+
+### Inlämning
+
+* Verifiera att den kompletta, fungerande versionen är publicerad på GitHub Pages.
+* Lämna in URL:en till din publicerade sida i Moodle.
+
+### Lycka till!
+
+</main>
