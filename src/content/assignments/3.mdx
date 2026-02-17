@@ -368,25 +368,57 @@ Bilderna i dataseten är platshållare — du behöver hitta eller skapa egna bi
 * **Minst 2 deltagare** ska ha ofullständig data — t.ex. `catchphrase: null`, en stat satt till `null` (oprövad nykomling), eller saknad `backstory`.
 * JSON-filen ska hämtas med `fetch`, **inte** importeras som en JavaScript-modul.
 
-#### Klass för deltagare
+#### Klass för match
 
-* Skapa en `Contestant`-klass som modellerar varje deltagare.
-* **Privata fält** (`#`) för stats — de ska inte kunna ändras utifrån.
-* **Getters** för att läsa individuella stats och en beräknad `overallRating` (t.ex. medelvärdet av alla stats).
-* En **metod** `compete(opponent)` som avgör vinnaren av en match (se nedan).
+Varje deltagare i JSON-datan är ett vanligt objekt — det behövs ingen klass för dem. Däremot har en *match* ett tydligt tillstånd som förändras: den har två deltagare, den kan spelas, och den har en vinnare. Det gör den till en bra kandidat för en klass.
+
+* Skapa en `Match`-klass som modellerar en match mellan två deltagare.
+* **Privata fält** (`#`) för de två deltagarna och vinnaren — de ska inte kunna ändras utifrån.
+* **Getters** för att läsa deltagarna, vinnaren, och om matchen är spelad (`isPlayed`).
+* En **metod** `compete()` som avgör vinnaren av matchen (se nedan).
 * Hantera saknade/null-värden med `?.` och `??` — t.ex. en stat som är `null` får ett standardvärde.
 
 #### Matchlogik
 
-* Metoden `compete(opponent)` ska jämföra deltagarnas stats och returnera vinnaren.
+* Metoden `compete()` ska jämföra de två deltagarnas stats och avgöra en vinnare.
 * **Viktat slumpmässigt resultat** — den starkare deltagaren ska ha högre sannolikhet att vinna, men den svagare ska alltid ha en chans. En match får alltså **inte** vara helt förutbestämd av datan.
-* Du väljer själv hur du implementerar detta, men det ska vara tydligt i koden hur sannolikheten beräknas.
+* Försök komma på en egen algoritm! Tänk på: hur räknar du ut vem som är "starkare"? Hur gör du så att slumpen fortfarande spelar roll?
+
+<details>
+<summary><strong>Exempelimplementation</strong> — Kika här om du kör fast</summary>
+
+Här är **ett** sätt att lösa det på. Du får använda denna lösning, men försök gärna hitta på en egen variant.
+
+```js
+compete () {
+  // Beräkna totalstyrka för varje deltagare.
+  // Om en stat är null, använd 5 som standardvärde.
+  const statsA = Object.values(this.#contestantA.stats)
+  const statsB = Object.values(this.#contestantB.stats)
+
+  const totalA = statsA.reduce((sum, val) => sum + (val ?? 5), 0)
+  const totalB = statsB.reduce((sum, val) => sum + (val ?? 5), 0)
+
+  // Räkna ut sannolikheten att deltagare A vinner.
+  // Om A har 30 och B har 20 → A vinner med 60% sannolikhet.
+  const chanceA = totalA / (totalA + totalB)
+
+  // Slumpa och jämför med sannolikheten.
+  const roll = Math.random()
+
+  this.#winner = roll < chanceA ? this.#contestantA : this.#contestantB
+  return this.#winner
+}
+```
+
+Algoritmen ger den starkare deltagaren en fördel, men aldrig en garanti. Även en deltagare med lägre stats kan vinna — precis som i en riktig turnering.
+</details>
 
 #### Turneringsflöde
 
 * **8 deltagare → Kvartsfinal (4 matcher) → Semifinal (2 matcher) → Final → Mästare**
-* Vid start: hämta JSON → skapa `Contestant`-instanser → `map()` deltagarna till matchpar → rendera första rundan.
-* Efter varje runda: `filter()` vinnarna → `map()` till nya par → rendera nästa runda.
+* Vid start: hämta JSON → `map()` deltagarna till `Match`-instanser (par om två) → rendera första rundan.
+* Efter varje runda: hämta vinnarna → `map()` till nya `Match`-instanser → rendera nästa runda.
 * Använd `find()` för att slå upp deltagare på `id` vid behov (t.ex. vid återställning från localStorage).
 
 #### Rendering
@@ -401,6 +433,7 @@ Bilderna i dataseten är platshållare — du behöver hitta eller skapa egna bi
 
 * Använd **optional chaining** (`?.`) och **nullish coalescing** (`??`) för att hantera deltagare med ofullständig data.
 * Exempel: `contestant.catchphrase ?? "Inget slagord..."` eller `contestant.stats?.agility ?? 5`.
+* I `Match`-klassen: använd `??` för att ge null-stats ett standardvärde vid beräkning av totalstyrka.
 
 #### Persistens med localStorage
 
@@ -422,7 +455,7 @@ Bilderna i dataseten är platshållare — du behöver hitta eller skapa egna bi
 
 ### Tips
 
-* Börja med att skapa JSON-filen och `Contestant`-klassen. Testa i konsolen att `compete()` fungerar.
+* Börja med att kopiera in JSON-filen och skapa `Match`-klassen. Testa i konsolen att `compete()` fungerar innan du bygger vidare.
 * Bygg bracket-layouten i HTML/CSS först (hårdkodat), så du vet hur det ska se ut — byt sedan till dynamisk rendering.
 * Implementera en runda i taget. Få kvartsfinalen att fungera helt innan du går vidare till semifinalen.
 * Testa `localStorage` tidigt — det är lättare att bygga in från början än att lägga till i efterhand.
